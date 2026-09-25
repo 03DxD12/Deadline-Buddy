@@ -127,7 +127,7 @@
                 display: inline-flex;
             }
             .calendar-page-card {
-                padding: 12px 10px 18px;
+                padding: clamp(8px, 2.6vw, 14px) clamp(6px, 2.2vw, 12px) 18px;
                 border-radius: 0;
                 border-left: 0;
                 border-right: 0;
@@ -145,13 +145,14 @@
             }
             .calendar-controls .btn {
                 width: 100%;
-                min-height: 42px;
-                padding-left: 8px;
-                padding-right: 8px;
+                min-height: clamp(36px, 10vw, 42px);
+                padding-left: clamp(4px, 1.6vw, 8px);
+                padding-right: clamp(4px, 1.6vw, 8px);
+                font-size: clamp(0.72rem, 3.2vw, 0.88rem);
             }
             #currentMonthYear {
                 width: 100%;
-                font-size: 1.55rem !important;
+                font-size: clamp(1.2rem, 6vw, 1.6rem) !important;
                 font-weight: 900;
                 order: 1;
             }
@@ -169,7 +170,7 @@
             }
             .calendar-day-header::after {
                 content: attr(data-short);
-                font-size: 0.74rem;
+                font-size: clamp(0.62rem, 2.7vw, 0.76rem);
             }
             .calendar-grid {
                 display: grid;
@@ -178,9 +179,9 @@
                 width: 100%;
             }
             .calendar-day-cell {
-                min-height: 78px;
+                min-height: clamp(60px, 18vw, 84px);
                 width: 100%;
-                padding: 4px 2px;
+                padding: clamp(2px, 1.2vw, 5px) 1px;
                 border: 0;
                 border-radius: 0;
                 background: transparent;
@@ -201,14 +202,14 @@
             }
             .day-number {
                 margin: 0;
-                width: 24px;
-                height: 24px;
+                width: clamp(20px, 6vw, 26px);
+                height: clamp(20px, 6vw, 26px);
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 border-radius: 50%;
                 background: transparent;
-                font-size: 0.78rem;
+                font-size: clamp(0.66rem, 3vw, 0.82rem);
                 font-weight: 900;
             }
             .calendar-day-cell.today .day-number {
@@ -221,13 +222,13 @@
             }
             .cal-task-pill {
                 width: 100%;
-                max-width: 52px;
-                font-size: 0.56rem;
-                padding: 2px 4px;
+                max-width: min(100%, 58px);
+                font-size: clamp(0.48rem, 2.15vw, 0.6rem);
+                padding: 2px clamp(2px, 1vw, 4px);
                 white-space: normal;
                 line-height: 1.05;
                 min-width: 0;
-                min-height: 14px;
+                min-height: clamp(13px, 3.7vw, 16px);
                 border-radius: 999px;
                 text-align: center;
                 box-shadow: none;
@@ -236,9 +237,46 @@
                 -webkit-box-orient: vertical;
             }
             .calendar-more {
-                font-size: 0.58rem;
+                font-size: clamp(0.48rem, 2.1vw, 0.6rem);
                 text-align: center;
                 padding: 0;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .calendar-grid {
+                gap: 1px;
+            }
+            .calendar-day-cell {
+                min-height: 58px;
+            }
+            .cal-task-pill {
+                max-width: 46px;
+                -webkit-line-clamp: 1;
+                line-height: 1.1;
+            }
+            .calendar-controls {
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 340px) {
+            .calendar-page-card {
+                padding-left: 4px;
+                padding-right: 4px;
+            }
+            .calendar-day-cell {
+                min-height: 52px;
+                gap: 2px;
+            }
+            .cal-task-pill {
+                max-width: 40px;
+                font-size: 0.46rem;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+            .calendar-more {
+                font-size: 0.46rem;
             }
         }
     </style>

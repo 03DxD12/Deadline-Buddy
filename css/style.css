@@ -958,7 +958,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     }
 
     .topbar {
-        padding: 14px 16px;
+        padding: clamp(10px, 3.4vw, 14px) clamp(10px, 3.8vw, 16px);
         align-items: flex-start;
         flex-wrap: wrap;
         gap: 10px;
@@ -982,7 +982,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     .topbar > .btn {
         order: 3;
         width: 100%;
-        min-height: 42px;
+        min-height: clamp(38px, 10vw, 42px);
     }
 
     .notification-wrapper {
@@ -990,11 +990,11 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     }
 
     .container {
-        padding: 18px 12px 96px 12px;
+        padding: clamp(12px, 3.6vw, 18px) clamp(8px, 3vw, 12px) 96px;
     }
 
     .card {
-        padding: 18px;
+        padding: clamp(14px, 4.4vw, 18px);
         border-radius: 14px;
     }
 
@@ -1020,5 +1020,33 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
     .subtask-row .remove-subtask-btn {
         width: 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .brand-title,
+    .topbar h1 {
+        word-break: break-word;
+    }
+
+    .btn {
+        font-size: 0.82rem;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .icon-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .mobile-nav-item {
+        font-size: 0.66rem;
+    }
+
+    .calendar-mobile-fab {
+        right: 14px;
+        width: 52px;
+        height: 52px;
     }
 }
