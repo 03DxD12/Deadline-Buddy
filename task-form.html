@@ -111,6 +111,9 @@
                             <div class="form-group">
                                 <label for="dueDate">Due Date & Time *</label>
                                 <input type="datetime-local" id="dueDate" class="form-control" required>
+                                <div class="datetime-preview" id="deadlinePreview" aria-live="polite">
+                                    Choose a due date and time to see the reminder schedule.
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="priority">Priority Level</label>
@@ -192,6 +195,8 @@
             const subtasksList = document.getElementById('subtasksList');
             const addSubtaskBtn = document.getElementById('addSubtaskBtn');
             const taskForm = document.getElementById('taskForm');
+            const dueDateInput = document.getElementById('dueDate');
+            const deadlinePreview = document.getElementById('deadlinePreview');
 
             // Populate subjects
             const subjects = Storage.getSubjects();
@@ -243,7 +248,7 @@
                     // due date formatting for datetime-local
                     const d = new Date(task.dueDate);
                     const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                    document.getElementById('dueDate').value = iso;
+                    dueDateInput.value = iso;
 
                     // subtasks
                     if (task.subtasks && task.subtasks.length > 0) {
@@ -256,8 +261,45 @@
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 tomorrow.setHours(17, 0, 0, 0);
                 const iso = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                document.getElementById('dueDate').value = iso;
+                dueDateInput.value = iso;
             }
+
+            function formatPreviewDate(date) {
+                return date.toLocaleString([], {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+            }
+
+            function updateDeadlinePreview() {
+                if (!dueDateInput.value) {
+                    deadlinePreview.textContent = 'Choose a due date and time to see the reminder schedule.';
+                    return;
+                }
+
+                const due = new Date(dueDateInput.value);
+                const oneDayBefore = new Date(due.getTime() - 24 * 60 * 60 * 1000);
+                const twentyMinsBefore = new Date(due.getTime() - 20 * 60 * 1000);
+                const now = new Date();
+
+                const oneDayText = oneDayBefore > now ? formatPreviewDate(oneDayBefore) : 'Already passed';
+                const twentyText = twentyMinsBefore > now ? formatPreviewDate(twentyMinsBefore) : 'Already passed';
+
+                deadlinePreview.innerHTML = `
+                    <strong>Deadline:</strong> ${formatPreviewDate(due)}
+                    <div class="datetime-preview-list">
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span><span>Reminder 1 day before: <strong>${oneDayText}</strong></span></div>
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span><span>Reminder 20 minutes before: <strong>${twentyText}</strong></span></div>
+                    </div>
+                `;
+            }
+
+            dueDateInput.addEventListener('input', updateDeadlinePreview);
+            dueDateInput.addEventListener('change', updateDeadlinePreview);
+            updateDeadlinePreview();
 
             // Form submission
             taskForm.addEventListener('submit', (e) => {
@@ -267,7 +309,7 @@
                 const title = document.getElementById('taskTitle').value.trim();
                 const subjectId = document.getElementById('subjectId').value;
                 const type = document.getElementById('taskType').value;
-                const dueDate = document.getElementById('dueDate').value;
+                const dueDate = dueDateInput.value;
                 const priority = document.getElementById('priority').value;
                 const status = document.getElementById('status').value;
                 const description = document.getElementById('description').value.trim();
