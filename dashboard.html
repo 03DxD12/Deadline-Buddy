@@ -14,7 +14,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon">🎓</div>
+                <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
                 <div>
                     <div class="brand-title">Deadline Buddy</div>
                     <div class="brand-sub">Olinsterg College Inc.</div>
@@ -23,27 +23,27 @@
             
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item active">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon app-icon icon-dashboard" aria-hidden="true"></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="tasks.html" class="nav-item">
-                    <span class="nav-icon">📝</span>
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
                     <span>Tasks & Requirements</span>
                 </a>
                 <a href="subjects.html" class="nav-item">
-                    <span class="nav-icon">📚</span>
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
                     <span>Subjects</span>
                 </a>
                 <a href="calendar.html" class="nav-item">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
                     <span>Calendar</span>
                 </a>
                 <a href="reminders.html" class="nav-item">
-                    <span class="nav-icon">⏰</span>
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
                     <span>Reminders & Alerts</span>
                 </a>
                 <a href="profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
                     <span>Student Profile</span>
                 </a>
             </nav>
@@ -61,19 +61,19 @@
         <main class="main-content">
             <!-- Top Navigation Bar -->
             <header class="topbar">
-                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
                 <div style="flex: 1;">
-                    <h1 style="font-size: 1.3rem; font-weight: 800; color: var(--text-heading); margin: 0;">Academic Dashboard 📊</h1>
+                    <h1 style="font-size: 1.3rem; font-weight: 800; color: var(--text-heading); margin: 0;"><span class="title-with-icon"><span class="app-icon icon-dashboard" aria-hidden="true"></span>Academic Dashboard</span></h1>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Welcome back! Here is your Grade 12 assignment overview.</p>
                 </div>
 
                 <a href="task-form.html" class="btn btn-primary" style="font-size: 0.85rem;">
-                    <span>➕</span> Add Requirement
+                    <span class="app-icon icon-plus" aria-hidden="true"></span> Add Requirement
                 </a>
 
                 <div class="notification-wrapper">
                     <button class="icon-btn" id="notifBtn" title="Notifications">
-                        🔔
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
                         <span class="badge-dot hidden" id="notifBadge"></span>
                     </button>
                     <div class="notif-dropdown hidden" id="notifDropdown">
@@ -116,7 +116,7 @@
                 <!-- Priority Focus Banner -->
                 <div class="card" style="background: var(--bg-card); border-left: 6px solid var(--primary); margin-bottom: 28px;" id="focusCard">
                     <div style="font-size: 0.78rem; font-weight: 800; color: var(--primary-hover); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-                        🎯 PRIORITY REQUIREMENT FOCUS
+                        <span class="label-with-icon"><span class="app-icon icon-focus" aria-hidden="true"></span>PRIORITY REQUIREMENT FOCUS</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                         <div>
@@ -132,7 +132,7 @@
 
                 <!-- Upcoming Requirements Section -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-heading); margin: 0;">Upcoming Academic Tasks 📌</h2>
+                    <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-heading); margin: 0;"><span class="title-with-icon"><span class="app-icon icon-pin" aria-hidden="true"></span>Upcoming Academic Tasks</span></h2>
                     <a href="tasks.html" style="font-size: 0.88rem; font-weight: 700; color: var(--primary-hover); text-decoration: none;">View All Requirements &rarr;</a>
                 </div>
 
@@ -147,23 +147,23 @@
     <!-- Mobile Navigation Bar -->
     <div class="mobile-nav">
         <a href="dashboard.html" class="mobile-nav-item active">
-            <span class="icon">📊</span>
+            <span class="icon app-icon icon-dashboard" aria-hidden="true"></span>
             <span>Home</span>
         </a>
         <a href="tasks.html" class="mobile-nav-item">
-            <span class="icon">📝</span>
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
         </a>
         <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon">📚</span>
+            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
             <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
-            <span class="icon">📅</span>
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
             <span>Calendar</span>
         </a>
         <a href="reminders.html" class="mobile-nav-item">
-            <span class="icon">⏰</span>
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
     </div>
@@ -213,7 +213,7 @@
                 const urgency = Deadline.getUrgencyState(nextTask.dueDate, nextTask.dueTime, nextTask.status);
 
                 document.getElementById('focusTitle').textContent = nextTask.title;
-                document.getElementById('focusSubject').textContent = `📚 ${sub ? (sub.name || sub.subjectName) : 'General'} • Due: ${Deadline.formatDeadline(nextTask.dueDate, nextTask.dueTime)}`;
+                document.getElementById('focusSubject').textContent = `${sub ? (sub.name || sub.subjectName) : 'General'} - Due: ${Deadline.formatDeadline(nextTask.dueDate, nextTask.dueTime)}`;
                 
                 const timerBadge = document.getElementById('focusTimerBadge');
                 timerBadge.setAttribute('data-due-date', nextTask.dueDate);
@@ -222,7 +222,7 @@
 
                 document.getElementById('focusBtn').href = `task-details.html?id=${nextTask.id}`;
             } else {
-                document.getElementById('focusTitle').textContent = 'No Pending Requirements! 🎉';
+                document.getElementById('focusTitle').textContent = 'No Pending Requirements!';
                 document.getElementById('focusSubject').textContent = 'All your school tasks are complete or up to date.';
                 document.getElementById('focusTimerBadge').style.display = 'none';
                 document.getElementById('focusBtn').style.display = 'none';
@@ -235,7 +235,7 @@
             if (displayTasks.length === 0) {
                 upcomingGrid.innerHTML = `
                     <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 32px;">
-                        <p style="font-size: 2rem; margin-bottom: 8px;">✨</p>
+                        <p style="font-size: 2rem; margin-bottom: 8px;"></p>
                         <h3 style="color: var(--text-heading);">You're all caught up!</h3>
                         <p style="color: var(--text-muted); margin-bottom: 16px;">Add a new Grade 12 assignment or project anytime.</p>
                         <a href="task-form.html" class="btn btn-primary">Add New Requirement</a>
@@ -254,24 +254,24 @@
                     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <span class="badge badge-normal">🏷️ ${t.type || t.taskType || 'Requirement'}</span>
+                                <span class="badge badge-normal">${t.type || t.taskType || 'Requirement'}</span>
                                 <span class="badge ${urgency.badgeClass}" data-due-date="${t.dueDate}">${urgency.label}</span>
                             </div>
                             <h3 style="margin: 0 0 6px 0; font-size: 1.1rem; color: var(--text-heading);">
                                 <a href="task-details.html?id=${t.id}" style="text-decoration: none; color: inherit;">${t.title}</a>
                             </h3>
                             <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                                📚 <strong>${sub ? (sub.name || sub.subjectName) : 'General'}</strong>
+                                <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> <strong>${sub ? (sub.name || sub.subjectName) : 'General'}</strong>
                             </div>
                             ${subtasks.length > 0 ? `
                                 <div style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 6px 10px; border-radius: 6px; margin-bottom: 12px;">
-                                    📋 Subtasks: <strong>${doneSub} / ${subtasks.length}</strong> done
+                                    Subtasks: <strong>${doneSub} / ${subtasks.length}</strong> done
                                 </div>
                             ` : ''}
                         </div>
 
                         <div style="display: flex; justify-content: space-between; align-align: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-size: 0.8rem;">
-                            <span style="color: var(--text-muted);">📅 Due: ${Deadline.formatDeadline(t.dueDate, t.dueTime)}</span>
+                            <span style="color: var(--text-muted);">Due: ${Deadline.formatDeadline(t.dueDate, t.dueTime)}</span>
                             <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;">Details &rarr;</a>
                         </div>
                     </div>

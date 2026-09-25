@@ -107,8 +107,208 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
     box-shadow: 0 4px 12px rgba(255, 139, 167, 0.4);
+    color: var(--text-heading);
+}
+
+.app-icon {
+    --icon-size: 22px;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex: 0 0 auto;
+    color: currentColor;
+}
+
+.app-icon::before,
+.app-icon::after {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.icon-brand::before {
+    content: "DB";
+    position: static;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+}
+
+.icon-dashboard::before {
+    width: 3px;
+    height: 13px;
+    bottom: 3px;
+    left: 5px;
+    border-radius: 2px;
+    background: currentColor;
+    box-shadow: 6px -5px 0 currentColor, 12px -2px 0 currentColor;
+}
+
+.icon-tasks::before {
+    width: 16px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-radius: 4px;
+}
+
+.icon-tasks::after {
+    width: 8px;
+    height: 4px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+}
+
+.icon-subjects::before {
+    width: 16px;
+    height: 17px;
+    border: 2px solid currentColor;
+    border-radius: 3px;
+}
+
+.icon-subjects::after {
+    width: 2px;
+    height: 15px;
+    left: 7px;
+    background: currentColor;
+}
+
+.icon-calendar::before {
+    width: 18px;
+    height: 17px;
+    border: 2px solid currentColor;
+    border-radius: 4px;
+}
+
+.icon-calendar::after {
+    width: 14px;
+    height: 2px;
+    top: 7px;
+    background: currentColor;
+    box-shadow: 0 5px 0 currentColor;
+}
+
+.icon-alerts::before {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+
+.icon-alerts::after {
+    width: 6px;
+    height: 7px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-35deg);
+    transform-origin: bottom left;
+}
+
+.icon-profile::before {
+    width: 8px;
+    height: 8px;
+    top: 3px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+
+.icon-profile::after {
+    width: 17px;
+    height: 8px;
+    bottom: 2px;
+    border: 2px solid currentColor;
+    border-radius: 999px 999px 4px 4px;
+}
+
+.icon-bell::before {
+    width: 14px;
+    height: 14px;
+    top: 3px;
+    border: 2px solid currentColor;
+    border-radius: 8px 8px 5px 5px;
+}
+
+.icon-bell::after {
+    width: 12px;
+    height: 2px;
+    bottom: 3px;
+    background: currentColor;
+    border-radius: 2px;
+    box-shadow: 4px -14px 0 -1px currentColor;
+}
+
+.icon-plus::before,
+.icon-plus::after {
+    width: 14px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+}
+
+.icon-plus::after {
+    transform: rotate(90deg);
+}
+
+.icon-menu::before {
+    width: 16px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    box-shadow: 0 -6px 0 currentColor, 0 6px 0 currentColor;
+}
+
+.icon-focus::before,
+.icon-pin::before,
+.icon-save::before,
+.icon-reset::before,
+.icon-search::before,
+.icon-info::before {
+    content: attr(data-fallback);
+    position: static;
+    width: 20px;
+    height: 20px;
+    border: 2px solid currentColor;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.icon-focus::before { content: "!"; border-radius: 50%; }
+.icon-pin::before { content: "P"; }
+.icon-save::before { content: "S"; }
+.icon-reset::before { content: "R"; }
+.icon-search::before { content: ""; border-radius: 50%; width: 13px; height: 13px; transform: translate(-2px, -2px); }
+.icon-search::after { width: 8px; height: 2px; background: currentColor; transform: rotate(45deg); right: 2px; bottom: 3px; border-radius: 2px; }
+.icon-info::before { content: "i"; border-radius: 50%; }
+
+.title-with-icon,
+.label-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.label-with-icon {
+    color: inherit;
+}
+
+.meta-icon {
+    --icon-size: 16px;
+    vertical-align: -3px;
+}
+
+.empty-state-icon {
+    --icon-size: 46px;
+    color: var(--primary);
+    margin: 0 auto 12px;
 }
 
 .brand-title {

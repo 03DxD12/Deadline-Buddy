@@ -14,7 +14,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon">🎓</div>
+                <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
                 <div>
                     <div class="brand-title">Deadline Buddy</div>
                     <div class="brand-sub">Olinsterg College Inc.</div>
@@ -23,27 +23,27 @@
             
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon app-icon icon-dashboard" aria-hidden="true"></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="tasks.html" class="nav-item">
-                    <span class="nav-icon">📝</span>
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
                     <span>Tasks & Requirements</span>
                 </a>
                 <a href="subjects.html" class="nav-item">
-                    <span class="nav-icon">📚</span>
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
                     <span>Subjects</span>
                 </a>
                 <a href="calendar.html" class="nav-item">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
                     <span>Calendar</span>
                 </a>
                 <a href="reminders.html" class="nav-item active">
-                    <span class="nav-icon">⏰</span>
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
                     <span>Reminders & Alerts</span>
                 </a>
                 <a href="profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
                     <span>Student Profile</span>
                 </a>
             </nav>
@@ -61,19 +61,19 @@
         <main class="main-content">
             <!-- Topbar -->
             <header class="topbar">
-                <button class="mobile-toggle" id="menuToggle">☰</button>
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
                 <div style="flex: 1;">
-                    <h1 style="font-size: 1.3rem; margin: 0;">Reminders & Deadline Alerts ⏰</h1>
+                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-alerts" aria-hidden="true"></span>Reminders & Deadline Alerts</span></h1>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Categorized list of urgent requirements needing immediate attention</p>
                 </div>
 
                 <button class="btn btn-primary" id="requestNotifPermBtn">
-                    <span>🔔</span> Enable Desktop Alerts
+                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Enable Desktop Alerts
                 </button>
 
                 <div class="notification-wrapper">
                     <button class="icon-btn" id="notifBtn" title="Notifications">
-                        🔔
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
                         <span class="badge-dot hidden" id="notifBadge"></span>
                     </button>
                     <div class="notif-dropdown hidden" id="notifDropdown">
@@ -93,7 +93,7 @@
                 <!-- Browser permission notice -->
                 <div class="alert alert-info" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;" id="permAlert">
                     <div>
-                        🔔 <strong>Browser Notifications Status:</strong> <span id="permStatusText">Checking permission...</span>
+                        <span class="app-icon icon-bell" aria-hidden="true"></span> <strong>Browser Notifications Status:</strong> <span id="permStatusText">Checking permission...</span>
                     </div>
                     <button class="btn btn-secondary" style="font-size: 0.8rem;" id="togglePermBtn">Request Permission</button>
                 </div>
@@ -102,7 +102,7 @@
                     <!-- Overdue Section -->
                     <div class="card" style="border-top: 4px solid var(--danger);">
                         <h3 style="margin-top: 0; color: var(--danger); font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>🚨 Overdue</span>
+                            <span>Overdue</span>
                             <span class="badge badge-overdue" id="overdueCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Tasks past due date.</p>
@@ -114,7 +114,7 @@
                     <!-- Due Today Section -->
                     <div class="card" style="border-top: 4px solid var(--warning);">
                         <h3 style="margin-top: 0; color: var(--warning); font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>⚠️ Due Today</span>
+                            <span>Due Today</span>
                             <span class="badge badge-urgent" id="dueTodayCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Deadlines today.</p>
@@ -126,7 +126,7 @@
                     <!-- Due Tomorrow Section -->
                     <div class="card" style="border-top: 4px solid #3b82f6;">
                         <h3 style="margin-top: 0; color: #3b82f6; font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>⏳ Due Tomorrow</span>
+                            <span>Due Tomorrow</span>
                             <span class="badge badge-due-soon" id="dueTomorrowCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Requirements within 24h.</p>
@@ -138,7 +138,7 @@
                     <!-- Coming Up Section -->
                     <div class="card" style="border-top: 4px solid var(--primary);">
                         <h3 style="margin-top: 0; color: var(--primary); font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>📅 Coming Up Soon</span>
+                            <span><span class="title-with-icon"><span class="app-icon icon-calendar" aria-hidden="true"></span>Coming Up Soon</span></span>
                             <span class="badge badge-normal" id="comingUpCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Due within 3-7 days.</p>
@@ -151,7 +151,7 @@
                 <!-- Recent Notifications Log Card -->
                 <div class="card" style="margin-top: 24px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 style="margin: 0; font-size: 1.1rem;">🔔 Notification History Log</h3>
+                        <h3 style="margin: 0; font-size: 1.1rem;"><span class="app-icon icon-bell" aria-hidden="true"></span> Notification History Log</h3>
                         <button class="btn btn-secondary" style="font-size: 0.8rem;" id="clearLogBtn">Clear Log</button>
                     </div>
                     <div id="notifLogList" style="display: flex; flex-direction: column; gap: 8px;">
@@ -165,23 +165,23 @@
     <!-- Bottom Mobile Nav -->
     <div class="mobile-nav">
         <a href="dashboard.html" class="mobile-nav-item">
-            <span class="icon">📊</span>
+            <span class="icon app-icon icon-dashboard" aria-hidden="true"></span>
             <span>Home</span>
         </a>
         <a href="tasks.html" class="mobile-nav-item">
-            <span class="icon">📝</span>
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
         </a>
         <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon">📚</span>
+            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
             <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
-            <span class="icon">📅</span>
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
             <span>Calendar</span>
         </a>
         <a href="reminders.html" class="mobile-nav-item active">
-            <span class="icon">⏰</span>
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
     </div>
@@ -202,7 +202,7 @@
                     if (Notification.permission === 'granted') {
                         statusText.style.color = 'var(--success)';
                         reqPermBtn.style.display = 'none';
-                        togglePermBtn.textContent = 'Notification Granted ✓';
+                        togglePermBtn.textContent = 'Notification Granted';
                         togglePermBtn.disabled = true;
                     } else if (Notification.permission === 'denied') {
                         statusText.style.color = 'var(--danger)';
@@ -285,7 +285,7 @@
                             <div>
                                 <strong style="font-size: 0.92rem; color: var(--text-heading);">${t.title}</strong>
                                 <div style="font-size: 0.78rem; color: var(--text-muted);">
-                                    📚 ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; ⏰ <span data-due-date="${t.dueDate}">${urgency.label}</span>
+                                    <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; <span data-due-date="${t.dueDate}">${urgency.label}</span>
                                 </div>
                             </div>
                             <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 8px;">View</a>

@@ -319,24 +319,24 @@ function seedDemoData() {
 // Auto-init on script load
 initStorage();
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Storage NAMESPACE — used by subjects.html, task-form.html, and other pages.
+// -----------------------------------------------------------------------------
+// Storage NAMESPACE - used by subjects.html, task-form.html, and other pages.
 // Bridges bare functions above with the dot-notation API the pages expect,
 // and normalises field names between storage format and UI format.
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 const Storage = {
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    // -- Helpers --------------------------------------------------------------
     generateId() {
         return Date.now() + Math.floor(Math.random() * 9999);
     },
 
-    // ── User ─────────────────────────────────────────────────────────────────
+    // -- User -----------------------------------------------------------------
     getUser()          { return getUser(); },
     saveUser(u)        { return saveUser(u); },
 
-    // ── Subjects ─────────────────────────────────────────────────────────────
+    // -- Subjects -------------------------------------------------------------
     // Internal storage uses { subjectName, teacherName, notes }.
-    // The UI uses { name, teacher, schedule } — bridge both directions.
+    // The UI uses { name, teacher, schedule } - bridge both directions.
     getSubjects() {
         return getSubjects().map(s => ({
             id:       s.id,
@@ -383,7 +383,7 @@ const Storage = {
         saveSubjects(subjects);
     },
 
-    // ── Tasks ────────────────────────────────────────────────────────────────
+    // -- Tasks ----------------------------------------------------------------
     getTasks()         { return getTasks(); },
 
     saveTask(data) {
@@ -430,17 +430,17 @@ const Storage = {
     updateTaskStatus(id, s)   { return updateTaskStatus(id, s); },
     getTaskById(id)           { return getTaskById(id); },
 
-    // ── Subtasks ─────────────────────────────────────────────────────────────
+    // -- Subtasks -------------------------------------------------------------
     addSubtask(taskId, title)              { return addSubtask(taskId, title); },
     toggleSubtask(taskId, subtaskId)       { return toggleSubtask(taskId, subtaskId); },
     deleteSubtask(taskId, subtaskId)       { return deleteSubtask(taskId, subtaskId); },
 
-    // ── Notifications ────────────────────────────────────────────────────────
+    // -- Notifications --------------------------------------------------------
     getNotifications()    { return getNotifications(); },
     saveNotifications(n)  { return saveNotifications(n); },
     clearNotifications()  { return clearNotifications(); },
 
-    // ── Backup / Restore ─────────────────────────────────────────────────────
+    // -- Backup / Restore -----------------------------------------------------
     exportBackupJSON()          { return exportBackupJSON(); },
     importBackupJSON(jsonStr)   { return importBackupJSON(jsonStr); },
     seedDemoData()              { return seedDemoData(); }

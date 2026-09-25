@@ -88,7 +88,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon">🎓</div>
+                <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
                 <div>
                     <div class="brand-title">Deadline Buddy</div>
                     <div class="brand-sub">Olinsterg College Inc.</div>
@@ -97,27 +97,27 @@
             
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon app-icon icon-dashboard" aria-hidden="true"></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="tasks.html" class="nav-item">
-                    <span class="nav-icon">📝</span>
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
                     <span>Tasks & Requirements</span>
                 </a>
                 <a href="subjects.html" class="nav-item">
-                    <span class="nav-icon">📚</span>
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
                     <span>Subjects</span>
                 </a>
                 <a href="calendar.html" class="nav-item active">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
                     <span>Calendar</span>
                 </a>
                 <a href="reminders.html" class="nav-item">
-                    <span class="nav-icon">⏰</span>
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
                     <span>Reminders & Alerts</span>
                 </a>
                 <a href="profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
                     <span>Student Profile</span>
                 </a>
             </nav>
@@ -135,19 +135,19 @@
         <main class="main-content">
             <!-- Topbar -->
             <header class="topbar">
-                <button class="mobile-toggle" id="menuToggle">☰</button>
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
                 <div style="flex: 1;">
-                    <h1 style="font-size: 1.3rem; margin: 0;">Academic Calendar 📅</h1>
+                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-calendar" aria-hidden="true"></span>Academic Calendar</span></h1>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Visual monthly schedule of all Grade 12 assignments and exams</p>
                 </div>
 
                 <a href="task-form.html" class="btn btn-primary">
-                    <span>➕</span> Add Requirement
+                    <span class="app-icon icon-plus" aria-hidden="true"></span> Add Requirement
                 </a>
 
                 <div class="notification-wrapper">
                     <button class="icon-btn" id="notifBtn" title="Notifications">
-                        🔔
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
                         <span class="badge-dot hidden" id="notifBadge"></span>
                     </button>
                     <div class="notif-dropdown hidden" id="notifDropdown">
@@ -167,9 +167,9 @@
                 <div class="card">
                     <div class="calendar-header">
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <button class="btn btn-secondary" id="prevMonthBtn">◀ Prev</button>
+                            <button class="btn btn-secondary" id="prevMonthBtn">&larr; Prev</button>
                             <button class="btn btn-secondary" id="todayBtn">Today</button>
-                            <button class="btn btn-secondary" id="nextMonthBtn">Next ▶</button>
+                            <button class="btn btn-secondary" id="nextMonthBtn">Next &rarr;</button>
                         </div>
                         <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-heading);" id="currentMonthYear">September 2026</h2>
                     </div>
@@ -210,23 +210,23 @@
     <!-- Bottom Mobile Nav -->
     <div class="mobile-nav">
         <a href="dashboard.html" class="mobile-nav-item">
-            <span class="icon">📊</span>
+            <span class="icon app-icon icon-dashboard" aria-hidden="true"></span>
             <span>Home</span>
         </a>
         <a href="tasks.html" class="mobile-nav-item">
-            <span class="icon">📝</span>
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
         </a>
         <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon">📚</span>
+            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
             <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item active">
-            <span class="icon">📅</span>
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
             <span>Calendar</span>
         </a>
         <a href="reminders.html" class="mobile-nav-item">
-            <span class="icon">⏰</span>
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
     </div>

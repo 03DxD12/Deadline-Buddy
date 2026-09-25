@@ -14,7 +14,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon">🎓</div>
+                <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
                 <div>
                     <div class="brand-title">Deadline Buddy</div>
                     <div class="brand-sub">Olinsterg College Inc.</div>
@@ -23,27 +23,27 @@
             
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon app-icon icon-dashboard" aria-hidden="true"></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="tasks.html" class="nav-item active">
-                    <span class="nav-icon">📝</span>
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
                     <span>Tasks & Requirements</span>
                 </a>
                 <a href="subjects.html" class="nav-item">
-                    <span class="nav-icon">📚</span>
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
                     <span>Subjects</span>
                 </a>
                 <a href="calendar.html" class="nav-item">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
                     <span>Calendar</span>
                 </a>
                 <a href="reminders.html" class="nav-item">
-                    <span class="nav-icon">⏰</span>
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
                     <span>Reminders & Alerts</span>
                 </a>
                 <a href="profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
                     <span>Student Profile</span>
                 </a>
             </nav>
@@ -61,19 +61,19 @@
         <main class="main-content">
             <!-- Topbar -->
             <header class="topbar">
-                <button class="mobile-toggle" id="menuToggle">☰</button>
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
                 <div style="flex: 1;">
-                    <h1 style="font-size: 1.3rem; margin: 0;">Academic Requirements 📝</h1>
+                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-tasks" aria-hidden="true"></span>Academic Requirements</span></h1>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Track, search, and manage your school deadlines in real-time</p>
                 </div>
 
                 <a href="task-form.html" class="btn btn-primary">
-                    <span>➕</span> Add Requirement
+                    <span class="app-icon icon-plus" aria-hidden="true"></span> Add Requirement
                 </a>
 
                 <div class="notification-wrapper">
                     <button class="icon-btn" id="notifBtn" title="Notifications">
-                        🔔
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
                         <span class="badge-dot hidden" id="notifBadge"></span>
                     </button>
                     <div class="notif-dropdown hidden" id="notifDropdown">
@@ -96,13 +96,13 @@
                     <button class="btn btn-secondary" id="tabPending" onclick="filterByTab('Pending')">Pending (<span id="countPending">0</span>)</button>
                     <button class="btn btn-secondary" id="tabInProgress" onclick="filterByTab('In Progress')">In Progress (<span id="countInProgress">0</span>)</button>
                     <button class="btn btn-secondary" id="tabCompleted" onclick="filterByTab('Completed')">Completed (<span id="countCompleted">0</span>)</button>
-                    <button class="btn btn-secondary" id="tabUrgent" onclick="filterByTab('Urgent')">🔥 Urgent / Overdue (<span id="countUrgent">0</span>)</button>
+                    <button class="btn btn-secondary" id="tabUrgent" onclick="filterByTab('Urgent')"><span class="app-icon icon-alerts" aria-hidden="true"></span> Urgent / Overdue (<span id="countUrgent">0</span>)</button>
                 </div>
 
                 <!-- Filters & Search Toolbar -->
                 <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
                     <div style="flex: 2; min-width: 220px;">
-                        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search task title, subject, or description...">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search task title, subject, or description...">
                     </div>
                     <div style="flex: 1; min-width: 160px;">
                         <select id="subjectFilter" class="form-control">
@@ -137,23 +137,23 @@
     <!-- Bottom Mobile Nav -->
     <div class="mobile-nav">
         <a href="dashboard.html" class="mobile-nav-item">
-            <span class="icon">📊</span>
+            <span class="icon app-icon icon-dashboard" aria-hidden="true"></span>
             <span>Home</span>
         </a>
         <a href="tasks.html" class="mobile-nav-item active">
-            <span class="icon">📝</span>
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
         </a>
         <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon">📚</span>
+            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
             <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
-            <span class="icon">📅</span>
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
             <span>Calendar</span>
         </a>
         <a href="reminders.html" class="mobile-nav-item">
-            <span class="icon">⏰</span>
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
     </div>
@@ -251,7 +251,7 @@
             if (filtered.length === 0) {
                 grid.innerHTML = `
                     <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                        <p style="font-size: 2.5rem; margin-bottom: 12px;">🔍</p>
+                        <div class="empty-state-icon app-icon icon-search" aria-hidden="true"></div>
                         <h3>No Requirements Found</h3>
                         <p style="color: var(--text-muted); margin-bottom: 20px;">Try adjusting your filters or search terms, or create a new requirement.</p>
                         <a href="task-form.html" class="btn btn-primary">Add New Requirement</a>
@@ -270,9 +270,9 @@
                     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <span class="badge badge-normal" style="font-size: 0.75rem;">🏷️ ${t.type || t.taskType || 'Requirement'}</span>
+                                <span class="badge badge-normal" style="font-size: 0.75rem;">${t.type || t.taskType || 'Requirement'}</span>
                                 <span class="badge ${urgency.badgeClass}" data-due-date="${t.dueDate}">
-                                    ${t.status === 'Completed' ? '✅ Completed' : urgency.label}
+                                    ${t.status === 'Completed' ? 'Completed' : urgency.label}
                                 </span>
                             </div>
 
@@ -280,25 +280,25 @@
                                 <a href="task-details.html?id=${t.id}" style="text-decoration: none; color: inherit;">${t.title}</a>
                             </h3>
                             <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                                📚 <strong>${sub ? sub.name : 'General'}</strong> &bull; Priority: <span style="font-weight: 600; color: ${t.priority === 'High' ? 'var(--danger)' : t.priority === 'Medium' ? 'var(--warning)' : 'var(--success)'};">${t.priority}</span>
+                                <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> <strong>${sub ? sub.name : 'General'}</strong> &bull; Priority: <span style="font-weight: 600; color: ${t.priority === 'High' ? 'var(--danger)' : t.priority === 'Medium' ? 'var(--warning)' : 'var(--success)'};">${t.priority}</span>
                             </div>
 
                             ${t.description ? `<p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">${t.description.length > 100 ? t.description.substring(0, 100) + '...' : t.description}</p>` : ''}
 
                             ${subtasks.length > 0 ? `
                                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: 4px;">
-                                    📋 Subtasks progress: <strong>${doneSub} / ${subtasks.length}</strong>
+                                    Subtasks progress: <strong>${doneSub} / ${subtasks.length}</strong>
                                 </div>
                             ` : ''}
                         </div>
 
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
-                            <span style="color: var(--text-muted);">📅 Due: ${Deadline.formatDeadline(t.dueDate, t.dueTime)}</span>
+                            <span style="color: var(--text-muted);">Due: ${Deadline.formatDeadline(t.dueDate, t.dueTime)}</span>
                             <div style="display: flex; gap: 6px;">
-                                <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.78rem;">👁️ Details</a>
-                                <a href="task-form.html?id=${t.id}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.78rem;">✏️ Edit</a>
+                                <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.78rem;">Details</a>
+                                <a href="task-form.html?id=${t.id}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.78rem;">Edit</a>
                                 <button onclick="quickToggleStatus('${t.id}')" class="btn ${t.status === 'Completed' ? 'btn-secondary' : 'btn-success'}" style="padding: 4px 8px; font-size: 0.78rem;">
-                                    ${t.status === 'Completed' ? 'Undo' : '✓ Done'}
+                                    ${t.status === 'Completed' ? 'Undo' : 'Done'}
                                 </button>
                             </div>
                         </div>

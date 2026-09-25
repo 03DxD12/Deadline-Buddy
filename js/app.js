@@ -26,7 +26,7 @@ function initCommonUI() {
         userNameEls.forEach(el => el.innerText = user.name || 'Student');
 
         const userMetaEls = document.querySelectorAll('.user-meta-display');
-        userMetaEls.forEach(el => el.innerText = `${user.gradeLevel || 'Grade 12'} • ${user.strand || 'ASSH'}`);
+        userMetaEls.forEach(el => el.innerText = `${user.gradeLevel || 'Grade 12'} - ${user.strand || 'ASSH'}`);
 
         const avatarEls = document.querySelectorAll('.avatar-display');
         avatarEls.forEach(el => {
@@ -64,10 +64,10 @@ function initCommonUI() {
             if (input) {
                 if (input.type === 'password') {
                     input.type = 'text';
-                    btn.innerText = '👁️‍🗨️';
+                    btn.innerText = 'Hide';
                 } else {
                     input.type = 'password';
-                    btn.innerText = '👁️';
+                    btn.innerText = 'Show';
                 }
             }
         });
@@ -137,7 +137,7 @@ function renderNotificationWidget() {
     if (!list) return;
 
     if (notifs.length === 0) {
-        list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No active alerts 🎉</div>';
+        list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No active alerts</div>';
         return;
     }
 

@@ -14,7 +14,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon">🎓</div>
+                <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
                 <div>
                     <div class="brand-title">Deadline Buddy</div>
                     <div class="brand-sub">Olinsterg College Inc.</div>
@@ -23,27 +23,27 @@
             
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon app-icon icon-dashboard" aria-hidden="true"></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="tasks.html" class="nav-item">
-                    <span class="nav-icon">📝</span>
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
                     <span>Tasks & Requirements</span>
                 </a>
                 <a href="subjects.html" class="nav-item active">
-                    <span class="nav-icon">📚</span>
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
                     <span>Subjects</span>
                 </a>
                 <a href="calendar.html" class="nav-item">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
                     <span>Calendar</span>
                 </a>
                 <a href="reminders.html" class="nav-item">
-                    <span class="nav-icon">⏰</span>
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
                     <span>Reminders & Alerts</span>
                 </a>
                 <a href="profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
                     <span>Student Profile</span>
                 </a>
             </nav>
@@ -61,19 +61,19 @@
         <main class="main-content">
             <!-- Topbar -->
             <header class="topbar">
-                <button class="mobile-toggle" id="menuToggle">☰</button>
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
                 <div style="flex: 1;">
-                    <h1 style="font-size: 1.3rem; margin: 0;">Subjects 📚</h1>
+                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-subjects" aria-hidden="true"></span>Subjects</span></h1>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Organize your Grade 12 subjects, advisers, and schedules</p>
                 </div>
 
                 <button class="btn btn-primary" id="openAddSubjectBtn">
-                    <span>➕</span> Add New Subject
+                    <span class="app-icon icon-plus" aria-hidden="true"></span> Add New Subject
                 </button>
 
                 <div class="notification-wrapper">
                     <button class="icon-btn" id="notifBtn" title="Notifications">
-                        🔔
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
                         <span class="badge-dot hidden" id="notifBadge"></span>
                     </button>
                     <div class="notif-dropdown hidden" id="notifDropdown">
@@ -91,7 +91,7 @@
             <!-- Container -->
             <div class="container">
                 <div class="alert alert-info" style="margin-bottom: 24px;">
-                    💡 <strong>Tip:</strong> Adding subjects helps you group your assignments, performance tasks, and quizzes accurately!
+                    <span class="meta-icon app-icon icon-info" aria-hidden="true"></span> <strong>Tip:</strong> Adding subjects helps you group your assignments, performance tasks, and quizzes accurately!
                 </div>
 
                 <!-- Subjects Grid -->
@@ -134,23 +134,23 @@
     <!-- Bottom Mobile Nav -->
     <div class="mobile-nav">
         <a href="dashboard.html" class="mobile-nav-item">
-            <span class="icon">📊</span>
+            <span class="icon app-icon icon-dashboard" aria-hidden="true"></span>
             <span>Home</span>
         </a>
         <a href="tasks.html" class="mobile-nav-item">
-            <span class="icon">📝</span>
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
         </a>
         <a href="subjects.html" class="mobile-nav-item active">
-            <span class="icon">📚</span>
+            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
             <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
-            <span class="icon">📅</span>
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
             <span>Calendar</span>
         </a>
         <a href="reminders.html" class="mobile-nav-item">
-            <span class="icon">⏰</span>
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
     </div>
@@ -180,7 +180,7 @@
                 if (subjects.length === 0) {
                     grid.innerHTML = `
                         <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                            <p style="font-size: 2rem; margin-bottom: 12px;">📚</p>
+                            <div class="empty-state-icon app-icon icon-subjects" aria-hidden="true"></div>
                             <h3>No Subjects Added Yet</h3>
                             <p style="color: var(--text-muted); margin-bottom: 20px;">Add your Grade 12 subjects to organize your academic tasks easily.</p>
                             <button class="btn btn-primary" onclick="document.getElementById('openAddSubjectBtn').click()">Add First Subject</button>
@@ -198,7 +198,7 @@
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                                 <div>
                                     <h3 style="margin: 0 0 4px 0; font-size: 1.1rem; color: var(--text-heading);">${sub.name}</h3>
-                                    <div style="font-size: 0.85rem; color: var(--text-muted);">👨‍🏫 ${sub.teacher || 'Teacher Unspecified'}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted);">${sub.teacher || 'Teacher Unspecified'}</div>
                                 </div>
                                 <span class="badge ${pendingCount > 0 ? 'badge-due-soon' : 'badge-completed'}">
                                     ${pendingCount} Pending
@@ -206,15 +206,15 @@
                             </div>
 
                             <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px;">
-                                📌 <strong>Schedule / Notes:</strong><br>
+                                <span class="meta-icon app-icon icon-pin" aria-hidden="true"></span> <strong>Schedule / Notes:</strong><br>
                                 ${sub.schedule ? sub.schedule.replace(/\n/g, '<br>') : 'No schedule added.'}
                             </div>
 
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 0.85rem;">
                                 <span style="color: var(--text-muted);">Total Requirements: <strong>${taskCount}</strong></span>
                                 <div style="display: flex; gap: 8px;">
-                                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="editSubject('${sub.id}')">✏️ Edit</button>
-                                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="deleteSubject('${sub.id}')">🗑️ Delete</button>
+                                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="editSubject('${sub.id}')">Edit</button>
+                                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="deleteSubject('${sub.id}')">Delete</button>
                                 </div>
                             </div>
                         </div>
