@@ -18,6 +18,12 @@ You can also open:
 dashboard.html
 ```
 
+For a simple presentation script, open:
+
+```text
+CLIENT-DEMO-GUIDE.md
+```
+
 ## Main Pages
 
 - `index.html` - opening page
