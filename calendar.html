@@ -120,12 +120,22 @@
             to { opacity: 1; transform: translateY(0); }
         }
         @media (max-width: 768px) {
+            .calendar-top-add {
+                display: none !important;
+            }
+            .calendar-mobile-fab {
+                display: inline-flex;
+            }
             .calendar-page-card {
-                padding: 14px;
+                padding: 12px 10px 18px;
+                border-radius: 0;
+                border-left: 0;
+                border-right: 0;
+                box-shadow: none;
             }
             .calendar-header {
                 align-items: stretch;
-                margin-bottom: 14px;
+                margin-bottom: 12px;
             }
             .calendar-controls {
                 display: grid;
@@ -141,61 +151,94 @@
             }
             #currentMonthYear {
                 width: 100%;
-                font-size: 1.15rem !important;
+                font-size: 1.55rem !important;
+                font-weight: 900;
                 order: 1;
             }
             .calendar-day-header {
-                display: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 28px;
+                padding: 0;
+                background: transparent;
+                border-radius: 0;
+                font-size: 0;
+                color: var(--text-muted);
+                font-weight: 900;
+            }
+            .calendar-day-header::after {
+                content: attr(data-short);
+                font-size: 0.74rem;
             }
             .calendar-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
+                display: grid;
+                grid-template-columns: repeat(7, minmax(0, 1fr));
+                gap: 0;
                 width: 100%;
             }
             .calendar-day-cell {
-                min-height: 0;
+                min-height: 78px;
                 width: 100%;
-                padding: 12px;
-                border-radius: 12px;
-                display: grid;
-                grid-template-columns: 44px minmax(0, 1fr);
-                align-items: start;
-                column-gap: 10px;
+                padding: 4px 2px;
+                border: 0;
+                border-radius: 0;
+                background: transparent;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 3px;
+                box-shadow: none;
             }
             .calendar-day-cell.other-month {
-                display: none;
+                display: flex;
+                opacity: 0.34;
+            }
+            .calendar-day-cell:hover {
+                transform: none;
+                box-shadow: none;
+                border-color: transparent;
             }
             .day-number {
                 margin: 0;
-                width: 36px;
-                height: 36px;
+                width: 24px;
+                height: 24px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 border-radius: 50%;
-                background: var(--bg-main);
+                background: transparent;
+                font-size: 0.78rem;
+                font-weight: 900;
             }
             .calendar-day-cell.today .day-number {
                 background: var(--primary);
                 color: var(--text-heading);
+                box-shadow: 0 5px 12px rgba(255,139,167,0.32);
             }
             .calendar-day-cell.has-tasks .day-number::after {
-                position: absolute;
-                margin-left: 26px;
-                margin-top: -24px;
+                display: none;
             }
             .cal-task-pill {
-                grid-column: 2;
-                font-size: 0.78rem;
-                padding: 7px 9px;
+                width: 100%;
+                max-width: 52px;
+                font-size: 0.56rem;
+                padding: 2px 4px;
                 white-space: normal;
-                line-height: 1.25;
+                line-height: 1.05;
                 min-width: 0;
+                min-height: 14px;
+                border-radius: 999px;
+                text-align: center;
+                box-shadow: none;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
             }
             .calendar-more {
-                grid-column: 2;
-                font-size: 0.78rem;
+                font-size: 0.58rem;
+                text-align: center;
+                padding: 0;
             }
         }
     </style>
@@ -258,7 +301,7 @@
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Visual monthly schedule of all Grade 12 assignments and exams</p>
                 </div>
 
-                <a href="task-form.html" class="btn btn-primary">
+                <a href="task-form.html" class="btn btn-primary calendar-top-add">
                     <span class="app-icon icon-plus" aria-hidden="true"></span> Add Requirement
                 </a>
 
@@ -293,13 +336,13 @@
 
                     <!-- Day headers -->
                     <div class="calendar-grid" style="margin-bottom: 8px;">
-                        <div class="calendar-day-header">Sun</div>
-                        <div class="calendar-day-header">Mon</div>
-                        <div class="calendar-day-header">Tue</div>
-                        <div class="calendar-day-header">Wed</div>
-                        <div class="calendar-day-header">Thu</div>
-                        <div class="calendar-day-header">Fri</div>
-                        <div class="calendar-day-header">Sat</div>
+                        <div class="calendar-day-header" data-short="S">Sun</div>
+                        <div class="calendar-day-header" data-short="M">Mon</div>
+                        <div class="calendar-day-header" data-short="T">Tue</div>
+                        <div class="calendar-day-header" data-short="W">Wed</div>
+                        <div class="calendar-day-header" data-short="T">Thu</div>
+                        <div class="calendar-day-header" data-short="F">Fri</div>
+                        <div class="calendar-day-header" data-short="S">Sat</div>
                     </div>
 
                     <!-- Days Cells Grid -->
@@ -310,6 +353,10 @@
             </div>
         </main>
     </div>
+
+    <a href="task-form.html" class="calendar-mobile-fab" aria-label="Add Requirement">
+        <span class="app-icon icon-plus" aria-hidden="true"></span>
+    </a>
 
     <!-- Day View Modal -->
     <div class="modal-overlay hidden" id="dayModal">
