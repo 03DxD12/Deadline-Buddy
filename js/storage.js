@@ -5,6 +5,8 @@
 
 const STORAGE_KEYS = {
     USER: 'deadlinebuddy_user',
+    ACCOUNTS: 'deadlinebuddy_accounts',
+    SAVED_LOGIN: 'deadlinebuddy_saved_login',
     SUBJECTS: 'deadlinebuddy_subjects',
     TASKS: 'deadlinebuddy_tasks',
     NOTIFICATIONS: 'deadlinebuddy_notifications'
@@ -93,6 +95,53 @@ function getUser() {
 
 function saveUser(user) {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+}
+
+function getAccounts() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.ACCOUNTS)) || [];
+}
+
+function saveAccounts(accounts) {
+    localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(accounts));
+}
+
+function findAccount(username) {
+    const cleanUsername = (username || '').trim().toLowerCase();
+    return getAccounts().find(acc => (acc.username || '').toLowerCase() === cleanUsername) || null;
+}
+
+function createAccount(accountData) {
+    const username = (accountData.username || '').trim();
+    if (!username) throw new Error('Username is required.');
+    if (findAccount(username)) throw new Error('That username is already used.');
+
+    const account = {
+        id: Date.now(),
+        name: (accountData.name || '').trim(),
+        username,
+        password: accountData.password || '',
+        gradeLevel: accountData.gradeLevel || 'Grade 12',
+        strand: accountData.strand || 'ASSH (Arts, Social Sciences & Humanities)',
+        school: accountData.school || 'Olinsterg College Inc.',
+        createdAt: new Date().toISOString()
+    };
+
+    const accounts = getAccounts();
+    accounts.push(account);
+    saveAccounts(accounts);
+    return account;
+}
+
+function getSavedLogin() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.SAVED_LOGIN)) || null;
+}
+
+function saveSavedLogin(loginData) {
+    localStorage.setItem(STORAGE_KEYS.SAVED_LOGIN, JSON.stringify(loginData));
+}
+
+function clearSavedLogin() {
+    localStorage.removeItem(STORAGE_KEYS.SAVED_LOGIN);
 }
 
 // Subject Operations
@@ -333,6 +382,12 @@ const Storage = {
     // -- User -----------------------------------------------------------------
     getUser()          { return getUser(); },
     saveUser(u)        { return saveUser(u); },
+    getAccounts()      { return getAccounts(); },
+    findAccount(u)     { return findAccount(u); },
+    createAccount(a)   { return createAccount(a); },
+    getSavedLogin()    { return getSavedLogin(); },
+    saveSavedLogin(l)  { return saveSavedLogin(l); },
+    clearSavedLogin()  { return clearSavedLogin(); },
 
     // -- Subjects -------------------------------------------------------------
     // Internal storage uses { subjectName, teacherName, notes }.

@@ -21,9 +21,9 @@
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             width: 100%;
-            max-width: 440px;
+            max-width: 500px;
             border-radius: var(--border-radius-lg);
-            padding: 40px;
+            padding: clamp(24px, 5vw, 40px);
             box-shadow: var(--shadow-lg);
         }
         .auth-header {
@@ -46,6 +46,96 @@
             display: inline-block;
             margin-top: 10px;
         }
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 6px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            margin-bottom: 22px;
+        }
+        .auth-tab {
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text-muted);
+            font: inherit;
+            font-weight: 800;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .auth-tab.active {
+            background: var(--primary);
+            color: var(--text-heading);
+            box-shadow: 0 8px 18px rgba(255, 139, 167, 0.25);
+        }
+        .auth-tab:active {
+            transform: scale(0.97);
+        }
+        .auth-panel.hidden {
+            display: none;
+        }
+        .password-field {
+            position: relative;
+        }
+        .password-field .form-control {
+            padding-right: 78px;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
+            color: var(--text-heading);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font: inherit;
+            font-size: 0.76rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            margin: -4px 0 18px;
+        }
+        .auth-message {
+            display: none;
+            padding: 10px 12px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 14px;
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+        .auth-message.show {
+            display: block;
+        }
+        .auth-message.error {
+            background: #ffe4e6;
+            color: #9f1239;
+            border: 1px solid #fecdd3;
+        }
+        .auth-message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        @media (max-width: 420px) {
+            body {
+                padding: 12px;
+            }
+            .auth-card {
+                border-radius: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -60,30 +150,87 @@
             </div>
         </div>
         <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-heading); margin-top: 8px;">Welcome, Student! </h2>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Grade 12 Academic Task & Deadline Tracker</p>
-        <div class="school-badge">Grade 12 ASSH - Academic Track</div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Grade 11 and Grade 12 Academic Task & Deadline Tracker</p>
+        <div class="school-badge">Olinsterg College Inc.</div>
     </div>
 
-    <form id="loginForm">
+    <div class="auth-tabs" role="tablist" aria-label="Login and sign up tabs">
+        <button type="button" class="auth-tab active" id="loginTab">Log In</button>
+        <button type="button" class="auth-tab" id="signupTab">Sign Up</button>
+    </div>
+
+    <div class="auth-message" id="authMessage"></div>
+
+    <form id="loginForm" class="auth-panel">
         <div class="form-group" style="margin-bottom: 18px;">
-            <label for="studentName">Student Full Name *</label>
-            <input type="text" id="studentName" class="form-control" placeholder="e.g. Denmhar Dela Cruz" required autofocus>
+            <label for="loginUsername">Username *</label>
+            <input type="text" id="loginUsername" class="form-control" placeholder="e.g. denmhar12" required autofocus>
         </div>
 
-        <div class="form-group" style="margin-bottom: 24px;">
-            <label for="strand">Strand / Track</label>
-            <select id="strand" class="form-control" required>
-                <option value="ASSH (Arts, Social Sciences & Humanities)" selected>ASSH (Arts, Social Sciences & Humanities)</option>
-                <option value="STEM (Science, Tech, Engineering & Math)">STEM (Science, Tech, Engineering & Math)</option>
-                <option value="ABM (Accountancy, Business & Management)">ABM (Accountancy, Business & Management)</option>
-                <option value="HUMSS (Humanities & Social Sciences)">HUMSS (Humanities & Social Sciences)</option>
-            </select>
+        <div class="form-group" style="margin-bottom: 14px;">
+            <label for="loginPassword">Password *</label>
+            <div class="password-field">
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                <button type="button" class="password-toggle-btn" data-target="loginPassword">Show</button>
+            </div>
+        </div>
+
+        <label class="remember-row">
+            <input type="checkbox" id="rememberLogin" checked>
+            Remember my login on this browser
+        </label>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; justify-content: center;">
+            Log In and Open Dashboard
+        </button>
+    </form>
+
+    <form id="signupForm" class="auth-panel hidden">
+        <div class="form-group" style="margin-bottom: 16px;">
+            <label for="signupName">Student Full Name *</label>
+            <input type="text" id="signupName" class="form-control" placeholder="e.g. Denmhar Dela Cruz" required>
+        </div>
+
+        <div class="grid grid-2" style="gap: 12px;">
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label for="signupUsername">Username *</label>
+                <input type="text" id="signupUsername" class="form-control" placeholder="e.g. denmhar12" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label for="signupPassword">Password *</label>
+                <div class="password-field">
+                    <input type="password" id="signupPassword" class="form-control" placeholder="Create password" required minlength="4">
+                    <button type="button" class="password-toggle-btn" data-target="signupPassword">Show</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-2" style="gap: 12px;">
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label for="signupGrade">Grade Level *</label>
+                <select id="signupGrade" class="form-control" required>
+                    <option value="Grade 11">Grade 11</option>
+                    <option value="Grade 12" selected>Grade 12</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label for="signupStrand">Strand / Track *</label>
+                <select id="signupStrand" class="form-control" required>
+                    <option value="ASSH (Arts, Social Sciences & Humanities)" selected>ASSH (Arts, Social Sciences & Humanities)</option>
+                    <option value="STEM (Science, Tech, Engineering & Math)">STEM (Science, Tech, Engineering & Math)</option>
+                    <option value="ABM (Accountancy, Business & Management)">ABM (Accountancy, Business & Management)</option>
+                    <option value="HUMSS (Humanities & Social Sciences)">HUMSS (Humanities & Social Sciences)</option>
+                    <option value="GAS (General Academic Strand)">GAS (General Academic Strand)</option>
+                    <option value="TVL (Technical-Vocational-Livelihood)">TVL (Technical-Vocational-Livelihood)</option>
+                </select>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; justify-content: center;">
-            Start Managing Deadlines &rarr;
+            Create Account and Start
         </button>
     </form>
+
 </div>
 
 <script src="js/storage.js"></script>
@@ -92,25 +239,118 @@
 <script src="js/app.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const user = Storage.getUser();
-        if (user && user.name) {
-            document.getElementById('studentName').value = user.name;
-            if (user.strand) document.getElementById('strand').value = user.strand;
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const authMessage = document.getElementById('authMessage');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const rememberLogin = document.getElementById('rememberLogin');
+
+        function showMessage(text, type = 'error') {
+            authMessage.textContent = text;
+            authMessage.className = `auth-message show ${type}`;
         }
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('studentName').value.trim();
-            const strand = document.getElementById('strand').value;
+        function clearMessage() {
+            authMessage.textContent = '';
+            authMessage.className = 'auth-message';
+        }
 
-            if (name) {
-                Storage.saveUser({
+        function showPanel(panel) {
+            clearMessage();
+            const isLogin = panel === 'login';
+            loginTab.classList.toggle('active', isLogin);
+            signupTab.classList.toggle('active', !isLogin);
+            loginForm.classList.toggle('hidden', !isLogin);
+            signupForm.classList.toggle('hidden', isLogin);
+
+            setTimeout(() => {
+                const field = isLogin ? loginUsername : document.getElementById('signupName');
+                field.focus();
+            }, 50);
+        }
+
+        function openDashboardForAccount(account) {
+            Storage.saveUser({
+                name: account.name,
+                username: account.username,
+                gradeLevel: account.gradeLevel,
+                strand: account.strand,
+                school: account.school || 'Olinsterg College Inc.'
+            });
+            window.location.href = 'dashboard.html';
+        }
+
+        loginTab.addEventListener('click', () => showPanel('login'));
+        signupTab.addEventListener('click', () => showPanel('signup'));
+
+        const savedLogin = Storage.getSavedLogin();
+        if (savedLogin) {
+            loginUsername.value = savedLogin.username || '';
+            loginPassword.value = savedLogin.password || '';
+            rememberLogin.checked = true;
+        }
+
+        if (Storage.getAccounts().length === 0) {
+            showPanel('signup');
+            showMessage('Create your student account first. After that, you can log in anytime on this browser.', 'success');
+        }
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value;
+            const account = Storage.findAccount(username);
+
+            if (!account) {
+                showMessage('No account found with that username. Please sign up first.');
+                return;
+            }
+
+            if (account.password !== password) {
+                showMessage('Wrong password. Please check your password and try again.');
+                loginPassword.focus();
+                return;
+            }
+
+            if (rememberLogin.checked) {
+                Storage.saveSavedLogin({ username, password });
+            } else {
+                Storage.clearSavedLogin();
+            }
+
+            openDashboardForAccount(account);
+        });
+
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const gradeLevel = document.getElementById('signupGrade').value;
+            const strand = document.getElementById('signupStrand').value;
+
+            if (password.length < 4) {
+                showMessage('Please use at least 4 characters for the password.');
+                return;
+            }
+
+            try {
+                const account = Storage.createAccount({
                     name,
+                    username,
+                    password,
+                    gradeLevel,
                     strand,
-                    gradeLevel: 'Grade 12',
                     school: 'Olinsterg College Inc.'
                 });
-                window.location.href = 'dashboard.html';
+
+                Storage.saveSavedLogin({ username, password });
+                openDashboardForAccount(account);
+            } catch (err) {
+                showMessage(err.message || 'Could not create the account. Please try again.');
             }
         });
     });

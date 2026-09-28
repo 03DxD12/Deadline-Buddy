@@ -100,7 +100,10 @@
 
                             <div class="form-group">
                                 <label for="gradeLevel">Grade Level</label>
-                                <input type="text" id="gradeLevel" class="form-control" value="Grade 12" readonly style="background: rgba(0,0,0,0.03);">
+                                <select id="gradeLevel" class="form-control">
+                                    <option value="Grade 11">Grade 11</option>
+                                    <option value="Grade 12">Grade 12</option>
+                                </select>
                             </div>
 
                             <div class="form-group">
@@ -204,6 +207,7 @@
             const user = Storage.getUser();
 
             document.getElementById('studentName').value = user.name || '';
+            document.getElementById('gradeLevel').value = user.gradeLevel || 'Grade 12';
             document.getElementById('trackStrand').value = user.strand || 'ASSH (Arts, Social Sciences & Humanities)';
             document.getElementById('schoolName').value = user.school || 'Olinsterg College Inc.';
             document.getElementById('section').value = user.section || '';
@@ -212,11 +216,12 @@
             document.getElementById('profileForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('studentName').value.trim();
+                const gradeLevel = document.getElementById('gradeLevel').value;
                 const strand = document.getElementById('trackStrand').value;
                 const school = document.getElementById('schoolName').value.trim();
                 const section = document.getElementById('section').value.trim();
 
-                Storage.saveUser({ name, gradeLevel: 'Grade 12', strand, school, section });
+                Storage.saveUser({ ...user, name, gradeLevel, strand, school, section });
                 alert('Profile updated successfully!');
                 window.location.reload();
             });
