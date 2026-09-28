@@ -34,6 +34,13 @@
     --shadow-md: 0 6px 18px rgba(43, 44, 52, 0.07);
     --shadow-lg: 0 12px 30px rgba(43, 44, 52, 0.12);
 
+    /* Motion */
+    --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    --duration-fast: 160ms;
+    --duration-base: 260ms;
+    --duration-slow: 420ms;
+
     /* Urgency & Status Palette */
     --urgency-overdue-bg: #ff5964;
     --urgency-overdue-text: #ffffff;
@@ -65,6 +72,27 @@ body {
     color: var(--text-main);
     line-height: 1.5;
     min-height: 100vh;
+    text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    body {
+        animation: appFadeIn var(--duration-slow) var(--ease-soft) both;
+    }
+
+    .container {
+        animation: contentRise var(--duration-slow) var(--ease-soft) both;
+    }
+}
+
+@keyframes appFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes contentRise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* App Layout Grid */
@@ -87,7 +115,7 @@ body {
     left: 0;
     z-index: 100;
     padding: 24px 16px;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform var(--duration-slow) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft);
 }
 
 .brand {
@@ -373,12 +401,12 @@ body {
     font-size: 0.93rem;
     font-weight: 600;
     border-radius: var(--border-radius);
-    transition: all 0.2s ease;
+    transition: background-color var(--duration-base) var(--ease-soft), color var(--duration-base) var(--ease-soft), transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft);
 }
 
 .nav-item .nav-icon {
     font-size: 1.15rem;
-    transition: transform 0.2s ease;
+    transition: transform var(--duration-base) var(--ease-soft);
 }
 
 .nav-item:hover {
@@ -479,13 +507,13 @@ body {
     border-radius: var(--border-radius-lg);
     padding: 24px;
     box-shadow: var(--shadow-sm);
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
 }
 
 .card:hover {
     box-shadow: 0 10px 24px rgba(43, 44, 52, 0.1);
     border-color: #d8c6bd;
-    transform: translateY(-3px);
+    transform: translateY(-4px);
 }
 
 /* Grid Layout Utilities */
@@ -519,11 +547,12 @@ body {
     border: 1px solid transparent;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(0) scale(1);
+    transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft), color var(--duration-base) var(--ease-soft);
 }
 
 .btn:active {
-    transform: scale(0.97) !important;
+    transform: translateY(0) scale(0.97) !important;
 }
 
 .btn-primary {
@@ -534,7 +563,7 @@ body {
 
 .btn-primary:hover {
     background-color: var(--primary-hover);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(255, 139, 167, 0.45);
 }
 
@@ -546,7 +575,7 @@ body {
 
 .btn-secondary:hover {
     background-color: var(--bg-accent-peach);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .btn-danger {
@@ -558,7 +587,7 @@ body {
 .btn-danger:hover {
     background-color: #ff5964;
     color: #ffffff;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .btn-success {
@@ -570,7 +599,7 @@ body {
 .btn-success:hover {
     background-color: #10b981;
     color: #ffffff;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .active-tab {
@@ -591,13 +620,13 @@ body {
     font-weight: 700;
     letter-spacing: 0.3px;
     white-space: nowrap;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
 }
 
 .badge-overdue {
     background-color: var(--urgency-overdue-bg);
     color: var(--urgency-overdue-text);
-    animation: pulseBadge 1.8s infinite;
+    animation: pulseBadge 2.4s var(--ease-soft) infinite;
 }
 
 .badge-urgent {
@@ -607,7 +636,7 @@ body {
 }
 
 .pulse-urgent {
-    animation: pulseBadge 1.8s infinite;
+    animation: pulseBadge 2.4s var(--ease-soft) infinite;
 }
 
 .badge-upcoming,
@@ -685,7 +714,7 @@ body {
     background-color: var(--bg-card);
     color: var(--text-heading);
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    transition: border-color var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), transform var(--duration-base) var(--ease-soft);
 }
 
 .form-control:focus {
@@ -710,7 +739,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator {
     border-radius: 8px;
     padding: 5px;
     background-color: var(--primary-light);
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
 }
 
 input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hover {
@@ -726,7 +755,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     background: linear-gradient(180deg, #fffffe, #fff7fa);
     color: var(--text-muted);
     font-size: 0.84rem;
-    animation: softPreviewIn 0.24s ease both;
+    animation: softPreviewIn var(--duration-base) var(--ease-soft) both;
 }
 
 .datetime-preview strong {
@@ -776,12 +805,17 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     cursor: pointer;
     font-size: 1.1rem;
     position: relative;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft);
 }
 
 .icon-btn:hover {
     background: var(--bg-accent-peach);
-    transform: translateY(-1px);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-btn:active {
+    transform: scale(0.94);
 }
 
 .badge-dot {
@@ -817,6 +851,13 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     box-shadow: var(--shadow-lg);
     z-index: 120;
     overflow: hidden;
+    transform-origin: top right;
+    animation: dropdownIn var(--duration-base) var(--ease-soft) both;
+}
+
+@keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .notif-header {
@@ -837,6 +878,12 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     padding: 10px 14px;
     border-bottom: 1px solid var(--border-color);
     font-size: 0.84rem;
+    transition: background-color var(--duration-fast) var(--ease-soft), transform var(--duration-fast) var(--ease-soft);
+}
+
+.notif-item:hover {
+    transform: translateX(3px);
+    background-color: rgba(255, 139, 167, 0.08);
 }
 
 /* Modal Windows */
@@ -863,7 +910,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     max-width: 520px;
     padding: 24px;
     box-shadow: var(--shadow-lg);
-    animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modalIn var(--duration-slow) var(--ease-soft);
 }
 
 @keyframes modalIn {
@@ -886,6 +933,12 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-muted);
+    transition: color var(--duration-base) var(--ease-soft), transform var(--duration-base) var(--ease-soft);
+}
+
+.modal-close:hover {
+    color: var(--text-heading);
+    transform: rotate(90deg) scale(1.08);
 }
 
 /* Mobile Bottom Navigation Bar */
@@ -917,7 +970,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     font-weight: 600;
     flex: 1;
     height: 100%;
-    transition: color 0.2s ease;
+    transition: color var(--duration-base) var(--ease-soft), transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
 }
 
 .mobile-nav-item .icon {
@@ -931,6 +984,21 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .mobile-nav-item.active .icon {
     transform: scale(1.1);
+}
+
+.mobile-nav-item:active {
+    transform: translateY(1px) scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+    }
 }
 
 .hidden {
