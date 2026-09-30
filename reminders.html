@@ -100,9 +100,9 @@
 
                 <div class="grid grid-4">
                     <!-- Overdue Section -->
-                    <div class="card" style="border-top: 4px solid var(--danger);">
-                        <h3 style="margin-top: 0; color: var(--danger); font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>Overdue</span>
+                    <div class="card reminder-column" style="border-top: 4px solid var(--danger);">
+                        <h3 class="reminder-column-header" style="margin-top: 0; color: var(--danger); font-size: 1.15rem;">
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-alerts" aria-hidden="true"></span><span>Overdue</span></span>
                             <span class="badge badge-overdue" id="overdueCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Tasks past due date.</p>
@@ -112,9 +112,9 @@
                     </div>
 
                     <!-- Due Today Section -->
-                    <div class="card" style="border-top: 4px solid var(--warning);">
-                        <h3 style="margin-top: 0; color: var(--warning); font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>Due Today</span>
+                    <div class="card reminder-column" style="border-top: 4px solid var(--warning);">
+                        <h3 class="reminder-column-header" style="margin-top: 0; color: var(--warning); font-size: 1.15rem;">
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Due Today</span></span>
                             <span class="badge badge-urgent" id="dueTodayCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Deadlines today.</p>
@@ -124,9 +124,9 @@
                     </div>
 
                     <!-- Due Tomorrow Section -->
-                    <div class="card" style="border-top: 4px solid #3b82f6;">
-                        <h3 style="margin-top: 0; color: #3b82f6; font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>Due Tomorrow</span>
+                    <div class="card reminder-column" style="border-top: 4px solid #3b82f6;">
+                        <h3 class="reminder-column-header" style="margin-top: 0; color: #3b82f6; font-size: 1.15rem;">
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-calendar" aria-hidden="true"></span><span>Due Tomorrow</span></span>
                             <span class="badge badge-due-soon" id="dueTomorrowCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Requirements within 24h.</p>
@@ -136,9 +136,9 @@
                     </div>
 
                     <!-- Coming Up Section -->
-                    <div class="card" style="border-top: 4px solid var(--primary);">
-                        <h3 style="margin-top: 0; color: var(--primary); font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span><span class="title-with-icon"><span class="app-icon icon-calendar" aria-hidden="true"></span>Coming Up Soon</span></span>
+                    <div class="card reminder-column" style="border-top: 4px solid var(--primary);">
+                        <h3 class="reminder-column-header" style="margin-top: 0; color: var(--primary); font-size: 1.15rem;">
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-schedule" aria-hidden="true"></span><span>Coming Up Soon</span></span>
                             <span class="badge badge-normal" id="comingUpCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Due within 3-7 days.</p>
@@ -150,7 +150,7 @@
 
                 <!-- Recent Notifications Log Card -->
                 <div class="card" style="margin-top: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div class="balanced-card-row" style="margin-bottom: 16px;">
                         <h3 style="margin: 0; font-size: 1.1rem;"><span class="app-icon icon-bell" aria-hidden="true"></span> Notification History Log</h3>
                         <button class="btn btn-secondary" style="font-size: 0.8rem;" id="clearLogBtn">Clear Log</button>
                     </div>
@@ -281,10 +281,10 @@
                     const sub = subjects.find(s => String(s.id) === String(t.subjectId));
                     const urgency = Deadline.getUrgencyState(t.dueDate, t.dueTime, t.status);
                     return `
-                        <div style="padding: 10px; background: rgba(0,0,0,0.02); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="reminder-task-card">
                             <div>
-                                <strong style="font-size: 0.92rem; color: var(--text-heading);">${t.title}</strong>
-                                <div style="font-size: 0.78rem; color: var(--text-muted);">
+                                <strong class="card-title-wrap" style="font-size: 0.92rem; color: var(--text-heading);">${t.title}</strong>
+                                <div class="reminder-task-meta">
                                     <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; <span data-due-date="${t.dueDate}">${urgency.label}</span>
                                 </div>
                             </div>
@@ -306,9 +306,9 @@
                 logContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 12px; text-align: center;">Notification history is empty.</div>`;
             } else {
                 logContainer.innerHTML = notifs.map(n => `
-                    <div style="padding: 10px 14px; background: rgba(0,0,0,0.02); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem;">
+                    <div class="reminder-log-row">
                         <div>
-                            <strong>${n.title}</strong> &bull; <span style="color: var(--text-muted);">${n.message}</span>
+                            <strong>${n.title}</strong> &bull; <span class="reminder-log-message">${n.message}</span>
                         </div>
                         <span style="font-size: 0.75rem; color: var(--text-muted);">${new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>

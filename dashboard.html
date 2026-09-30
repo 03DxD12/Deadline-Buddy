@@ -253,14 +253,14 @@
                 return `
                     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div class="balanced-card-row" style="margin-bottom: 8px;">
                                 <span class="badge badge-normal">${t.type || t.taskType || 'Requirement'}</span>
                                 <span class="badge ${urgency.badgeClass}" data-due-date="${t.dueDate}">${urgency.label}</span>
                             </div>
-                            <h3 style="margin: 0 0 6px 0; font-size: 1.1rem; color: var(--text-heading);">
+                            <h3 class="card-title-wrap" style="margin: 0 0 6px 0; font-size: 1.1rem; color: var(--text-heading);">
                                 <a href="task-details.html?id=${t.id}" style="text-decoration: none; color: inherit;">${t.title}</a>
                             </h3>
-                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                            <div class="card-meta-wrap" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                                 <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> <strong>${sub ? (sub.name || sub.subjectName) : 'General'}</strong>
                             </div>
                             ${subtasks.length > 0 ? `
@@ -270,8 +270,8 @@
                             ` : ''}
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; align-align: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-size: 0.8rem;">
-                            <span style="color: var(--text-muted);">Due: ${Deadline.formatDeadline(t.dueDate, t.dueTime)}</span>
+                        <div class="balanced-card-row" style="align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-size: 0.8rem;">
+                            <span class="card-meta-wrap" style="color: var(--text-muted);">Due: ${Deadline.formatDeadline(t.dueDate, t.dueTime)}</span>
                             <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;">Details &rarr;</a>
                         </div>
                     </div>

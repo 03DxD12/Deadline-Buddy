@@ -65,6 +65,9 @@
 /* Reset & Base Reset */
 html {
     scroll-behavior: smooth;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 * {
@@ -82,6 +85,8 @@ body {
     min-height: 100vh;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 ::selection {
@@ -159,6 +164,9 @@ body {
     display: flex;
     min-height: 100vh;
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
 }
 
 .app-layout::before {
@@ -316,6 +324,36 @@ body {
     box-shadow: 0 5px 0 currentColor;
 }
 
+.icon-deadline::before {
+    width: 18px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+
+.icon-deadline::after {
+    width: 7px;
+    height: 7px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translate(2px, -2px) rotate(-45deg);
+}
+
+.icon-schedule::before {
+    width: 18px;
+    height: 15px;
+    border: 2px solid currentColor;
+    border-radius: 4px;
+}
+
+.icon-schedule::after {
+    width: 12px;
+    height: 2px;
+    top: 7px;
+    background: currentColor;
+    box-shadow: 0 4px 0 currentColor;
+}
+
 .icon-alerts::before {
     width: 18px;
     height: 18px;
@@ -434,6 +472,9 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
 }
 
 .label-with-icon {
@@ -517,6 +558,13 @@ body {
     position: relative;
     overflow: hidden;
     isolation: isolate;
+    min-width: 0;
+}
+
+.nav-item span:last-child,
+.mobile-nav-item span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .nav-item .nav-icon {
@@ -663,6 +711,10 @@ body {
     flex-direction: column;
     min-height: 100vh;
     background-color: var(--bg-main);
+    min-width: 0;
+    width: calc(100% - 270px);
+    max-width: 100%;
+    overflow-x: clip;
 }
 
 /* Top Navigation Bar */
@@ -679,6 +731,17 @@ body {
     top: 0;
     z-index: 90;
     transition: box-shadow var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
+    min-width: 0;
+    max-width: 100%;
+}
+
+.topbar > div[style*="flex: 1"] {
+    min-width: 0;
+}
+
+.topbar h1,
+.topbar p {
+    overflow-wrap: anywhere;
 }
 
 .mobile-toggle {
@@ -712,6 +775,8 @@ body {
     width: 100%;
     margin: 0 auto;
     flex: 1;
+    min-width: 0;
+    overflow-x: clip;
 }
 
 /* Cards & Layout Containers */
@@ -723,6 +788,18 @@ body {
     box-shadow: var(--shadow-sm);
     transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
     will-change: transform;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.card h1,
+.card h2,
+.card h3,
+.card p,
+.card strong,
+.card span,
+.card a {
+    max-width: 100%;
 }
 
 .card:hover {
@@ -740,6 +817,11 @@ body {
 .grid {
     display: grid;
     gap: 20px;
+    min-width: 0;
+}
+
+.grid > * {
+    min-width: 0;
 }
 
 .grid-2 {
@@ -773,6 +855,14 @@ body {
     overflow: hidden;
     isolation: isolate;
     will-change: transform;
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+    line-height: 1.2;
+}
+
+.btn .app-icon {
+    flex: 0 0 auto;
 }
 
 .btn:active {
@@ -915,8 +1005,150 @@ body {
     font-size: 0.76rem;
     font-weight: 700;
     letter-spacing: 0.3px;
-    white-space: nowrap;
+    white-space: normal;
+    max-width: 100%;
+    text-align: center;
+    overflow-wrap: anywhere;
     transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
+}
+
+.text-wrap-safe,
+.card-title-wrap,
+.card-meta-wrap {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.card-title-wrap {
+    line-height: 1.25;
+}
+
+.balanced-card-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.balanced-card-row > :first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.action-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.action-row .btn {
+    flex: 0 0 auto;
+}
+
+.soft-info-box {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    background: rgba(0,0,0,0.025);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.subject-card,
+.reminder-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.subject-card-header,
+.reminder-column-header,
+.reminder-log-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
+
+.subject-icon-badge,
+.reminder-type-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-light);
+    color: var(--text-heading);
+    flex: 0 0 auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.subject-title-block,
+.reminder-title-block {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.subject-card h3,
+.reminder-column h3 {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.subject-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
+    font-size: 0.85rem;
+    min-width: 0;
+}
+
+.reminder-task-card {
+    padding: 12px;
+    background: rgba(0,0,0,0.025);
+    border: 1px solid rgba(231,219,213,0.8);
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.reminder-task-card strong,
+.reminder-log-row strong {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.reminder-task-meta,
+.reminder-log-message {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+}
+
+.reminder-log-row {
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.025);
+    border-radius: 8px;
+    font-size: 0.88rem;
+}
+
+.reminder-log-row > div {
+    min-width: 0;
 }
 
 .badge:hover {
@@ -1593,6 +1825,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     border-bottom: 1px solid var(--border-color);
     font-size: 0.84rem;
     transition: background-color var(--duration-fast) var(--ease-soft), transform var(--duration-fast) var(--ease-soft);
+    overflow-wrap: anywhere;
+    min-width: 0;
 }
 
 .notif-item:hover {
@@ -1828,6 +2062,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
     .main-content {
         margin-left: 0;
+        width: 100%;
+        max-width: 100%;
         padding-bottom: 74px; /* Space for bottom nav */
     }
 
@@ -2014,6 +2250,32 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
     .grid-2, .grid-3, .grid-4 {
         grid-template-columns: 1fr;
+    }
+
+    .balanced-card-row,
+    .subject-card-header,
+    .subject-card-footer,
+    .reminder-column-header,
+    .reminder-log-row {
+        align-items: flex-start;
+    }
+
+    .subject-card-footer {
+        flex-direction: column;
+    }
+
+    .subject-card-footer .action-row,
+    .subject-card-footer .btn,
+    .reminder-task-card .btn {
+        width: 100%;
+    }
+
+    .reminder-task-card {
+        grid-template-columns: 1fr;
+    }
+
+    .reminder-log-row {
+        flex-direction: column;
     }
 
     .subtask-row {

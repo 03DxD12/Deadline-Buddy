@@ -194,25 +194,26 @@
                     const pendingCount = tasks.filter(t => t.subjectId === sub.id && t.status !== 'Completed').length;
 
                     return `
-                        <div class="card">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                                <div>
-                                    <h3 style="margin: 0 0 4px 0; font-size: 1.1rem; color: var(--text-heading);">${sub.name}</h3>
-                                    <div style="font-size: 0.85rem; color: var(--text-muted);">${sub.teacher || 'Teacher Unspecified'}</div>
+                        <div class="card subject-card">
+                            <div class="subject-card-header">
+                                <span class="subject-icon-badge app-icon icon-subjects" aria-hidden="true"></span>
+                                <div class="subject-title-block">
+                                    <h3 class="card-title-wrap" style="margin: 0 0 4px 0; font-size: 1.1rem; color: var(--text-heading);">${sub.name}</h3>
+                                    <div class="card-meta-wrap" style="font-size: 0.85rem; color: var(--text-muted);">${sub.teacher || 'Teacher Unspecified'}</div>
                                 </div>
                                 <span class="badge ${pendingCount > 0 ? 'badge-due-soon' : 'badge-completed'}">
                                     ${pendingCount} Pending
                                 </span>
                             </div>
 
-                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px;">
+                            <div class="soft-info-box">
                                 <span class="meta-icon app-icon icon-pin" aria-hidden="true"></span> <strong>Schedule / Notes:</strong><br>
                                 ${sub.schedule ? sub.schedule.replace(/\n/g, '<br>') : 'No schedule added.'}
                             </div>
 
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 0.85rem;">
-                                <span style="color: var(--text-muted);">Total Requirements: <strong>${taskCount}</strong></span>
-                                <div style="display: flex; gap: 8px;">
+                            <div class="subject-card-footer">
+                                <span class="card-meta-wrap" style="color: var(--text-muted);">Total Requirements: <strong>${taskCount}</strong></span>
+                                <div class="action-row">
                                     <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="editSubject('${sub.id}')">Edit</button>
                                     <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="deleteSubject('${sub.id}')">Delete</button>
                                 </div>
