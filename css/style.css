@@ -522,7 +522,6 @@ body {
     color: var(--text-muted);
     font-size: 0.78rem;
 }
-}
 
 /* Main Content Layout */
 .main-content {
@@ -602,7 +601,7 @@ body {
 }
 
 .grid-4 {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
 
 /* Buttons */
@@ -1074,6 +1073,43 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .hidden {
     display: none !important;
+}
+
+@media (min-width: 769px) {
+    .sidebar {
+        width: 270px;
+        bottom: 0;
+        transform: none !important;
+    }
+
+    .main-content {
+        margin-left: 270px;
+        min-width: 0;
+    }
+
+    .mobile-toggle,
+    .mobile-nav {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1180px) {
+    .container {
+        padding: 24px;
+    }
+
+    .topbar {
+        padding: 14px 24px;
+        flex-wrap: wrap;
+    }
+
+    .topbar > div[style*="flex: 1"] {
+        min-width: 280px;
+    }
+
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Responsive Breakpoints */
