@@ -12,6 +12,8 @@ const STORAGE_KEYS = {
     NOTIFICATIONS: 'deadlinebuddy_notifications'
 };
 
+const COMPLETED_TASK_KEEP_MS = 30 * 24 * 60 * 60 * 1000;
+
 // Seed initial Grade 12 ASSH demo data if storage is empty
 function initStorage() {
     if (!localStorage.getItem(STORAGE_KEYS.USER)) {
@@ -209,11 +211,45 @@ function deleteSubject(id) {
 // Task Operations
 function getTasks() {
     initStorage();
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS)) || [];
+    return cleanExpiredCompletedTasks(JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS)) || []);
 }
 
 function saveTasks(tasks) {
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+}
+
+function cleanExpiredCompletedTasks(tasks) {
+    const now = Date.now();
+    let changed = false;
+    const cleaned = tasks.filter(task => {
+        if (task.status !== 'Completed') {
+            if (task.completedAt) {
+                task.completedAt = null;
+                changed = true;
+            }
+            return true;
+        }
+
+        if (!task.completedAt) {
+            task.completedAt = new Date().toISOString();
+            changed = true;
+            return true;
+        }
+
+        const completedTime = new Date(task.completedAt).getTime();
+        if (Number.isNaN(completedTime)) {
+            task.completedAt = new Date().toISOString();
+            changed = true;
+            return true;
+        }
+
+        const shouldRemove = now - completedTime >= COMPLETED_TASK_KEEP_MS;
+        if (shouldRemove) changed = true;
+        return !shouldRemove;
+    });
+
+    if (changed) saveTasks(cleaned);
+    return cleaned;
 }
 
 function getTaskById(id) {
@@ -229,6 +265,8 @@ function saveTaskForm(taskData) {
         // Edit existing
         const index = tasks.findIndex(t => t.id === parseInt(taskData.id));
         if (index !== -1) {
+            const nextStatus = taskData.status || 'Pending';
+            const wasCompleted = tasks[index].status === 'Completed';
             tasks[index] = {
                 ...tasks[index],
                 subjectId: parsedSubjectId,
@@ -236,7 +274,8 @@ function saveTaskForm(taskData) {
                 description: taskData.description ? taskData.description.trim() : '',
                 taskType: taskData.taskType || 'Assignment',
                 priority: taskData.priority || 'Medium',
-                status: taskData.status || 'Pending',
+                status: nextStatus,
+                completedAt: nextStatus === 'Completed' ? (wasCompleted && tasks[index].completedAt ? tasks[index].completedAt : new Date().toISOString()) : null,
                 dueDate: taskData.dueDate,
                 dueTime: taskData.dueTime || '23:59',
                 notes: taskData.notes ? taskData.notes.trim() : ''
@@ -254,6 +293,7 @@ function saveTaskForm(taskData) {
             taskType: taskData.taskType || 'Assignment',
             priority: taskData.priority || 'Medium',
             status: taskData.status || 'Pending',
+            completedAt: taskData.status === 'Completed' ? new Date().toISOString() : null,
             dueDate: taskData.dueDate,
             dueTime: taskData.dueTime || '23:59',
             notes: taskData.notes ? taskData.notes.trim() : '',
@@ -466,6 +506,7 @@ const Storage = {
             description: (data.description || '').trim(),
             priority:    data.priority || 'Medium',
             status:      data.status || 'Pending',
+            completedAt: data.status === 'Completed' ? new Date().toISOString() : null,
             dueDate:     data.dueDate || new Date().toISOString(),
             notes:       (data.notes || '').trim(),
             createdAt:   new Date().toISOString(),
@@ -480,16 +521,19 @@ const Storage = {
         const tasks = getTasks();
         const idx = tasks.findIndex(t => String(t.id) === String(id));
         if (idx !== -1) {
+            const nextStatus = data.status || tasks[idx].status;
+            const wasCompleted = tasks[idx].status === 'Completed';
             tasks[idx] = {
                 ...tasks[idx],
                 subjectId:   data.subjectId ? parseInt(data.subjectId) : tasks[idx].subjectId,
-                title:       (data.title || '').trim(),
+                title:       data.title !== undefined ? (data.title || '').trim() : tasks[idx].title,
                 type:        data.type || data.taskType || tasks[idx].type,
-                description: (data.description || '').trim(),
+                description: data.description !== undefined ? (data.description || '').trim() : tasks[idx].description,
                 priority:    data.priority || tasks[idx].priority,
-                status:      data.status   || tasks[idx].status,
+                status:      nextStatus,
+                completedAt: nextStatus === 'Completed' ? (wasCompleted && tasks[idx].completedAt ? tasks[idx].completedAt : new Date().toISOString()) : null,
                 dueDate:     data.dueDate  || tasks[idx].dueDate,
-                notes:       (data.notes   || '').trim(),
+                notes:       data.notes !== undefined ? (data.notes || '').trim() : tasks[idx].notes,
                 subtasks:    data.subtasks !== undefined ? data.subtasks : tasks[idx].subtasks
             };
             saveTasks(tasks);
