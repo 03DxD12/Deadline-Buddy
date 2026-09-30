@@ -418,21 +418,32 @@ body {
 .icon-search::after { width: 8px; height: 2px; background: currentColor; transform: rotate(45deg); right: 2px; bottom: 3px; border-radius: 2px; }
 .icon-info::before { content: "i"; border-radius: 50%; }
 
+.icon-back {
+    color: var(--text-heading);
+}
+
 .icon-back::before {
-    width: 15px;
+    width: 24px;
     height: 15px;
-    border-left: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(45deg);
-    left: 5px;
+    left: 7px;
+    top: 12px;
+    background: var(--primary);
+    border: 2px solid var(--text-heading);
+    border-right: 0;
+    border-radius: 8px 0 0 8px;
+    box-shadow: -3px 3px 0 rgba(255,139,167,0.35), inset 0 2px 0 rgba(255,255,255,0.45);
 }
 
 .icon-back::after {
-    width: 18px;
-    height: 2px;
-    background: currentColor;
-    border-radius: 2px;
-    right: 2px;
+    width: 17px;
+    height: 17px;
+    right: 6px;
+    top: 11px;
+    background: var(--primary);
+    border-top: 2px solid var(--text-heading);
+    border-right: 2px solid var(--text-heading);
+    transform: rotate(45deg);
+    box-shadow: 3px 0 0 rgba(255,139,167,0.28);
 }
 
 .title-with-icon,
@@ -922,9 +933,9 @@ body {
 }
 
 .btn-return .app-icon {
-    width: 40px;
+    width: 52px;
     height: 40px;
-    border-radius: 12px;
+    border-radius: 14px;
     background: #fff0f3;
     color: var(--text-heading);
     border: 1px solid #ffc6c7;
@@ -961,7 +972,7 @@ body {
 }
 
 .btn-return:hover .app-icon {
-    background: var(--primary);
+    background: #ffe4e6;
     border-color: var(--primary);
     transform: translateX(-4px);
     box-shadow: 0 8px 16px rgba(255,139,167,0.24);
