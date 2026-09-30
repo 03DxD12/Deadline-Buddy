@@ -42,18 +42,28 @@ function initCommonUI() {
         menuToggleBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             sidebar.classList.toggle('open');
+            document.body.classList.toggle('sidebar-open', sidebar.classList.contains('open'));
         });
 
         // Close sidebar on document click outside
         document.addEventListener('click', function (e) {
             if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !menuToggleBtn.contains(e.target)) {
                 sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
             }
         });
     }
 
     // Notification Bell Dropdown setup
     setupNotificationBell();
+    setupButtonPressEffects();
 
     // Password visibility toggle buttons
     const passToggleBtns = document.querySelectorAll('.password-toggle-btn');
@@ -80,6 +90,27 @@ function initCommonUI() {
             alert.style.opacity = '0';
             setTimeout(() => alert.style.display = 'none', 400);
         }, 6000);
+    });
+}
+
+function setupButtonPressEffects() {
+    const pressTargets = document.querySelectorAll('.btn, .icon-btn, .mobile-toggle, .nav-item, .mobile-nav-item');
+
+    pressTargets.forEach(target => {
+        target.addEventListener('pointerdown', function (e) {
+            const rect = target.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            target.style.setProperty('--press-x', `${x}%`);
+            target.style.setProperty('--press-y', `${y}%`);
+            target.classList.add('is-pressing');
+        });
+
+        ['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach(eventName => {
+            target.addEventListener(eventName, function () {
+                window.setTimeout(() => target.classList.remove('is-pressing'), 120);
+            });
+        });
     });
 }
 
