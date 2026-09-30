@@ -108,20 +108,23 @@
                         </div>
 
                         <div class="grid grid-3">
-                            <div class="form-group">
+                            <div class="form-group due-date-group">
                                 <label for="dueDate">Due Date & Time *</label>
                                 <input type="datetime-local" id="dueDate" class="form-control" required>
                                 <div class="datetime-preview" id="deadlinePreview" aria-live="polite">
                                     Choose a due date and time to see the reminder schedule.
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group priority-group">
                                 <label for="priority">Priority Level</label>
-                                <select id="priority" class="form-control">
-                                    <option value="Low">Low</option>
-                                    <option value="Medium" selected>Medium</option>
-                                    <option value="High">High</option>
+                                <select id="priority" class="form-control priority-select priority-medium">
+                                    <option value="Low" class="priority-option-low">Easy</option>
+                                    <option value="Medium" class="priority-option-medium" selected>Medium</option>
+                                    <option value="High" class="priority-option-high">Hard</option>
                                 </select>
+                                <div class="priority-preview priority-medium" id="priorityPreview">
+                                    Medium tasks need steady progress. Plan a little time each day.
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="status">Current Status</label>
@@ -197,6 +200,8 @@
             const taskForm = document.getElementById('taskForm');
             const dueDateInput = document.getElementById('dueDate');
             const deadlinePreview = document.getElementById('deadlinePreview');
+            const prioritySelect = document.getElementById('priority');
+            const priorityPreview = document.getElementById('priorityPreview');
 
             // Populate subjects
             const subjects = Storage.getSubjects();
@@ -300,6 +305,26 @@
             dueDateInput.addEventListener('input', updateDeadlinePreview);
             dueDateInput.addEventListener('change', updateDeadlinePreview);
             updateDeadlinePreview();
+
+            function updatePriorityPreview() {
+                const priority = prioritySelect.value || 'Medium';
+                const priorityClass = `priority-${priority.toLowerCase()}`;
+                const messages = {
+                    Low: 'Easy task. You can finish this with a simple plan.',
+                    Medium: 'Medium task. Work on it little by little so it does not pile up.',
+                    High: 'Hard task. Start early and break it into smaller steps.'
+                };
+
+                prioritySelect.classList.remove('priority-low', 'priority-medium', 'priority-high');
+                priorityPreview.classList.remove('priority-low', 'priority-medium', 'priority-high');
+                prioritySelect.classList.add(priorityClass);
+                priorityPreview.classList.add(priorityClass);
+                priorityPreview.textContent = messages[priority] || messages.Medium;
+            }
+
+            prioritySelect.addEventListener('change', updatePriorityPreview);
+            prioritySelect.addEventListener('input', updatePriorityPreview);
+            updatePriorityPreview();
 
             // Form submission
             taskForm.addEventListener('submit', (e) => {
