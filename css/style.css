@@ -16,6 +16,7 @@
     --primary-hover: #ff7597;      /* Deeper Coral Pink */
     --primary-light: #fff0f3;      /* Ultra soft pink glow */
     --primary-text: #2b2c34;       /* High contrast dark text on pink */
+    --primary-rgb: 255, 139, 167;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ff5964;
@@ -73,6 +74,7 @@
     --primary-hover: #238ee0;
     --primary-light: #e7f5ff;
     --primary-text: #fffffe;
+    --primary-rgb: 61, 169, 252;
     --success: #0f9f7a;
     --warning: #f59e0b;
     --danger: #ef4565;
