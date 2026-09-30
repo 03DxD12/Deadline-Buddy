@@ -169,14 +169,46 @@
                         <!-- System Reset Card -->
                         <div class="card" style="border-top: 3px solid var(--warning);">
                             <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-heading);">
-                                <span class="title-with-icon"><span class="app-icon icon-reset" aria-hidden="true"></span>Reset Sample Records</span>
+                                <span class="title-with-icon"><span class="app-icon icon-reset" aria-hidden="true"></span>Clean All Records</span>
                             </h3>
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
-                                Use this only for practice or presentation. It removes the records saved in this browser and brings back the sample Grade 12 ASSH tasks.
+                                Use this only for practice or presentation. It clears the records saved in this browser and brings back the sample records.
                             </p>
                             <button class="btn btn-secondary" id="resetDemoBtn" style="width: 100%; justify-content: center; color: var(--warning); border-color: var(--warning);">
                                 Bring Back Sample Records
                             </button>
+                        </div>
+
+                        <!-- Theme Card -->
+                        <div class="card" style="border-top: 3px solid var(--primary);">
+                            <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-heading);">
+                                <span class="title-with-icon"><span class="app-icon icon-schedule" aria-hidden="true"></span>Change Theme</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                                Choose the color style you want to use in Deadline Buddy.
+                            </p>
+                            <div class="theme-options" role="group" aria-label="Choose theme">
+                                <button type="button" class="theme-option" data-theme-choice="pink">
+                                    <span class="theme-swatch-row" aria-hidden="true">
+                                        <span class="theme-swatch" style="background:#faeee7;"></span>
+                                        <span class="theme-swatch" style="background:#ff8ba7;"></span>
+                                        <span class="theme-swatch" style="background:#f3d2c1;"></span>
+                                        <span class="theme-swatch" style="background:#2b2c34;"></span>
+                                    </span>
+                                    <strong>Default Pink</strong>
+                                    <small>Soft Deadline Buddy colors.</small>
+                                </button>
+                                <button type="button" class="theme-option" data-theme-choice="blue">
+                                    <span class="theme-swatch-row" aria-hidden="true">
+                                        <span class="theme-swatch" style="background:#fffffe;"></span>
+                                        <span class="theme-swatch" style="background:#094067;"></span>
+                                        <span class="theme-swatch" style="background:#3da9fc;"></span>
+                                        <span class="theme-swatch" style="background:#ef4565;"></span>
+                                    </span>
+                                    <strong>Clean Blue</strong>
+                                    <small>White, blue, and bright study colors.</small>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -316,6 +348,28 @@
 
             renderProfilePhoto();
 
+            const themeButtons = document.querySelectorAll('[data-theme-choice]');
+
+            function renderThemeButtons() {
+                const selectedTheme = Storage.getTheme();
+                document.documentElement.setAttribute('data-theme', selectedTheme);
+                document.body.setAttribute('data-theme', selectedTheme);
+                themeButtons.forEach(button => {
+                    const isActive = button.dataset.themeChoice === selectedTheme;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            }
+
+            themeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    Storage.saveTheme(button.dataset.themeChoice);
+                    renderThemeButtons();
+                });
+            });
+
+            renderThemeButtons();
+
             // Profile form save
             document.getElementById('profileForm').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -364,10 +418,9 @@
 
             // Reset demo data
             document.getElementById('resetDemoBtn').addEventListener('click', () => {
-                if (confirm('This will remove the records saved in this browser and bring back the sample Grade 12 ASSH tasks. Continue?')) {
-                    localStorage.clear();
+                if (confirm('Are you sure? This will clear the records saved in this browser and bring back the sample records.')) {
                     Storage.seedDemoData();
-                    alert('Sample records restored!');
+                    alert('Sample records restored.');
                     window.location.href = 'dashboard.html';
                 }
             });

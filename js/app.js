@@ -3,11 +3,26 @@
  * Shared UI controller, sidebar drawer, notification bell, live ticker loop.
  */
 
+applySavedTheme();
+
 document.addEventListener('DOMContentLoaded', function () {
+    applySavedTheme();
     initCommonUI();
     updateLiveTimers();
     setInterval(updateLiveTimers, 1000);
 });
+
+function applySavedTheme() {
+    let theme = 'pink';
+    if (typeof Storage !== 'undefined' && typeof Storage.getTheme === 'function') {
+        theme = Storage.getTheme();
+    } else {
+        theme = localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink';
+    }
+
+    document.documentElement.setAttribute('data-theme', theme);
+    if (document.body) document.body.setAttribute('data-theme', theme);
+}
 
 function initCommonUI() {
     // Top bar info & User display elements

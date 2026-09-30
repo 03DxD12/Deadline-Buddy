@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
     USER: 'deadlinebuddy_user',
     ACCOUNTS: 'deadlinebuddy_accounts',
     SAVED_LOGIN: 'deadlinebuddy_saved_login',
+    THEME: 'deadlinebuddy_theme',
     SUBJECTS: 'deadlinebuddy_subjects',
     TASKS: 'deadlinebuddy_tasks',
     NOTIFICATIONS: 'deadlinebuddy_notifications'
@@ -158,6 +159,15 @@ function saveSavedLogin(loginData) {
 
 function clearSavedLogin() {
     localStorage.removeItem(STORAGE_KEYS.SAVED_LOGIN);
+}
+
+function getTheme() {
+    const theme = localStorage.getItem(STORAGE_KEYS.THEME);
+    return theme === 'blue' ? 'blue' : 'pink';
+}
+
+function saveTheme(theme) {
+    localStorage.setItem(STORAGE_KEYS.THEME, theme === 'blue' ? 'blue' : 'pink');
 }
 
 // Subject Operations
@@ -376,6 +386,7 @@ function exportBackupJSON() {
     const data = {
         user: getUser(),
         accounts: getAccounts(),
+        theme: getTheme(),
         subjects: getSubjects(),
         tasks: getTasks(),
         notifications: getNotifications(),
@@ -403,6 +414,7 @@ function importBackupJSON(jsonStr) {
         }
         if (data.user) saveUser(data.user);
         if (data.accounts) saveAccounts(data.accounts);
+        if (data.theme) saveTheme(data.theme);
         if (data.subjects) saveSubjects(data.subjects);
         if (data.tasks) saveTasks(data.tasks);
         if (data.notifications) saveNotifications(data.notifications);
@@ -445,6 +457,8 @@ const Storage = {
     getSavedLogin()    { return getSavedLogin(); },
     saveSavedLogin(l)  { return saveSavedLogin(l); },
     clearSavedLogin()  { return clearSavedLogin(); },
+    getTheme()         { return getTheme(); },
+    saveTheme(t)       { return saveTheme(t); },
 
     // -- Subjects -------------------------------------------------------------
     // Internal storage uses { subjectName, teacherName, notes }.
