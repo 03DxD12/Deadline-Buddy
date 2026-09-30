@@ -1,6 +1,6 @@
 # Deadline Buddy
 
-Deadline Buddy is a simple Grade 12 academic deadline tracker for students. It helps users save subjects, school requirements, due dates, reminders, and checklist steps.
+Deadline Buddy is a simple academic deadline tracker for Grade 11 and Grade 12 students. It helps users create a local account, save subjects, school requirements, due dates, reminders, and checklist steps.
 
 ## How To Open
 
@@ -26,7 +26,7 @@ CLIENT-DEMO-GUIDE.md
 
 ## Main Pages
 
-- `index.html` - opening page
+- `index.html` - login and sign-up page
 - `dashboard.html` - overview of deadlines and tasks
 - `tasks.html` - list of requirements
 - `task-form.html` - add or edit a requirement
@@ -39,19 +39,26 @@ CLIENT-DEMO-GUIDE.md
 ## Features
 
 - Add, edit, and delete academic requirements
+- Create a local student account
+- Log in with username and password
+- Remember login on the same browser
+- Choose Grade 11 or Grade 12
 - Add subjects
 - Add checklist steps for each task
+- Preview reminder times when setting a deadline
 - Deadline status badges
 - Alerts for overdue tasks
 - Alerts 20 minutes before a deadline
 - Alerts 1 day before a deadline
 - Browser notification support
+- Responsive mobile calendar
+- Smooth UI animations and effects
 - Save and restore records using a downloaded file
 - Reset sample records for practice or presentation
 
 ## Where Data Is Saved
 
-The app saves records in the browser using local storage. This means records stay in the same browser on the same laptop.
+The app saves accounts and records in the browser using local storage. This means records stay in the same browser on the same laptop.
 
 If the user changes laptop or browser, they should use:
 
@@ -85,4 +92,4 @@ js/
 
 ## Notes For The Client
 
-Because this is a browser-only project, there is no online database. Records are saved locally in the browser. To move records to another laptop or browser, use the saved-records feature on the Profile page.
+Because this is a browser-only project, there is no online database. Accounts and records are saved locally in the browser. To move records to another laptop or browser, use the saved-records feature on the Profile page.
