@@ -912,48 +912,63 @@ body {
 }
 
 .btn-return {
-    min-height: 48px;
-    padding: 8px 14px 8px 12px;
-    border-color: #ead5ce;
-    background: linear-gradient(135deg, #fffffe, #fff7fa);
-    box-shadow: 0 6px 16px rgba(43,44,52,0.05);
+    min-height: 54px;
+    padding: 8px 16px 8px 10px;
+    border-color: #f4cdd4;
+    background: linear-gradient(135deg, #fffffe 0%, #fff7fa 62%, #fff0f3 100%);
+    box-shadow: 0 8px 18px rgba(43,44,52,0.06);
+    border-radius: 14px;
+    gap: 10px;
 }
 
 .btn-return .app-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: var(--primary-light);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #fff0f3;
     color: var(--text-heading);
-    transition: transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft);
+    border: 1px solid #ffc6c7;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    transition: transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft);
 }
 
 .btn-return-text {
     display: grid;
-    gap: 1px;
+    gap: 2px;
     text-align: left;
-    line-height: 1.15;
+    line-height: 1.08;
+    min-width: 0;
 }
 
 .btn-return-text strong {
-    font-size: 0.9rem;
+    color: var(--text-heading);
+    font-size: 0.94rem;
+    font-weight: 900;
+    letter-spacing: 0;
 }
 
 .btn-return-text small {
     color: var(--text-muted);
-    font-size: 0.68rem;
-    font-weight: 700;
+    font-size: 0.72rem;
+    font-weight: 800;
 }
 
 .btn-return:hover {
     border-color: var(--primary);
     background: #fffffe;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(255,139,167,0.16);
 }
 
 .btn-return:hover .app-icon {
     background: var(--primary);
-    transform: translateX(-3px);
+    border-color: var(--primary);
+    transform: translateX(-4px);
     box-shadow: 0 8px 16px rgba(255,139,167,0.24);
+}
+
+.btn-return:active {
+    transform: translateY(0) scale(0.98) !important;
 }
 
 .active-tab {
