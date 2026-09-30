@@ -170,9 +170,7 @@
                                         </section>
                                     </div>
                                 </div>
-                                <div class="datetime-preview" id="deadlinePreview" aria-live="polite">
-                                    Choose a due date and time to see the reminder schedule.
-                                </div>
+                                <div class="datetime-preview hidden" id="deadlinePreview" aria-live="polite"></div>
                             </div>
                             <div class="form-group priority-group">
                                 <label for="priority">Priority Level</label>
@@ -511,7 +509,8 @@
 
             function updateDeadlinePreview() {
                 if (!dueDateInput.value) {
-                    deadlinePreview.textContent = 'Choose a due date and time to see the reminder schedule.';
+                    deadlinePreview.classList.add('hidden');
+                    deadlinePreview.textContent = '';
                     deadlineDisplay.textContent = 'Choose due date and time';
                     deadlineDisplaySub.textContent = 'Reminders will be prepared automatically';
                     return;
@@ -522,16 +521,8 @@
                 const twentyMinsBefore = new Date(due.getTime() - 20 * 60 * 1000);
                 const now = new Date();
 
-                const oneDayText = oneDayBefore > now ? formatPreviewDate(oneDayBefore) : 'Already passed';
-                const twentyText = twentyMinsBefore > now ? formatPreviewDate(twentyMinsBefore) : 'Already passed';
-
-                deadlinePreview.innerHTML = `
-                    <strong>Deadline:</strong> ${formatPreviewDate(due)}
-                    <div class="datetime-preview-list">
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span><span>Reminder 1 day before: <strong>${oneDayText}</strong></span></div>
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span><span>Reminder 20 minutes before: <strong>${twentyText}</strong></span></div>
-                    </div>
-                `;
+                deadlinePreview.classList.add('hidden');
+                deadlinePreview.textContent = '';
                 deadlineDisplay.textContent = formatPreviewDate(due);
                 deadlineDisplaySub.textContent = 'Alerts: 1 day before and 20 minutes before';
             }
@@ -575,6 +566,7 @@
 
                 if (!dueDate) {
                     openDeadlinePicker();
+                    deadlinePreview.classList.remove('hidden');
                     deadlinePreview.innerHTML = '<strong>Please choose a due date and time before saving.</strong>';
                     return;
                 }
