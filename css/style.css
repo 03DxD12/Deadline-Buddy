@@ -176,6 +176,25 @@ body {
     box-shadow: 6px -5px 0 currentColor, 12px -2px 0 currentColor;
 }
 
+.icon-home::before {
+    width: 13px;
+    height: 13px;
+    top: 2px;
+    border-left: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    border-radius: 2px 0 0 0;
+    transform: rotate(45deg);
+}
+
+.icon-home::after {
+    width: 14px;
+    height: 11px;
+    bottom: 2px;
+    border: 2px solid currentColor;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+}
+
 .icon-tasks::before {
     width: 16px;
     height: 18px;
@@ -221,19 +240,18 @@ body {
 }
 
 .icon-alerts::before {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border: 2px solid currentColor;
     border-radius: 50%;
 }
 
 .icon-alerts::after {
-    width: 6px;
-    height: 7px;
-    border-left: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(-35deg);
-    transform-origin: bottom left;
+    content: "!";
+    position: static;
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1;
 }
 
 .icon-profile::before {
@@ -1023,18 +1041,24 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
     .mobile-toggle {
         display: flex;
+        grid-column: 1;
+        grid-row: 1;
     }
 
     .topbar {
         padding: clamp(10px, 3.4vw, 14px) clamp(10px, 3.8vw, 16px);
-        align-items: flex-start;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) 42px;
+        align-items: center;
+        flex-wrap: unset;
         gap: 10px;
     }
 
     .topbar > div[style*="flex: 1"] {
         min-width: 0;
-        flex: 1 1 calc(100% - 56px) !important;
+        grid-column: 2;
+        grid-row: 1;
+        flex: unset !important;
     }
 
     .topbar h1 {
@@ -1048,13 +1072,30 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     }
 
     .topbar > .btn {
-        order: 3;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        order: unset;
         width: 100%;
         min-height: clamp(38px, 10vw, 42px);
     }
 
     .notification-wrapper {
-        margin-left: auto;
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+        margin-left: 0;
+    }
+
+    .notification-wrapper .icon-btn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .notif-dropdown {
+        position: fixed;
+        top: 72px;
+        right: 10px;
+        width: min(330px, calc(100vw - 20px));
     }
 
     .container {
