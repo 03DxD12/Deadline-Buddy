@@ -137,6 +137,14 @@ body {
     justify-content: center;
     box-shadow: 0 4px 12px rgba(255, 139, 167, 0.4);
     color: var(--text-heading);
+    overflow: hidden;
+}
+
+.brand-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .app-icon {
@@ -469,6 +477,59 @@ body {
     font-weight: 800;
     font-size: 0.95rem;
     box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.avatar.has-image {
+    background: var(--bg-card);
+}
+
+.avatar img,
+.profile-photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-photo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-main);
+    margin-bottom: 16px;
+}
+
+.profile-photo-preview {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: var(--bg-accent-peach);
+    color: var(--text-heading);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    flex: 0 0 auto;
+}
+
+.profile-photo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.profile-photo-note {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
 }
 
 /* Main Content Layout */

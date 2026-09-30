@@ -14,7 +14,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
+                <div class="brand-icon"><img src="images/deadline-buddy-logo.svg" alt="Deadline Buddy logo"></div>
                 <div>
                     <div class="brand-title">Deadline Buddy</div>
                     <div class="brand-sub">Olinsterg College Inc.</div>
@@ -93,6 +93,16 @@
                             <span class="title-with-icon"><span class="app-icon icon-profile" aria-hidden="true"></span>Academic Profile Information</span>
                         </h3>
                         <form id="profileForm">
+                            <div class="profile-photo-row">
+                                <div class="profile-photo-preview" id="profilePhotoPreview">S</div>
+                                <div class="profile-photo-actions">
+                                    <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-secondary" id="uploadProfilePhotoBtn">Upload Profile Picture</button>
+                                    <button type="button" class="btn btn-secondary" id="removeProfilePhotoBtn">Remove Picture</button>
+                                    <div class="profile-photo-note">Saved only in this browser, so it works even on GitHub Pages.</div>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label for="studentName">Student Name *</label>
                                 <input type="text" id="studentName" class="form-control" placeholder="e.g., Juan Dela Cruz" required>
@@ -205,12 +215,84 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const user = Storage.getUser();
+            let avatarDataUrl = user.avatarDataUrl || '';
+            const profilePhotoPreview = document.getElementById('profilePhotoPreview');
+            const profilePhotoInput = document.getElementById('profilePhotoInput');
+            const uploadProfilePhotoBtn = document.getElementById('uploadProfilePhotoBtn');
+            const removeProfilePhotoBtn = document.getElementById('removeProfilePhotoBtn');
 
             document.getElementById('studentName').value = user.name || '';
             document.getElementById('gradeLevel').value = user.gradeLevel || 'Grade 12';
             document.getElementById('trackStrand').value = user.strand || 'ASSH (Arts, Social Sciences & Humanities)';
             document.getElementById('schoolName').value = user.school || 'Olinsterg College Inc.';
             document.getElementById('section').value = user.section || '';
+
+            function renderProfilePhoto() {
+                if (avatarDataUrl) {
+                    profilePhotoPreview.classList.add('has-image');
+                    profilePhotoPreview.innerHTML = `<img src="${avatarDataUrl}" alt="Profile picture preview">`;
+                    removeProfilePhotoBtn.style.display = 'inline-flex';
+                } else {
+                    profilePhotoPreview.classList.remove('has-image');
+                    profilePhotoPreview.textContent = (document.getElementById('studentName').value || user.name || 'S').charAt(0).toUpperCase();
+                    removeProfilePhotoBtn.style.display = 'none';
+                }
+            }
+
+            function resizeImageToDataUrl(file, callback) {
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const size = 360;
+                        const scale = Math.max(size / img.width, size / img.height);
+                        const width = img.width * scale;
+                        const height = img.height * scale;
+                        const x = (size - width) / 2;
+                        const y = (size - height) / 2;
+
+                        canvas.width = size;
+                        canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#fffffe';
+                        ctx.fillRect(0, 0, size, size);
+                        ctx.drawImage(img, x, y, width, height);
+                        callback(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            uploadProfilePhotoBtn.addEventListener('click', () => profilePhotoInput.click());
+
+            profilePhotoInput.addEventListener('change', event => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Please choose an image file.');
+                    return;
+                }
+
+                resizeImageToDataUrl(file, dataUrl => {
+                    avatarDataUrl = dataUrl;
+                    renderProfilePhoto();
+                });
+            });
+
+            removeProfilePhotoBtn.addEventListener('click', () => {
+                avatarDataUrl = '';
+                profilePhotoInput.value = '';
+                renderProfilePhoto();
+            });
+
+            document.getElementById('studentName').addEventListener('input', () => {
+                if (!avatarDataUrl) renderProfilePhoto();
+            });
+
+            renderProfilePhoto();
 
             // Profile form save
             document.getElementById('profileForm').addEventListener('submit', (e) => {
@@ -221,7 +303,11 @@
                 const school = document.getElementById('schoolName').value.trim();
                 const section = document.getElementById('section').value.trim();
 
-                Storage.saveUser({ ...user, name, gradeLevel, strand, school, section });
+                const updatedUser = { ...user, name, gradeLevel, strand, school, section, avatarDataUrl };
+                Storage.saveUser(updatedUser);
+                if (updatedUser.username) {
+                    Storage.updateAccount(updatedUser.username, updatedUser);
+                }
                 alert('Profile updated successfully!');
                 window.location.reload();
             });

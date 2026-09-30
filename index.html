@@ -31,6 +31,12 @@
             text-align: center;
             margin-bottom: 28px;
         }
+        .auth-logo-img {
+            width: min(260px, 72vw);
+            display: block;
+            margin: 0 auto 18px;
+            filter: drop-shadow(0 12px 20px rgba(255, 139, 167, 0.22));
+        }
         .auth-brand {
             display: inline-flex;
             align-items: center;
@@ -168,8 +174,9 @@
 
 <div class="auth-card">
     <div class="auth-header">
+        <img class="auth-logo-img" src="images/deadline-buddy-logo.svg" alt="Deadline Buddy logo">
         <div class="auth-brand">
-            <div class="brand-icon"><span class="app-icon icon-brand" aria-hidden="true"></span></div>
+            <div class="brand-icon"><img src="images/deadline-buddy-logo.svg" alt="Deadline Buddy logo"></div>
             <div style="text-align: left;">
                 <div class="brand-title" style="font-size: 1.4rem;">Deadline Buddy</div>
                 <div class="brand-sub">Olinsterg College Inc.</div>
@@ -304,7 +311,8 @@
                 username: account.username,
                 gradeLevel: account.gradeLevel,
                 strand: account.strand,
-                school: account.school || 'Olinsterg College Inc.'
+                school: account.school || 'Olinsterg College Inc.',
+                avatarDataUrl: account.avatarDataUrl || ''
             });
             window.location.href = 'dashboard.html';
         }

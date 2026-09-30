@@ -132,6 +132,20 @@ function createAccount(accountData) {
     return account;
 }
 
+function updateAccount(username, updates) {
+    const accounts = getAccounts();
+    const index = accounts.findIndex(acc => (acc.username || '').toLowerCase() === (username || '').toLowerCase());
+    if (index === -1) return null;
+
+    accounts[index] = {
+        ...accounts[index],
+        ...updates,
+        username: accounts[index].username
+    };
+    saveAccounts(accounts);
+    return accounts[index];
+}
+
 function getSavedLogin() {
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.SAVED_LOGIN)) || null;
 }
@@ -385,6 +399,7 @@ const Storage = {
     getAccounts()      { return getAccounts(); },
     findAccount(u)     { return findAccount(u); },
     createAccount(a)   { return createAccount(a); },
+    updateAccount(u, updates) { return updateAccount(u, updates); },
     getSavedLogin()    { return getSavedLogin(); },
     saveSavedLogin(l)  { return saveSavedLogin(l); },
     clearSavedLogin()  { return clearSavedLogin(); },

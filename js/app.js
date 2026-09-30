@@ -20,7 +20,7 @@ function initCommonUI() {
 
         if (sidebarName) sidebarName.innerText = user.name || 'Student';
         if (sidebarTrack) sidebarTrack.innerText = `${user.gradeLevel || 'Grade 12'} - ${user.strand || 'ASSH'}`;
-        if (sidebarAvatar) sidebarAvatar.innerText = (user.name || 'G12').charAt(0).toUpperCase();
+        if (sidebarAvatar) renderAvatar(sidebarAvatar, user);
 
         const userNameEls = document.querySelectorAll('.user-name-display');
         userNameEls.forEach(el => el.innerText = user.name || 'Student');
@@ -30,7 +30,7 @@ function initCommonUI() {
 
         const avatarEls = document.querySelectorAll('.avatar-display');
         avatarEls.forEach(el => {
-            el.innerText = (user.name || 'A').charAt(0).toUpperCase();
+            renderAvatar(el, user);
         });
     }
 
@@ -81,6 +81,17 @@ function initCommonUI() {
             setTimeout(() => alert.style.display = 'none', 400);
         }, 6000);
     });
+}
+
+function renderAvatar(el, user) {
+    if (!el) return;
+    if (user && user.avatarDataUrl) {
+        el.classList.add('has-image');
+        el.innerHTML = `<img src="${user.avatarDataUrl}" alt="${escapeHtml(user.name || 'Student')} profile picture">`;
+    } else {
+        el.classList.remove('has-image');
+        el.textContent = (user && user.name ? user.name : 'G12').charAt(0).toUpperCase();
+    }
 }
 
 function setupNotificationBell() {
@@ -185,4 +196,13 @@ function updateLiveTimers() {
     if (typeof NotificationsEngine !== 'undefined') {
         NotificationsEngine.checkDeadlinesAndNotify();
     }
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
