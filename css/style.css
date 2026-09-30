@@ -1418,6 +1418,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .deadline-picker-trigger {
     width: 100%;
+    max-width: 100%;
     min-height: 72px;
     border: 1px solid var(--primary);
     border-radius: 16px;
@@ -1431,6 +1432,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     cursor: pointer;
     font: inherit;
     text-align: left;
+    min-width: 0;
+    overflow: hidden;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 12px 24px rgba(255,139,167,0.1);
     transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft);
 }
@@ -1448,6 +1451,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     border-radius: 14px;
     background: var(--bg-accent-pink);
     box-shadow: 0 10px 20px rgba(255,139,167,0.2);
+    flex: 0 0 auto;
 }
 
 .deadline-trigger-text {
@@ -1458,15 +1462,18 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .deadline-trigger-text strong {
     font-size: 0.98rem;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
 }
 
 .deadline-trigger-text small {
     color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
 }
 
 .deadline-trigger-action {
@@ -1477,6 +1484,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     padding: 8px 13px;
     font-size: 0.72rem;
     font-weight: 900;
+    justify-self: end;
+    white-space: nowrap;
     transition: transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft);
 }
 
@@ -1488,6 +1497,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 }
 
 .deadline-picker-panel {
+    width: 100%;
+    max-width: 100%;
     margin-top: 16px;
     padding: 18px;
     border: 1px solid #ffc6c7;
@@ -1497,12 +1508,14 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     animation: pickerPanelIn var(--duration-slow) var(--ease-soft) both;
     position: relative;
     z-index: 25;
+    overflow: clip;
 }
 
 .deadline-picker-grid {
     display: grid;
-    grid-template-columns: minmax(280px, 1.18fr) minmax(250px, 0.82fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: 18px;
+    min-width: 0;
 }
 
 .deadline-picker-card {
@@ -1512,6 +1525,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     padding: 20px;
     box-shadow: 0 12px 28px rgba(43,44,52,0.06);
     transition: transform var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), border-color var(--duration-base) var(--ease-soft);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .deadline-picker-card:hover {
@@ -1526,6 +1541,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 14px;
+    min-width: 0;
 }
 
 .deadline-picker-eyebrow {
@@ -1538,18 +1554,20 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .deadline-picker-head h3 {
     margin: 2px 0 0;
-    font-size: 1.05rem;
+    font-size: clamp(0.98rem, 2vw, 1.05rem);
     color: var(--text-heading);
+    overflow-wrap: anywhere;
 }
 
 .deadline-picker-controls {
     display: flex;
     gap: 8px;
+    flex: 0 0 auto;
 }
 
 .deadline-small-btn {
-    width: 48px;
-    height: 48px;
+    width: clamp(40px, 5vw, 48px);
+    height: clamp(40px, 5vw, 48px);
     border-radius: 50%;
     font-size: 1.25rem;
     font-weight: 900;
@@ -1559,7 +1577,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 .deadline-date-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 6px;
+    gap: clamp(4px, 1vw, 8px);
+    min-width: 0;
 }
 
 .deadline-weekdays {
@@ -1570,6 +1589,12 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     text-align: center;
 }
 
+.deadline-weekdays span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
 .deadline-day {
     border: 0;
     border-radius: 10px;
@@ -1577,6 +1602,9 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     background: transparent;
     color: var(--text-heading);
     font-weight: 800;
+    min-width: 0;
+    min-height: clamp(34px, 4.4vw, 48px);
+    font-size: clamp(0.82rem, 1.9vw, 0.98rem);
     cursor: pointer;
     transition: transform var(--duration-base) var(--ease-soft), background-color var(--duration-base) var(--ease-soft), box-shadow var(--duration-base) var(--ease-soft), color var(--duration-base) var(--ease-soft);
 }
@@ -1607,8 +1635,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 }
 
 .deadline-clock {
-    width: 164px;
-    height: 164px;
+    width: clamp(128px, 18vw, 164px);
+    height: clamp(128px, 18vw, 164px);
     margin: 2px auto 18px;
     border-radius: 50%;
     background:
@@ -1639,14 +1667,14 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .clock-hand-hour {
     width: 4px;
-    height: 48px;
+    height: 29%;
     margin-left: -2px;
     background: var(--border-dark);
 }
 
 .clock-hand-minute {
     width: 2px;
-    height: 62px;
+    height: 38%;
     margin-left: -1px;
     background: var(--primary-hover);
 }
@@ -1675,9 +1703,10 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
 .deadline-time-stepper {
     display: grid;
-    grid-template-columns: minmax(74px, 1fr) auto minmax(74px, 1fr) minmax(82px, 0.95fr);
+    grid-template-columns: minmax(68px, 1fr) auto minmax(68px, 1fr) minmax(76px, 0.95fr);
     align-items: center;
     gap: 8px;
+    min-width: 0;
 }
 
 .time-stepper-unit {
@@ -1694,6 +1723,8 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     font-weight: 800;
     margin-top: 5px;
     text-transform: uppercase;
+    text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .time-step-btn,
@@ -2400,45 +2431,87 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
         grid-template-columns: 48px minmax(0, 1fr);
         min-height: auto;
         padding: 10px;
+        gap: 10px;
+        border-radius: 14px;
     }
 
     .due-date-group {
         grid-column: 1;
     }
 
+    .deadline-trigger-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .deadline-trigger-text strong {
+        font-size: 0.94rem;
+    }
+
     .deadline-trigger-action {
         grid-column: 1 / -1;
-        justify-self: start;
+        justify-self: stretch;
+        text-align: center;
+        padding: 9px 12px;
     }
 
     .deadline-picker-panel {
-        padding: 10px;
+        padding: clamp(8px, 2.6vw, 12px);
         border-radius: 16px;
+        margin-top: 12px;
     }
 
     .deadline-picker-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .deadline-picker-card {
-        padding: 14px;
+        padding: clamp(12px, 3.6vw, 16px);
+        border-radius: 16px;
+    }
+
+    .deadline-picker-card:hover {
+        transform: none;
+    }
+
+    .deadline-picker-head {
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .deadline-picker-controls {
+        gap: 6px;
+    }
+
+    .deadline-small-btn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .deadline-weekdays,
+    .deadline-date-grid {
+        gap: clamp(3px, 1.8vw, 6px);
+    }
+
+    .deadline-weekdays {
+        font-size: 0.66rem;
+    }
+
+    .deadline-day {
+        min-height: clamp(32px, 9vw, 42px);
+        border-radius: 9px;
     }
 
     .deadline-clock {
-        width: 132px;
-        height: 132px;
-    }
-
-    .clock-hand-hour {
-        height: 34px;
-    }
-
-    .clock-hand-minute {
-        height: 44px;
+        width: clamp(118px, 38vw, 140px);
+        height: clamp(118px, 38vw, 140px);
+        border-width: 8px;
+        margin-bottom: 14px;
     }
 
     .deadline-time-stepper {
-        grid-template-columns: minmax(62px, 1fr) auto minmax(62px, 1fr) minmax(68px, 0.9fr);
+        grid-template-columns: minmax(60px, 1fr) auto minmax(60px, 1fr) minmax(64px, 0.9fr);
         gap: 6px;
     }
 
@@ -2449,6 +2522,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     .time-step-value {
         min-height: 48px;
         font-size: 0.98rem;
+        border-radius: 11px;
     }
 
     .time-step-divider {
@@ -2458,10 +2532,12 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
     .deadline-picker-actions {
         grid-template-columns: minmax(82px, 0.8fr) minmax(126px, 1.2fr);
+        padding-top: 12px;
     }
 
     .deadline-picker-actions .btn {
         width: 100%;
+        min-height: 46px;
     }
 
     .mobile-nav {
@@ -2515,6 +2591,107 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     }
 }
 
+@media (max-width: 480px) {
+    .deadline-picker-trigger {
+        grid-template-columns: 44px minmax(0, 1fr);
+        padding: 9px;
+    }
+
+    .deadline-trigger-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .deadline-picker-panel {
+        padding: 8px;
+        border-radius: 14px;
+    }
+
+    .deadline-picker-card {
+        padding: 12px 10px;
+    }
+
+    .deadline-picker-head {
+        align-items: flex-start;
+    }
+
+    .deadline-picker-eyebrow {
+        font-size: 0.66rem;
+        letter-spacing: 0.06em;
+    }
+
+    .deadline-picker-head h3 {
+        font-size: 0.98rem;
+    }
+
+    .deadline-small-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .deadline-weekdays span {
+        font-size: 0.62rem;
+    }
+
+    .deadline-date-grid {
+        gap: 3px;
+    }
+
+    .deadline-day {
+        min-height: 31px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+    }
+
+    .deadline-clock {
+        width: 116px;
+        height: 116px;
+        border-width: 7px;
+    }
+
+    .deadline-clock::before {
+        inset: 9px;
+    }
+
+    .deadline-time-stepper {
+        grid-template-columns: minmax(54px, 1fr) auto minmax(54px, 1fr) minmax(58px, 0.9fr);
+        gap: 4px;
+    }
+
+    .time-stepper-unit {
+        grid-template-rows: 22px 44px 22px auto;
+    }
+
+    .time-step-btn {
+        width: 30px;
+        height: 22px;
+        font-size: 0.74rem;
+    }
+
+    .time-step-value {
+        min-height: 44px;
+        font-size: 0.9rem;
+    }
+
+    .time-stepper-unit span {
+        font-size: 0.58rem;
+    }
+
+    .time-step-divider {
+        font-size: 0.92rem;
+        padding-bottom: 26px;
+    }
+
+    .deadline-picker-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .deadline-picker-actions .btn {
+        min-height: 44px;
+    }
+}
+
 @keyframes mobileNavUp {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
@@ -2535,6 +2712,62 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     .icon-btn {
         width: 38px;
         height: 38px;
+    }
+
+    .deadline-picker-trigger {
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .deadline-trigger-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .deadline-trigger-text strong {
+        font-size: 0.88rem;
+    }
+
+    .deadline-trigger-text small {
+        font-size: 0.68rem;
+    }
+
+    .deadline-picker-card {
+        padding: 10px 8px;
+    }
+
+    .deadline-picker-head {
+        gap: 8px;
+    }
+
+    .deadline-small-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .deadline-day {
+        min-height: 28px;
+        font-size: 0.78rem;
+    }
+
+    .deadline-clock {
+        width: 108px;
+        height: 108px;
+    }
+
+    .deadline-time-stepper {
+        grid-template-columns: minmax(48px, 1fr) auto minmax(48px, 1fr) minmax(52px, 0.9fr);
+        gap: 3px;
+    }
+
+    .time-step-value {
+        min-height: 40px;
+        font-size: 0.84rem;
+    }
+
+    .time-stepper-unit span {
+        font-size: 0.54rem;
     }
 
     .mobile-nav-item {
