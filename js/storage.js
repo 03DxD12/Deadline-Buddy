@@ -375,6 +375,7 @@ function clearNotifications() {
 function exportBackupJSON() {
     const data = {
         user: getUser(),
+        accounts: getAccounts(),
         subjects: getSubjects(),
         tasks: getTasks(),
         notifications: getNotifications(),
@@ -401,6 +402,7 @@ function importBackupJSON(jsonStr) {
             throw new Error('The selected file is not a valid Deadline Buddy backup.');
         }
         if (data.user) saveUser(data.user);
+        if (data.accounts) saveAccounts(data.accounts);
         if (data.subjects) saveSubjects(data.subjects);
         if (data.tasks) saveTasks(data.tasks);
         if (data.notifications) saveNotifications(data.notifications);

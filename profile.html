@@ -239,6 +239,20 @@
                 }
             }
 
+            function saveProfilePhotoNow() {
+                const currentUser = Storage.getUser();
+                const updatedUser = { ...currentUser, avatarDataUrl };
+                Storage.saveUser(updatedUser);
+                if (updatedUser.username) {
+                    Storage.updateAccount(updatedUser.username, updatedUser);
+                }
+
+                const sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar && typeof renderAvatar === 'function') {
+                    renderAvatar(sidebarAvatar, updatedUser);
+                }
+            }
+
             function resizeImageToDataUrl(file, callback) {
                 const reader = new FileReader();
                 reader.onload = event => {
@@ -279,6 +293,13 @@
                 resizeImageToDataUrl(file, dataUrl => {
                     avatarDataUrl = dataUrl;
                     renderProfilePhoto();
+                    try {
+                        saveProfilePhotoNow();
+                        alert('Profile picture saved successfully.');
+                    } catch (err) {
+                        console.error('Profile picture save failed:', err);
+                        alert('The picture is too large for this browser to save. Please try a smaller image.');
+                    }
                 });
             });
 
@@ -286,6 +307,7 @@
                 avatarDataUrl = '';
                 profilePhotoInput.value = '';
                 renderProfilePhoto();
+                saveProfilePhotoNow();
             });
 
             document.getElementById('studentName').addEventListener('input', () => {
