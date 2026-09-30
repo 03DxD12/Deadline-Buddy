@@ -155,10 +155,31 @@
                                                 <span class="clock-hand-minute" id="clockMinuteHand"></span>
                                                 <span class="clock-center"></span>
                                             </div>
-                                            <div class="deadline-time-selects">
-                                                <select class="form-control" id="pickerHour" aria-label="Hour"></select>
-                                                <select class="form-control" id="pickerMinute" aria-label="Minute"></select>
-                                                <select class="form-control" id="pickerPeriod" aria-label="AM or PM">
+                                            <div class="deadline-time-stepper" aria-label="Set deadline time">
+                                                <div class="time-stepper-unit">
+                                                    <button type="button" class="time-step-btn" data-time-part="hour" data-time-step="up" aria-label="Increase hour">&#9650;</button>
+                                                    <button type="button" class="time-step-value" id="pickerHourDisplay" data-time-part="hour" aria-label="Selected hour">05</button>
+                                                    <button type="button" class="time-step-btn" data-time-part="hour" data-time-step="down" aria-label="Decrease hour">&#9660;</button>
+                                                    <span>Hour</span>
+                                                </div>
+                                                <span class="time-step-divider">:</span>
+                                                <div class="time-stepper-unit">
+                                                    <button type="button" class="time-step-btn" data-time-part="minute" data-time-step="up" aria-label="Increase minute">&#9650;</button>
+                                                    <button type="button" class="time-step-value" id="pickerMinuteDisplay" data-time-part="minute" aria-label="Selected minute">00</button>
+                                                    <button type="button" class="time-step-btn" data-time-part="minute" data-time-step="down" aria-label="Decrease minute">&#9660;</button>
+                                                    <span>Minute</span>
+                                                </div>
+                                                <div class="time-stepper-unit period-unit">
+                                                    <button type="button" class="time-step-btn" data-time-part="period" data-time-step="up" aria-label="Change AM or PM">&#9650;</button>
+                                                    <button type="button" class="time-step-value" id="pickerPeriodDisplay" data-time-part="period" aria-label="Selected AM or PM">PM</button>
+                                                    <button type="button" class="time-step-btn" data-time-part="period" data-time-step="down" aria-label="Change AM or PM">&#9660;</button>
+                                                    <span>AM/PM</span>
+                                                </div>
+                                            </div>
+                                            <div class="deadline-time-selects native-time-values" aria-hidden="true">
+                                                <select id="pickerHour" aria-label="Hour"></select>
+                                                <select id="pickerMinute" aria-label="Minute"></select>
+                                                <select id="pickerPeriod" aria-label="AM or PM">
                                                     <option value="AM">AM</option>
                                                     <option value="PM">PM</option>
                                                 </select>
@@ -268,6 +289,9 @@
             const pickerHour = document.getElementById('pickerHour');
             const pickerMinute = document.getElementById('pickerMinute');
             const pickerPeriod = document.getElementById('pickerPeriod');
+            const pickerHourDisplay = document.getElementById('pickerHourDisplay');
+            const pickerMinuteDisplay = document.getElementById('pickerMinuteDisplay');
+            const pickerPeriodDisplay = document.getElementById('pickerPeriodDisplay');
             const saveDeadlinePicker = document.getElementById('saveDeadlinePicker');
             const cancelDeadlinePicker = document.getElementById('cancelDeadlinePicker');
             const clockHourHand = document.getElementById('clockHourHand');
@@ -379,6 +403,7 @@
                 pickerMinute.value = String(minute).padStart(2, '0');
                 pickerPeriod.value = period;
 
+                updateTimeStepperDisplay();
                 renderDeadlinePicker();
                 updateClockPreview();
             }
@@ -447,6 +472,37 @@
                 clockMinuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
             }
 
+            function updateTimeStepperDisplay() {
+                pickerHourDisplay.textContent = pickerHour.value || '12';
+                pickerMinuteDisplay.textContent = pickerMinute.value || '00';
+                pickerPeriodDisplay.textContent = pickerPeriod.value || 'PM';
+            }
+
+            function changeTimeValue(part, direction) {
+                if (part === 'hour') {
+                    const current = parseInt(pickerHour.value || '12', 10);
+                    let next = direction === 'up' ? current + 1 : current - 1;
+                    if (next > 12) next = 1;
+                    if (next < 1) next = 12;
+                    pickerHour.value = String(next).padStart(2, '0');
+                }
+
+                if (part === 'minute') {
+                    const current = parseInt(pickerMinute.value || '0', 10);
+                    let next = direction === 'up' ? current + 5 : current - 5;
+                    if (next > 59) next = 0;
+                    if (next < 0) next = 55;
+                    pickerMinute.value = String(next).padStart(2, '0');
+                }
+
+                if (part === 'period') {
+                    pickerPeriod.value = pickerPeriod.value === 'AM' ? 'PM' : 'AM';
+                }
+
+                updateTimeStepperDisplay();
+                updateClockPreview();
+            }
+
             function savePickerValue() {
                 let hour = parseInt(pickerHour.value || '12', 10);
                 const minute = parseInt(pickerMinute.value || '0', 10);
@@ -501,7 +557,16 @@
             });
 
             [pickerHour, pickerMinute, pickerPeriod].forEach(el => {
-                el.addEventListener('change', updateClockPreview);
+                el.addEventListener('change', () => {
+                    updateTimeStepperDisplay();
+                    updateClockPreview();
+                });
+            });
+
+            document.querySelectorAll('[data-time-part][data-time-step]').forEach(button => {
+                button.addEventListener('click', () => {
+                    changeTimeValue(button.dataset.timePart, button.dataset.timeStep);
+                });
             });
 
             saveDeadlinePicker.addEventListener('click', savePickerValue);
