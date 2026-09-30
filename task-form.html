@@ -114,7 +114,62 @@
                         <div class="grid grid-3">
                             <div class="form-group due-date-group">
                                 <label for="dueDate">Due Date & Time *</label>
-                                <input type="datetime-local" id="dueDate" class="form-control" required>
+                                <input type="hidden" id="dueDate" required>
+                                <button type="button" class="deadline-picker-trigger" id="deadlinePickerTrigger" aria-expanded="false" aria-controls="deadlinePickerPanel">
+                                    <span class="deadline-trigger-icon app-icon icon-calendar" aria-hidden="true"></span>
+                                    <span class="deadline-trigger-text">
+                                        <strong id="deadlineDisplay">Choose due date and time</strong>
+                                        <small id="deadlineDisplaySub">Reminders will be prepared automatically</small>
+                                    </span>
+                                    <span class="deadline-trigger-action">Change</span>
+                                </button>
+                                <div class="deadline-picker-panel hidden" id="deadlinePickerPanel">
+                                    <div class="deadline-picker-grid">
+                                        <section class="deadline-picker-card">
+                                            <div class="deadline-picker-head">
+                                                <div>
+                                                    <span class="deadline-picker-eyebrow">Select Date</span>
+                                                    <h3 id="pickerMonthLabel">October 2026</h3>
+                                                </div>
+                                                <div class="deadline-picker-controls">
+                                                    <button type="button" class="icon-btn deadline-small-btn" id="pickerPrevMonth" aria-label="Previous month">&lsaquo;</button>
+                                                    <button type="button" class="icon-btn deadline-small-btn" id="pickerNextMonth" aria-label="Next month">&rsaquo;</button>
+                                                </div>
+                                            </div>
+                                            <div class="deadline-weekdays">
+                                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                                            </div>
+                                            <div class="deadline-date-grid" id="deadlineDateGrid"></div>
+                                        </section>
+
+                                        <section class="deadline-picker-card deadline-time-card">
+                                            <div class="deadline-picker-head">
+                                                <div>
+                                                    <span class="deadline-picker-eyebrow">Set Time</span>
+                                                    <h3>Deadline Clock</h3>
+                                                </div>
+                                                <span class="app-icon icon-bell" aria-hidden="true"></span>
+                                            </div>
+                                            <div class="deadline-clock" aria-hidden="true">
+                                                <span class="clock-hand-hour" id="clockHourHand"></span>
+                                                <span class="clock-hand-minute" id="clockMinuteHand"></span>
+                                                <span class="clock-center"></span>
+                                            </div>
+                                            <div class="deadline-time-selects">
+                                                <select class="form-control" id="pickerHour" aria-label="Hour"></select>
+                                                <select class="form-control" id="pickerMinute" aria-label="Minute"></select>
+                                                <select class="form-control" id="pickerPeriod" aria-label="AM or PM">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="deadline-picker-actions">
+                                                <button type="button" class="btn btn-secondary" id="cancelDeadlinePicker">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="saveDeadlinePicker">Save Date & Time</button>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
                                 <div class="datetime-preview" id="deadlinePreview" aria-live="polite">
                                     Choose a due date and time to see the reminder schedule.
                                 </div>
@@ -204,8 +259,25 @@
             const taskForm = document.getElementById('taskForm');
             const dueDateInput = document.getElementById('dueDate');
             const deadlinePreview = document.getElementById('deadlinePreview');
+            const deadlineDisplay = document.getElementById('deadlineDisplay');
+            const deadlineDisplaySub = document.getElementById('deadlineDisplaySub');
+            const deadlinePickerTrigger = document.getElementById('deadlinePickerTrigger');
+            const deadlinePickerPanel = document.getElementById('deadlinePickerPanel');
+            const pickerMonthLabel = document.getElementById('pickerMonthLabel');
+            const deadlineDateGrid = document.getElementById('deadlineDateGrid');
+            const pickerPrevMonth = document.getElementById('pickerPrevMonth');
+            const pickerNextMonth = document.getElementById('pickerNextMonth');
+            const pickerHour = document.getElementById('pickerHour');
+            const pickerMinute = document.getElementById('pickerMinute');
+            const pickerPeriod = document.getElementById('pickerPeriod');
+            const saveDeadlinePicker = document.getElementById('saveDeadlinePicker');
+            const cancelDeadlinePicker = document.getElementById('cancelDeadlinePicker');
+            const clockHourHand = document.getElementById('clockHourHand');
+            const clockMinuteHand = document.getElementById('clockMinuteHand');
             const prioritySelect = document.getElementById('priority');
             const priorityPreview = document.getElementById('priorityPreview');
+            let pickerSelectedDate = new Date();
+            let pickerViewDate = new Date();
 
             // Populate subjects
             const subjects = Storage.getSubjects();
@@ -258,6 +330,7 @@
                     const d = new Date(task.dueDate);
                     const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
                     dueDateInput.value = iso;
+                    syncPickerFromValue();
 
                     // subtasks
                     if (task.subtasks && task.subtasks.length > 0) {
@@ -271,6 +344,7 @@
                 tomorrow.setHours(17, 0, 0, 0);
                 const iso = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
                 dueDateInput.value = iso;
+                syncPickerFromValue();
             }
 
             function formatPreviewDate(date) {
@@ -283,9 +357,163 @@
                 });
             }
 
+            function toDatetimeLocalValue(date) {
+                return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            }
+
+            function parseDatetimeLocal(value) {
+                if (!value) return new Date();
+                const parsed = new Date(value);
+                return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+            }
+
+            function syncPickerFromValue() {
+                const date = parseDatetimeLocal(dueDateInput.value);
+                pickerSelectedDate = new Date(date);
+                pickerViewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+
+                let hour = date.getHours();
+                const minute = date.getMinutes();
+                const period = hour >= 12 ? 'PM' : 'AM';
+                hour = hour % 12 || 12;
+
+                pickerHour.value = String(hour).padStart(2, '0');
+                pickerMinute.value = String(minute).padStart(2, '0');
+                pickerPeriod.value = period;
+
+                renderDeadlinePicker();
+                updateClockPreview();
+            }
+
+            function populateTimeSelects() {
+                pickerHour.innerHTML = Array.from({ length: 12 }, (_, i) => {
+                    const val = String(i + 1).padStart(2, '0');
+                    return `<option value="${val}">${val}</option>`;
+                }).join('');
+
+                pickerMinute.innerHTML = Array.from({ length: 60 }, (_, i) => {
+                    const val = String(i).padStart(2, '0');
+                    return `<option value="${val}">${val}</option>`;
+                }).join('');
+            }
+
+            function renderDeadlinePicker() {
+                const year = pickerViewDate.getFullYear();
+                const month = pickerViewDate.getMonth();
+                const monthName = pickerViewDate.toLocaleDateString([], { month: 'long', year: 'numeric' });
+                const firstDayIndex = new Date(year, month, 1).getDay();
+                const lastDate = new Date(year, month + 1, 0).getDate();
+                const prevLastDate = new Date(year, month, 0).getDate();
+                const today = new Date();
+
+                pickerMonthLabel.textContent = monthName;
+                deadlineDateGrid.innerHTML = '';
+
+                for (let i = firstDayIndex; i > 0; i--) {
+                    deadlineDateGrid.appendChild(createPickerDay(prevLastDate - i + 1, true, new Date(year, month - 1, prevLastDate - i + 1)));
+                }
+
+                for (let day = 1; day <= lastDate; day++) {
+                    const date = new Date(year, month, day);
+                    const isToday = date.toDateString() === today.toDateString();
+                    const isSelected = date.toDateString() === pickerSelectedDate.toDateString();
+                    deadlineDateGrid.appendChild(createPickerDay(day, false, date, isToday, isSelected));
+                }
+
+                const totalCells = firstDayIndex + lastDate;
+                const nextDays = (7 - (totalCells % 7)) % 7;
+                for (let day = 1; day <= nextDays; day++) {
+                    deadlineDateGrid.appendChild(createPickerDay(day, true, new Date(year, month + 1, day)));
+                }
+            }
+
+            function createPickerDay(day, isOtherMonth, date, isToday = false, isSelected = false) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `deadline-day ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`;
+                btn.textContent = day;
+                btn.addEventListener('click', () => {
+                    pickerSelectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    pickerViewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+                    renderDeadlinePicker();
+                });
+                return btn;
+            }
+
+            function updateClockPreview() {
+                const hour = parseInt(pickerHour.value || '12', 10);
+                const minute = parseInt(pickerMinute.value || '0', 10);
+                const hourDegrees = ((hour % 12) * 30) + (minute * 0.5);
+                const minuteDegrees = minute * 6;
+                clockHourHand.style.transform = `rotate(${hourDegrees}deg)`;
+                clockMinuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
+            }
+
+            function savePickerValue() {
+                let hour = parseInt(pickerHour.value || '12', 10);
+                const minute = parseInt(pickerMinute.value || '0', 10);
+                if (pickerPeriod.value === 'PM' && hour !== 12) hour += 12;
+                if (pickerPeriod.value === 'AM' && hour === 12) hour = 0;
+
+                const finalDate = new Date(
+                    pickerSelectedDate.getFullYear(),
+                    pickerSelectedDate.getMonth(),
+                    pickerSelectedDate.getDate(),
+                    hour,
+                    minute,
+                    0,
+                    0
+                );
+
+                dueDateInput.value = toDatetimeLocalValue(finalDate);
+                closeDeadlinePicker();
+                updateDeadlinePreview();
+            }
+
+            function openDeadlinePicker() {
+                syncPickerFromValue();
+                deadlinePickerPanel.classList.remove('hidden');
+                deadlinePickerTrigger.setAttribute('aria-expanded', 'true');
+            }
+
+            function closeDeadlinePicker() {
+                deadlinePickerPanel.classList.add('hidden');
+                deadlinePickerTrigger.setAttribute('aria-expanded', 'false');
+            }
+
+            populateTimeSelects();
+            syncPickerFromValue();
+
+            deadlinePickerTrigger.addEventListener('click', () => {
+                if (deadlinePickerPanel.classList.contains('hidden')) {
+                    openDeadlinePicker();
+                } else {
+                    closeDeadlinePicker();
+                }
+            });
+
+            pickerPrevMonth.addEventListener('click', () => {
+                pickerViewDate.setMonth(pickerViewDate.getMonth() - 1);
+                renderDeadlinePicker();
+            });
+
+            pickerNextMonth.addEventListener('click', () => {
+                pickerViewDate.setMonth(pickerViewDate.getMonth() + 1);
+                renderDeadlinePicker();
+            });
+
+            [pickerHour, pickerMinute, pickerPeriod].forEach(el => {
+                el.addEventListener('change', updateClockPreview);
+            });
+
+            saveDeadlinePicker.addEventListener('click', savePickerValue);
+            cancelDeadlinePicker.addEventListener('click', closeDeadlinePicker);
+
             function updateDeadlinePreview() {
                 if (!dueDateInput.value) {
                     deadlinePreview.textContent = 'Choose a due date and time to see the reminder schedule.';
+                    deadlineDisplay.textContent = 'Choose due date and time';
+                    deadlineDisplaySub.textContent = 'Reminders will be prepared automatically';
                     return;
                 }
 
@@ -304,6 +532,8 @@
                         <div class="datetime-preview-item"><span class="datetime-preview-dot"></span><span>Reminder 20 minutes before: <strong>${twentyText}</strong></span></div>
                     </div>
                 `;
+                deadlineDisplay.textContent = formatPreviewDate(due);
+                deadlineDisplaySub.textContent = 'Alerts: 1 day before and 20 minutes before';
             }
 
             dueDateInput.addEventListener('input', updateDeadlinePreview);
@@ -342,6 +572,12 @@
                 const priority = document.getElementById('priority').value;
                 const status = document.getElementById('status').value;
                 const description = document.getElementById('description').value.trim();
+
+                if (!dueDate) {
+                    openDeadlinePicker();
+                    deadlinePreview.innerHTML = '<strong>Please choose a due date and time before saving.</strong>';
+                    return;
+                }
 
                 // Collect subtasks
                 const subtaskRows = subtasksList.querySelectorAll('.subtask-row');
