@@ -8,3 +8,4 @@ node_modules/
 backend/*.sqlite
 backend/*.sqlite-shm
 backend/*.sqlite-wal
+backend/*.log
