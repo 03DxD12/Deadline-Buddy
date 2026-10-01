@@ -1,0 +1,19 @@
+{
+  "name": "deadline-buddy-pwa-push",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Deadline Buddy static app with optional PWA Web Push reminder backend.",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "web-push:keys": "web-push generate-vapid-keys",
+    "check": "node --check backend/server.js && node --check js/app.js && node --check js/storage.js && node --check js/deadline.js && node --check js/notifications.js && node --check js/pwa.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "web-push": "^3.6.7"
+  }
+}

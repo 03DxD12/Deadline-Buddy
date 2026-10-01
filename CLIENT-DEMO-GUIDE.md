@@ -307,4 +307,6 @@ You can say this during the presentation:
 - The Remember my login option only works on the same browser.
 - To move records to another laptop or browser, use Download My Saved Records first.
 - Live reminder pop-ups work while the app is open in the browser.
+- Real closed-tab reminders use the optional PWA Web Push backend. Start the Node backend, enable Deadline Notifications on the Reminders page, then use Send Test Notification to confirm the push setup.
+- If the laptop is completely turned off, no notification can appear at that exact time.
 - Desktop and mobile layouts are supported.

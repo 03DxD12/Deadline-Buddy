@@ -1,0 +1,19 @@
+{
+  "name": "Deadline Buddy",
+  "short_name": "Deadline Buddy",
+  "description": "A student deadline tracker with reminders, subjects, calendar, and saved records.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffffe",
+  "theme_color": "#ff8ba7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/deadline-buddy-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

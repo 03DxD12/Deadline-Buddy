@@ -4,13 +4,15 @@ Deadline Buddy is a simple academic deadline tracker for Grade 11 and Grade 12 s
 
 ## How To Open
 
-This version is a static website. It does not need XAMPP, PHP, MySQL, Node.js, or a server.
+This version can still open as a static website for normal testing. It does not need XAMPP, PHP, or MySQL.
 
 Open this file in a browser:
 
 ```text
 index.html
 ```
+
+For real background reminders after the tab is closed, use the optional Web Push backend. That part needs Node.js because a browser-only website cannot schedule and send true Web Push reminders by itself.
 
 You can also open:
 
@@ -51,6 +53,8 @@ CLIENT-DEMO-GUIDE.md
 - Alerts 20 minutes before a deadline
 - Alerts 1 day before a deadline
 - Browser notification support
+- PWA manifest and service worker
+- Optional Web Push backend for closed-tab reminders
 - Responsive mobile calendar
 - Smooth UI animations and effects
 - Save and restore records using a downloaded file
@@ -92,4 +96,71 @@ js/
 
 ## Notes For The Client
 
-Because this is a browser-only project, there is no online database. Accounts and records are saved locally in the browser. To move records to another laptop or browser, use the saved-records feature on the Profile page.
+Because the main student records are browser-based, accounts and normal records are saved locally in the browser. To move records to another laptop or browser, use the saved-records feature on the Profile page.
+
+## Real Web Push Reminder Mode
+
+The old live reminders work only while Deadline Buddy is open. The upgraded Web Push mode adds:
+
+- `manifest.json`
+- `service-worker.js`
+- `js/pwa.js`
+- `backend/server.js`
+- `.env.example`
+
+This mode can show reminders after the Deadline Buddy tab is closed, as long as:
+
+- the student enabled notifications
+- the push backend is running
+- the browser/device can receive push messages
+- the device is not completely powered off
+
+### Backend Setup
+
+Install dependencies:
+
+```text
+npm install
+```
+
+Generate VAPID keys:
+
+```text
+npm run web-push:keys
+```
+
+Copy `.env.example` to `.env`, then paste the generated keys:
+
+```text
+VAPID_PUBLIC_KEY=...
+VAPID_PRIVATE_KEY=...
+```
+
+Start the backend:
+
+```text
+npm run dev
+```
+
+The backend runs at:
+
+```text
+http://localhost:3001
+```
+
+Then open Deadline Buddy and go to:
+
+```text
+reminders.html
+```
+
+Use:
+
+```text
+Enable Deadline Notifications
+Send Test Notification
+```
+
+### Important Reminder Note
+
+If the laptop is completely turned off, no notification can appear at that exact time. Web Push can work after the app tab is closed, but it still depends on the browser, operating system, internet connection, and push service.

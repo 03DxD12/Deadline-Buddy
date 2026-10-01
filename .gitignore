@@ -3,3 +3,8 @@ Deadline-Buddy-Final.zip
 .DS_Store
 Thumbs.db
 .vscode/
+node_modules/
+.env
+backend/*.sqlite
+backend/*.sqlite-shm
+backend/*.sqlite-wal

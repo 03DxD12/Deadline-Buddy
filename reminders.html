@@ -7,6 +7,7 @@
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,8 +71,8 @@
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Categorized list of urgent requirements needing immediate attention</p>
                 </div>
 
-                <button class="btn btn-primary" id="requestNotifPermBtn">
-                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Enable Desktop Alerts
+                <button class="btn btn-primary" id="enablePushBtn">
+                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Enable Deadline Notifications
                 </button>
 
                 <div class="notification-wrapper">
@@ -93,12 +94,47 @@
 
             <!-- Container -->
             <div class="container">
-                <!-- Browser permission notice -->
-                <div class="alert alert-info" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;" id="permAlert">
-                    <div>
-                        <span class="app-icon icon-bell" aria-hidden="true"></span> <strong>Browser Notifications Status:</strong> <span id="permStatusText">Checking permission...</span>
+                <!-- Web Push notification settings -->
+                <div class="card" style="margin-bottom: 24px; border-top: 4px solid var(--primary);">
+                    <div class="balanced-card-row" style="align-items: flex-start; gap: 16px;">
+                        <div style="min-width: 0;">
+                            <h3 style="margin: 0 0 6px; font-size: 1.08rem;">
+                                <span class="title-with-icon"><span class="app-icon icon-bell" aria-hidden="true"></span>Deadline Notifications</span>
+                            </h3>
+                            <p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.86rem;">
+                                Use this for real reminders that can appear after the Deadline Buddy tab is closed. The push backend must be running.
+                            </p>
+                            <div style="font-size: 0.88rem;">
+                                <strong>Status:</strong> <span id="pushStatusText">Checking...</span>
+                            </div>
+                            <p id="pushDetailText" style="margin: 6px 0 0; color: var(--text-muted); font-size: 0.82rem;">
+                                Enable deadline notifications to allow real Web Push reminders.
+                            </p>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;">
+                            <button class="btn btn-primary" id="sendTestPushBtn" type="button">Send Test Notification</button>
+                            <button class="btn btn-secondary" id="disablePushBtn" type="button">Disable Notifications</button>
+                        </div>
                     </div>
-                    <button class="btn btn-secondary" style="font-size: 0.8rem;" id="togglePermBtn">Request Permission</button>
+
+                    <div class="grid grid-2" style="margin-top: 18px;">
+                        <div>
+                            <label style="font-weight: 800; display: block; margin-bottom: 8px;">Remind Me</label>
+                            <div style="display: grid; gap: 8px;">
+                                <label><input type="checkbox" data-reminder-pref="oneDay"> 1 day before</label>
+                                <label><input type="checkbox" data-reminder-pref="oneHour"> 1 hour before</label>
+                                <label><input type="checkbox" data-reminder-pref="twentyMinutes"> 20 minutes before</label>
+                                <label><input type="checkbox" data-reminder-pref="overdue"> When overdue</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="pushApiBaseInput" style="font-weight: 800; display: block; margin-bottom: 8px;">Push Backend URL</label>
+                            <input id="pushApiBaseInput" class="form-control" type="url" placeholder="http://localhost:3001">
+                            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 0.78rem;">
+                                For local testing, run the Node backend. For production, use an HTTPS backend URL.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-4">
@@ -193,46 +229,14 @@
     <script src="js/deadline.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/pwa.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const reqPermBtn = document.getElementById('requestNotifPermBtn');
-            const togglePermBtn = document.getElementById('togglePermBtn');
-
-            function updatePermUI() {
-                const statusText = document.getElementById('permStatusText');
-                if ('Notification' in window) {
-                    statusText.textContent = Notification.permission.toUpperCase();
-                    if (Notification.permission === 'granted') {
-                        statusText.style.color = 'var(--success)';
-                        reqPermBtn.style.display = 'none';
-                        togglePermBtn.textContent = 'Notification Granted';
-                        togglePermBtn.disabled = true;
-                    } else if (Notification.permission === 'denied') {
-                        statusText.style.color = 'var(--danger)';
-                        togglePermBtn.textContent = 'Blocked in Browser Settings';
-                    } else {
-                        statusText.style.color = 'var(--warning)';
-                        togglePermBtn.textContent = 'Enable Notifications';
-                    }
-                } else {
-                    statusText.textContent = 'NOT SUPPORTED';
-                }
-            }
-
-            const requestPermission = () => {
-                requestBrowserNotificationPermission();
-                setTimeout(updatePermUI, 500);
-            };
-
-            reqPermBtn.addEventListener('click', requestPermission);
-            togglePermBtn.addEventListener('click', requestPermission);
-
             document.getElementById('clearLogBtn').addEventListener('click', () => {
                 Storage.clearNotifications();
                 renderReminders();
             });
 
-            updatePermUI();
             renderReminders();
         });
 
