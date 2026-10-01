@@ -1,7 +1,7 @@
 /**
  * PWA AND WEB PUSH CLIENT - Deadline Buddy
  * Registers the service worker, subscribes the browser for push reminders,
- * and syncs task reminder schedules to the optional Node backend.
+ * and syncs task reminder schedules to the Node backend.
  */
 
 const PUSH_STORAGE_KEYS = {

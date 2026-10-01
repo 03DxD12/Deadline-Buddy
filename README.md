@@ -1,10 +1,10 @@
 # Deadline Buddy
 
-Deadline Buddy is a simple academic deadline tracker for Grade 11 and Grade 12 students. It helps users create a local account, save subjects, school requirements, due dates, reminders, and checklist steps.
+Deadline Buddy is an academic deadline and reminder system for Grade 11 and Grade 12 students. Its core feature is deadline reminders that use PWA, Service Worker, and Web Push technology so students can receive alerts even when the Deadline Buddy page is closed.
 
 ## How To Open
 
-This version can still open as a static website for normal testing. It does not need XAMPP, PHP, or MySQL.
+This version can still open as a static website for normal interface testing. It does not need XAMPP, PHP, or MySQL.
 
 Open this file in a browser:
 
@@ -12,7 +12,7 @@ Open this file in a browser:
 index.html
 ```
 
-For real background reminders after the tab is closed, use the optional Web Push backend. That part needs Node.js because a browser-only website cannot schedule and send true Web Push reminders by itself.
+For the client's main requirement, real background reminders after the tab is closed require the Web Push backend. That part needs Node.js because a browser-only website cannot schedule and send true Web Push reminders by itself.
 
 You can also open:
 
@@ -51,10 +51,11 @@ CLIENT-DEMO-GUIDE.md
 - Deadline status badges
 - Alerts for overdue tasks
 - Alerts 20 minutes before a deadline
+- Alerts 1 hour before a deadline
 - Alerts 1 day before a deadline
 - Browser notification support
 - PWA manifest and service worker
-- Optional Web Push backend for closed-tab reminders
+- Web Push backend for closed-tab reminders
 - Responsive mobile calendar
 - Smooth UI animations and effects
 - Save and restore records using a downloaded file
@@ -100,7 +101,7 @@ Because the main student records are browser-based, accounts and normal records 
 
 ## Real Web Push Reminder Mode
 
-The old live reminders work only while Deadline Buddy is open. The upgraded Web Push mode adds:
+The old live reminders work only while Deadline Buddy is open. The core Web Push reminder mode adds:
 
 - `manifest.json`
 - `service-worker.js`

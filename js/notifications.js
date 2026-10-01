@@ -3,12 +3,14 @@
  * Exact alert rules:
  * - OVERDUE: due date/time has passed and task is not completed
  * - DUE_20_MIN: due in 20 minutes or less
+ * - DUE_1_HOUR: due in 1 hour or less
  * - DUE_1_DAY: due in 24 hours or less
  */
 
 const DEADLINE_ALERTS = {
     OVERDUE_MS: 0,
     TWENTY_MIN_MS: 20 * 60 * 1000,
+    ONE_HOUR_MS: 60 * 60 * 1000,
     ONE_DAY_MS: 24 * 60 * 60 * 1000,
     CHECK_INTERVAL_MS: 30 * 1000
 };
@@ -84,6 +86,15 @@ function getDeadlineAlert(task, diffMs, dueAt) {
         };
     }
 
+    if (diffMs <= DEADLINE_ALERTS.ONE_HOUR_MS) {
+        return {
+            type: 'DUE_1_HOUR',
+            triggerKey: `TASK_${taskId}_1_HOUR`,
+            title: '1-hour deadline reminder',
+            message: `"${task.title}" is due in about 1 hour (${dueText}).`
+        };
+    }
+
     if (diffMs <= DEADLINE_ALERTS.ONE_DAY_MS) {
         const hours = Math.max(1, Math.ceil(diffMs / 3600000));
         return {
@@ -120,6 +131,7 @@ function showToast(title, message, type) {
     const colors = {
         OVERDUE: { bg: '#ffe5ec', border: '#b51d54', label: 'Overdue' },
         DUE_20_MIN: { bg: '#fff0c2', border: '#7a4d00', label: '20 min' },
+        DUE_1_HOUR: { bg: '#e7f5ff', border: '#094067', label: '1 hour' },
         DUE_1_DAY: { bg: '#e5fff3', border: '#00664f', label: '1 day' }
     }[type] || { bg: '#fffffe', border: '#33272a', label: 'Alert' };
 
@@ -165,7 +177,7 @@ function showToast(title, message, type) {
         toast.style.opacity = '1';
     });
 
-    setTimeout(() => dismissToast(toast), type === 'OVERDUE' || type === 'DUE_20_MIN' ? 12000 : 8000);
+    setTimeout(() => dismissToast(toast), type === 'OVERDUE' || type === 'DUE_20_MIN' || type === 'DUE_1_HOUR' ? 12000 : 8000);
 }
 
 function dismissToast(toast) {

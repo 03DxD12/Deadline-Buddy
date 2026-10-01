@@ -4,7 +4,7 @@ Use this guide when presenting Deadline Buddy to someone who has never used the 
 
 ## Simple Explanation
 
-Deadline Buddy is a student helper app for Grade 11 and Grade 12 students. It helps students organize school requirements, subjects, deadlines, reminders, and checklist steps.
+Deadline Buddy is a student helper app for Grade 11 and Grade 12 students. It helps students organize school requirements, subjects, deadlines, reminders, and checklist steps. Its main feature is the deadline reminder system, which can use Web Push so reminders can still appear after the Deadline Buddy tab is closed.
 
 The app helps students see:
 
@@ -23,7 +23,7 @@ Open the project folder, then open this file in a browser:
 index.html
 ```
 
-This version does not need XAMPP, MySQL, or an online database. It runs directly in the browser.
+This version does not need XAMPP or MySQL. The pages can open directly in the browser for normal demo use, but real closed-tab reminders need the Node Web Push backend running.
 
 The records are saved inside the browser on the same laptop. If the student uses another laptop or browser, they should use the saved-records buttons on the Student Profile page.
 
@@ -119,7 +119,7 @@ Point out the reminder preview below the date and time field.
 
 Say:
 
-> The app shows when the deadline is due and when reminders will happen, including 1 day before and 20 minutes before the deadline.
+> The app shows when the deadline is due and when reminders will happen, including 1 day before, 1 hour before, 20 minutes before, and when a deadline becomes overdue.
 
 Add checklist steps:
 
@@ -169,16 +169,17 @@ Say:
 Explain:
 
 - If a task is 1 day before the deadline, the app shows a reminder.
+- If a task is 1 hour before the deadline, the app shows a reminder.
 - If a task is 20 minutes before the deadline, the app shows a stronger reminder.
 - If a task is past the deadline, the app marks it as overdue.
 
 Say:
 
-> The notification bell shows how many deadline alerts need attention.
+> The notification bell shows how many deadline alerts need attention. For the client's main requirement, use Enable Deadline Notifications so the backend can send Web Push reminders even when the app tab is closed.
 
 Important:
 
-> The app must be open in the browser for live pop-up reminders and sounds to appear.
+> Live pop-up reminders work while the app is open. Closed-tab reminders require the Web Push backend, notification permission, and the browser/device being able to receive push messages.
 
 ### 7. Show The Calendar
 
@@ -307,6 +308,6 @@ You can say this during the presentation:
 - The Remember my login option only works on the same browser.
 - To move records to another laptop or browser, use Download My Saved Records first.
 - Live reminder pop-ups work while the app is open in the browser.
-- Real closed-tab reminders use the optional PWA Web Push backend. Start the Node backend, enable Deadline Notifications on the Reminders page, then use Send Test Notification to confirm the push setup.
+- Real closed-tab reminders use the PWA Web Push backend. Start the Node backend, enable Deadline Notifications on the Reminders page, then use Send Test Notification to confirm the push setup.
 - If the laptop is completely turned off, no notification can appear at that exact time.
 - Desktop and mobile layouts are supported.
