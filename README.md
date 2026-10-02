@@ -23,7 +23,7 @@ The website alone should not be described as a guaranteed closed-app offline not
 ## Main Pages
 
 - `index.html` - login and sign-up page
-- `dashboard.html` - summary of deadlines and tasks
+- `dashboard.html` - summary of deadlines, today's classes, today's deadlines, and tasks
 - `tasks.html` - list of requirements
 - `task-form.html` - add or edit a requirement
 - `task-details.html` - view one requirement and checklist
@@ -35,6 +35,13 @@ The website alone should not be described as a guaranteed closed-app offline not
 ## Data
 
 The current shared app saves records in the browser using local storage.
+
+The dashboard also uses saved local records to show:
+
+- **Today's Classes** - based on the schedules saved on the Subjects page, such as `MWF` or `TTH`.
+- **Today's Deadlines** - unfinished requirements with a due date today.
+
+These sections work offline because they read from the student's saved local records.
 
 The Profile page includes:
 

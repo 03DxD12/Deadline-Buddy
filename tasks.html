@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,6 +161,10 @@
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
+        </a>
     </div>
 
     <script src="js/storage.js"></script>
@@ -276,7 +281,7 @@
                     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <div class="balanced-card-row" style="margin-bottom: 8px;">
-                                <span class="badge badge-normal" style="font-size: 0.75rem;">${t.type || t.taskType || 'Requirement'}</span>
+                                <span class="badge badge-normal category-badge" style="font-size: 0.75rem;">${formatRequirementCategory(t.type || t.taskType || 'Requirement')}</span>
                                 <span class="badge ${urgency.badgeClass}" data-due-date="${t.dueDate}">
                                     ${t.status === 'Completed' ? 'Completed' : urgency.label}
                                 </span>
@@ -286,7 +291,7 @@
                                 <a href="task-details.html?id=${t.id}" style="text-decoration: none; color: inherit;">${t.title}</a>
                             </h3>
                             <div class="card-meta-wrap" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                                <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> <strong>${sub ? sub.name : 'General'}</strong> &bull; Priority: <span style="font-weight: 600; color: ${t.priority === 'High' ? 'var(--danger)' : t.priority === 'Medium' ? 'var(--warning)' : 'var(--success)'};">${t.priority}</span>
+                                <span class="subject-meta-emoji" aria-hidden="true">📚</span> <strong>${sub ? sub.name : 'General'}</strong> &bull; Priority: <span style="font-weight: 600; color: ${t.priority === 'High' ? 'var(--danger)' : t.priority === 'Medium' ? 'var(--warning)' : 'var(--success)'};">${t.priority}</span>
                             </div>
 
                             ${t.description ? `<p class="card-meta-wrap" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">${t.description.length > 100 ? t.description.substring(0, 100) + '...' : t.description}</p>` : ''}

@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +24,48 @@
         }
         .calendar-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
             flex-wrap: wrap;
+            padding: 6px;
+            border: 1px solid rgba(231, 219, 213, 0.75);
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,254,0.88), rgba(255,240,243,0.72));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.72), 0 10px 24px rgba(43,44,52,0.04);
+        }
+        .calendar-nav-btn {
+            min-width: 108px;
+            min-height: 46px;
+            padding: 10px 16px;
+            border-radius: 13px;
+            border-color: rgba(255, 139, 167, 0.28);
+            background: rgba(255,255,254,0.92);
+            color: var(--text-heading);
+            font-weight: 900;
+            box-shadow: 0 6px 14px rgba(43,44,52,0.045);
+        }
+        .calendar-nav-btn .app-icon {
+            font-size: 0.92rem;
+        }
+        .calendar-nav-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(var(--primary-rgb), 0.16);
+        }
+        .calendar-nav-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+        .calendar-nav-today {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            border-color: var(--primary);
+            color: var(--primary-text);
+            box-shadow: var(--shadow-primary);
+        }
+        .calendar-nav-today:hover {
+            color: var(--primary-text);
+            background: linear-gradient(135deg, var(--primary-hover), var(--primary));
         }
         .calendar-grid {
             display: grid;
@@ -203,6 +243,9 @@
                 grid-template-columns: 1fr 1fr 1fr;
                 width: 100%;
                 order: 2;
+                gap: 6px;
+                padding: 5px;
+                border-radius: 14px;
             }
             .calendar-controls .btn {
                 width: 100%;
@@ -210,6 +253,8 @@
                 padding-left: clamp(4px, 1.6vw, 8px);
                 padding-right: clamp(4px, 1.6vw, 8px);
                 font-size: clamp(0.72rem, 3.2vw, 0.88rem);
+                min-width: 0;
+                gap: 5px;
             }
             #currentMonthYear {
                 width: 100%;
@@ -435,9 +480,9 @@
                 <div class="card calendar-page-card">
                     <div class="calendar-header">
                         <div class="calendar-controls">
-                            <button class="btn btn-secondary" id="prevMonthBtn">&larr; Prev</button>
-                            <button class="btn btn-secondary" id="todayBtn">Today</button>
-                            <button class="btn btn-secondary" id="nextMonthBtn">Next &rarr;</button>
+                            <button class="btn btn-secondary calendar-nav-btn" id="prevMonthBtn"><span class="app-icon icon-prev" aria-hidden="true"></span> Prev</button>
+                            <button class="btn btn-secondary calendar-nav-btn calendar-nav-today" id="todayBtn"><span class="app-icon icon-calendar" aria-hidden="true"></span> Today</button>
+                            <button class="btn btn-secondary calendar-nav-btn" id="nextMonthBtn">Next <span class="app-icon icon-next" aria-hidden="true"></span></button>
                         </div>
                         <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-heading);" id="currentMonthYear">September 2026</h2>
                     </div>
@@ -500,6 +545,10 @@
         <a href="reminders.html" class="mobile-nav-item">
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
         </a>
     </div>
 
@@ -622,7 +671,7 @@
                     }
 
                     const taskType = t.type || t.taskType || 'Requirement';
-                    const fullLabel = `${taskType}: ${t.title}`;
+                    const fullLabel = `${formatRequirementCategory(taskType)}: ${t.title}`;
                     pill.textContent = fullLabel;
                     pill.title = fullLabel;
                     pill.dataset.fullTitle = fullLabel;
@@ -662,7 +711,7 @@
                             <span class="badge ${urgency.badgeClass}">${urgency.label}</span>
                         </div>
                         <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
-                            Category: ${t.type} &bull; Due: ${new Date(t.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            Category: ${formatRequirementCategory(t.type || t.taskType || 'Requirement')} &bull; Due: ${new Date(t.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                         <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 10px;">View Requirement Details</a>
                     </div>

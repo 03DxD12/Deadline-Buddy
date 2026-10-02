@@ -8,6 +8,13 @@
 (function registerOfflineShell() {
     if (!('serviceWorker' in navigator)) return;
 
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+
     window.addEventListener('load', () => {
         if (window.location.protocol === 'file:') {
             console.info('Deadline Buddy PWA cache is available when opened from localhost or HTTPS.');
@@ -16,6 +23,7 @@
 
         navigator.serviceWorker
             .register('./service-worker.js')
+            .then(registration => registration.update())
             .catch(error => console.warn('Deadline Buddy service worker setup failed:', error));
     });
 })();

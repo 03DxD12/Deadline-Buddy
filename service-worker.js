@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deadline-buddy-shell-v2';
+const CACHE_NAME = 'deadline-buddy-shell-v14';
 const APP_SHELL = [
     './',
     './index.html',
@@ -11,6 +11,7 @@ const APP_SHELL = [
     './reminders.html',
     './profile.html',
     './css/style.css',
+    './css/fontawesome.min.css',
     './js/app.js',
     './js/deadline.js',
     './js/notifications.js',
@@ -18,6 +19,11 @@ const APP_SHELL = [
     './js/device-reminders.js',
     './js/storage.js',
     './images/deadline-buddy-logo.svg',
+    './images/subject-books.svg',
+    './webfonts/fa-brands-400.woff2',
+    './webfonts/fa-regular-400.woff2',
+    './webfonts/fa-solid-900.woff2',
+    './webfonts/fa-v4compatibility.woff2',
     './manifest.json'
 ];
 
@@ -50,11 +56,11 @@ self.addEventListener('fetch', event => {
     }
 
     event.respondWith(
-        caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+        fetch(event.request).then(response => {
             const copy = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
             return response;
-        }).catch(() => cached))
+        }).catch(() => caches.match(event.request))
     );
 });
 

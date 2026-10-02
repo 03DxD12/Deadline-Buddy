@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,16 +102,16 @@
                             <div class="form-group">
                                 <label for="taskType">Category / Type *</label>
                                 <select id="taskType" class="form-control" required>
-                                    <option value="Assignment">Assignment</option>
-                                    <option value="Project">Project</option>
-                                    <option value="Quiz">Quiz</option>
-                                    <option value="Exam">Exam</option>
-                                    <option value="Activity">Activity</option>
-                                    <option value="Performance Task">Performance Task</option>
-                                    <option value="Research">Research Requirement</option>
-                                    <option value="Presentation">Presentation</option>
-                                    <option value="Written Work">Written Work</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Assignment">📝 Assignment</option>
+                                    <option value="Project">📊 Project</option>
+                                    <option value="Quiz">🧠 Quiz</option>
+                                    <option value="Exam">💯 Exam</option>
+                                    <option value="Activity">🎯 Activity</option>
+                                    <option value="Performance Task">🎭 Performance Task</option>
+                                    <option value="Research">🔍 Research Requirement</option>
+                                    <option value="Presentation">🗣️ Presentation</option>
+                                    <option value="Written Work">✍️ Written Work</option>
+                                    <option value="Other">✨ Other</option>
                                 </select>
                             </div>
                         </div>
@@ -195,7 +196,6 @@
                                         </section>
                                     </div>
                                 </div>
-                                <div class="datetime-preview hidden" id="deadlinePreview" aria-live="polite"></div>
                             </div>
                             <div class="form-group priority-group">
                                 <label for="priority">Priority Level</label>
@@ -268,6 +268,10 @@
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
+        </a>
     </div>
 
     <script src="js/storage.js"></script>
@@ -283,7 +287,6 @@
             const addSubtaskBtn = document.getElementById('addSubtaskBtn');
             const taskForm = document.getElementById('taskForm');
             const dueDateInput = document.getElementById('dueDate');
-            const deadlinePreview = document.getElementById('deadlinePreview');
             const deadlineDisplay = document.getElementById('deadlineDisplay');
             const deadlineDisplaySub = document.getElementById('deadlineDisplaySub');
             const deadlinePickerTrigger = document.getElementById('deadlinePickerTrigger');
@@ -580,35 +583,12 @@
 
             function updateDeadlinePreview() {
                 if (!dueDateInput.value) {
-                    deadlinePreview.classList.add('hidden');
-                    deadlinePreview.textContent = '';
                     deadlineDisplay.textContent = 'Choose due date and time';
                     deadlineDisplaySub.textContent = 'Reminders will be prepared automatically';
                     return;
                 }
 
                 const due = new Date(dueDateInput.value);
-                const oneDayBefore = new Date(due.getTime() - 24 * 60 * 60 * 1000);
-                const oneHourBefore = new Date(due.getTime() - 60 * 60 * 1000);
-                const twentyMinsBefore = new Date(due.getTime() - 20 * 60 * 1000);
-                const now = new Date();
-
-                const previewTask = {
-                    dueDate: due.toISOString(),
-                    status: 'Pending'
-                };
-
-                deadlinePreview.classList.remove('hidden');
-                deadlinePreview.innerHTML = `
-                    <strong>Deadline Preview</strong>
-                    <div class="datetime-preview-list">
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>${formatPreviewDate(due)}</div>
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>Time Remaining: <strong>${Deadline.getTimeRemainingText(previewTask)}</strong></div>
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>1 day before: ${oneDayBefore > now ? formatPreviewDate(oneDayBefore) : 'Already passed'}</div>
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>1 hour before: ${oneHourBefore > now ? formatPreviewDate(oneHourBefore) : 'Already passed'}</div>
-                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>20 minutes before: ${twentyMinsBefore > now ? formatPreviewDate(twentyMinsBefore) : 'Already passed'}</div>
-                    </div>
-                `;
                 deadlineDisplay.textContent = formatPreviewDate(due);
                 deadlineDisplaySub.textContent = 'Alerts: 1 day, 1 hour, and 20 minutes before';
             }
@@ -652,8 +632,11 @@
 
                 if (!dueDate) {
                     openDeadlinePicker();
-                    deadlinePreview.classList.remove('hidden');
-                    deadlinePreview.innerHTML = '<strong>Please choose a due date and time before saving.</strong>';
+                    if (typeof showFeedbackToast === 'function') {
+                        showFeedbackToast('Please choose a due date and time before saving.', 'warning');
+                    } else {
+                        alert('Please choose a due date and time before saving.');
+                    }
                     return;
                 }
 

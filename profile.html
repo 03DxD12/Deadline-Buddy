@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -158,12 +159,14 @@
 
                             <div style="display: flex; flex-direction: column; gap: 12px;">
                                 <button class="btn btn-primary" id="exportBtn" style="justify-content: center; gap: 8px;">
+                                    <span class="app-icon icon-download" aria-hidden="true"></span>
                                     Download My Saved Records
                                 </button>
 
                                 <div style="position: relative;">
                                     <input type="file" id="importFileInput" accept=".json" style="display: none;">
                                     <button class="btn btn-secondary" id="importBtn" style="width: 100%; justify-content: center; gap: 8px;">
+                                        <span class="app-icon icon-upload" aria-hidden="true"></span>
                                         Bring Back My Saved Records
                                     </button>
                                 </div>
@@ -178,15 +181,16 @@
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
                                 Use this only for practice or presentation. It clears the records saved in this browser and brings back the sample records.
                             </p>
-                            <button class="btn btn-secondary" id="resetDemoBtn" style="width: 100%; justify-content: center; color: var(--warning); border-color: var(--warning);">
-                                Bring Back Sample Records
+                            <button class="btn btn-secondary" id="resetDemoBtn" style="width: 100%; justify-content: center; color: var(--warning); border-color: var(--warning); gap: 8px;">
+                                <span class="app-icon icon-reset" aria-hidden="true"></span>
+                                Clean All & Bring Back Sample Records
                             </button>
                         </div>
 
                         <!-- Theme Card -->
                         <div class="card" style="border-top: 3px solid var(--primary);">
                             <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-heading);">
-                                <span class="title-with-icon"><span class="app-icon icon-schedule" aria-hidden="true"></span>Change Theme</span>
+                                <span class="title-with-icon"><span class="app-icon icon-theme" aria-hidden="true"></span>Change Theme</span>
                             </h3>
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
                                 Choose the color style you want to use in Deadline Buddy.
@@ -241,6 +245,10 @@
         <a href="reminders.html" class="mobile-nav-item">
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item active">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
         </a>
     </div>
 
@@ -424,7 +432,7 @@
 
             // Reset demo data
             document.getElementById('resetDemoBtn').addEventListener('click', () => {
-                if (confirm('Are you sure? This will clear the records saved in this browser and bring back the sample records.')) {
+                if (confirm('Clean all records saved in this browser?\n\nThis will remove your current subjects, requirements, checklist steps, and notification history, then bring back the sample records.\n\nChoose OK only if you are sure.')) {
                     Storage.seedDemoData();
                     alert('Sample records restored.');
                     window.location.href = 'dashboard.html';

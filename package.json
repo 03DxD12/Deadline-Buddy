@@ -29,6 +29,7 @@
       "reminders.html",
       "profile.html",
       "css/**/*",
+      "webfonts/**/*",
       "js/**/*",
       "images/**/*",
       "electron/**/*",
@@ -43,5 +44,8 @@
         "nsis"
       ]
     }
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1"
   }
 }

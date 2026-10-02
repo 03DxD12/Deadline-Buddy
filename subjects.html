@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,8 +95,33 @@
 
             <!-- Container -->
             <div class="container">
-                <div class="alert alert-info" style="margin-bottom: 24px;">
-                    <span class="meta-icon app-icon icon-info" aria-hidden="true"></span> <strong>Tip:</strong> Adding subjects helps you group your assignments, performance tasks, and quizzes accurately!
+                <div class="subject-guide">
+                    <div class="subject-guide-main">
+                        <span class="subject-guide-icon app-icon icon-info" aria-hidden="true"></span>
+                        <div>
+                            <h2>Build Your Subject List</h2>
+                            <p>Add each subject with teacher and schedule. Deadline Buddy uses this to group requirements and show Today's Classes on the dashboard.</p>
+                        </div>
+                    </div>
+                    <div class="subject-guide-actions">
+                        <a href="dashboard.html" class="btn btn-secondary"><span class="app-icon icon-home" aria-hidden="true"></span> Dashboard</a>
+                        <a href="tasks.html" class="btn btn-secondary"><span class="app-icon icon-tasks" aria-hidden="true"></span> Requirements</a>
+                    </div>
+                </div>
+
+                <div class="subject-summary-strip">
+                    <div>
+                        <span>Total Subjects</span>
+                        <strong id="subjectTotalCount">0</strong>
+                    </div>
+                    <div>
+                        <span>Total Requirements</span>
+                        <strong id="subjectRequirementCount">0</strong>
+                    </div>
+                    <div>
+                        <span>Pending Requirements</span>
+                        <strong id="subjectPendingCount">0</strong>
+                    </div>
                 </div>
 
                 <!-- Subjects Grid -->
@@ -157,6 +183,10 @@
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
+        </a>
     </div>
 
     <script src="js/storage.js"></script>
@@ -182,6 +212,11 @@
                 const subjects = Storage.getSubjects();
                 const tasks = Storage.getTasks();
                 const grid = document.getElementById('subjectsGrid');
+                const totalPending = tasks.filter(t => t.status !== 'Completed').length;
+
+                document.getElementById('subjectTotalCount').textContent = subjects.length;
+                document.getElementById('subjectRequirementCount').textContent = tasks.length;
+                document.getElementById('subjectPendingCount').textContent = totalPending;
 
                 if (subjects.length === 0) {
                     grid.innerHTML = `
@@ -198,13 +233,14 @@
                 grid.innerHTML = subjects.map(sub => {
                     const taskCount = tasks.filter(t => t.subjectId === sub.id).length;
                     const pendingCount = tasks.filter(t => t.subjectId === sub.id && t.status !== 'Completed').length;
+                    const completedCount = taskCount - pendingCount;
 
                     return `
                         <div class="card subject-card">
                             <div class="subject-card-header">
                                 <span class="subject-icon-badge app-icon icon-subjects" aria-hidden="true"></span>
                                 <div class="subject-title-block">
-                                    <h3 class="card-title-wrap" style="margin: 0 0 4px 0; font-size: 1.1rem; color: var(--text-heading);">${sub.name}</h3>
+                                    <h3 class="card-title-wrap">${sub.name}</h3>
                                     <div class="card-meta-wrap" style="font-size: 0.85rem; color: var(--text-muted);">${sub.teacher || 'Teacher Unspecified'}</div>
                                 </div>
                                 <span class="badge ${pendingCount > 0 ? 'badge-due-soon' : 'badge-completed'}">
@@ -213,15 +249,24 @@
                             </div>
 
                             <div class="soft-info-box">
-                                <span class="meta-icon app-icon icon-pin" aria-hidden="true"></span> <strong>Schedule / Notes:</strong><br>
-                                ${sub.schedule ? sub.schedule.replace(/\n/g, '<br>') : 'No schedule added.'}
+                                <div class="subject-schedule-head">
+                                    <span class="meta-icon app-icon icon-schedule" aria-hidden="true"></span>
+                                    <strong>Schedule / Notes</strong>
+                                </div>
+                                <div class="subject-schedule-text">${sub.schedule ? sub.schedule.replace(/\n/g, '<br>') : 'No schedule added.'}</div>
+                            </div>
+
+                            <div class="subject-count-row">
+                                <span><strong>${taskCount}</strong> total</span>
+                                <span><strong>${pendingCount}</strong> pending</span>
+                                <span><strong>${completedCount}</strong> done</span>
                             </div>
 
                             <div class="subject-card-footer">
-                                <span class="card-meta-wrap" style="color: var(--text-muted);">Total Requirements: <strong>${taskCount}</strong></span>
+                                <a href="tasks.html" class="subject-view-link">View requirements</a>
                                 <div class="action-row">
-                                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="editSubject('${sub.id}')">Edit</button>
-                                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="deleteSubject('${sub.id}')">Delete</button>
+                                    <button class="btn btn-secondary subject-action-btn" onclick="editSubject('${sub.id}')"><span class="app-icon icon-edit" aria-hidden="true"></span> Edit</button>
+                                    <button class="btn btn-danger subject-action-btn" onclick="deleteSubject('${sub.id}')"><span class="app-icon icon-delete" aria-hidden="true"></span> Delete</button>
                                 </div>
                             </div>
                         </div>

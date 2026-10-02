@@ -5,6 +5,30 @@
 
 applySavedTheme();
 
+const RequirementCategoryIcons = {
+    Assignment: '📝',
+    Project: '📊',
+    Quiz: '🧠',
+    Exam: '💯',
+    Activity: '🎯',
+    'Performance Task': '🎭',
+    Research: '🔍',
+    'Research Requirement': '🔍',
+    Presentation: '🗣️',
+    'Written Work': '✍️',
+    Other: '✨',
+    Requirement: '📋'
+};
+
+function getRequirementCategoryIcon(type) {
+    return RequirementCategoryIcons[type] || RequirementCategoryIcons.Requirement;
+}
+
+function formatRequirementCategory(type) {
+    const label = type || 'Requirement';
+    return `${getRequirementCategoryIcon(label)} ${label === 'Research' ? 'Research Requirement' : label}`;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     applySavedTheme();
     initCommonUI();

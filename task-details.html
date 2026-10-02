@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,6 +110,10 @@
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
         </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
+        </a>
     </div>
 
     <script src="js/storage.js"></script>
@@ -165,7 +170,7 @@
                 <div class="card" style="margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
                         <div>
-                            <span class="badge badge-normal" style="margin-bottom: 8px;">${currentTask.type}</span>
+                            <span class="badge badge-normal category-badge" style="margin-bottom: 8px;">${formatRequirementCategory(currentTask.type || currentTask.taskType || 'Requirement')}</span>
                             <h2 style="margin: 4px 0 8px 0; font-size: 1.5rem; color: var(--text-heading);">${currentTask.title}</h2>
                             <div style="font-size: 0.95rem; color: var(--text-muted);">
                                 Subject: <strong style="color: var(--text-main);">${subject ? subject.name : 'Unspecified'}</strong> 

@@ -8,6 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -158,7 +159,7 @@
                     <!-- Due Today Section -->
                     <div class="card reminder-column" style="border-top: 4px solid var(--warning);">
                         <h3 class="reminder-column-header" style="margin-top: 0; color: var(--warning); font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Due Today</span></span>
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-calendar" aria-hidden="true"></span><span>Due Today</span></span>
                             <span class="badge badge-urgent" id="dueTodayCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Deadlines today.</p>
@@ -170,7 +171,7 @@
                     <!-- Urgent Section -->
                     <div class="card reminder-column" style="border-top: 4px solid #3b82f6;">
                         <h3 class="reminder-column-header" style="margin-top: 0; color: #3b82f6; font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Urgent</span></span>
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-bell" aria-hidden="true"></span><span>Urgent</span></span>
                             <span class="badge badge-due-soon" id="dueTomorrowCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Less than 24 hours left.</p>
@@ -182,7 +183,7 @@
                     <!-- Coming Up Section -->
                     <div class="card reminder-column" style="border-top: 4px solid var(--primary);">
                         <h3 class="reminder-column-header" style="margin-top: 0; color: var(--primary); font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-schedule" aria-hidden="true"></span><span>Due Soon & Upcoming</span></span>
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Due Soon & Upcoming</span></span>
                             <span class="badge badge-normal" id="comingUpCount">0</span>
                         </h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Future requirements to prepare for.</p>
@@ -227,6 +228,10 @@
         <a href="reminders.html" class="mobile-nav-item active">
             <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
             <span>Alerts</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
         </a>
     </div>
 
@@ -294,7 +299,7 @@
                             <div>
                                 <strong class="card-title-wrap" style="font-size: 0.92rem; color: var(--text-heading);">${t.title}</strong>
                                 <div class="reminder-task-meta">
-                                    <span class="meta-icon app-icon icon-subjects" aria-hidden="true"></span> ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; <span data-due-date="${t.dueDate}">${urgency.label}</span>
+                                    <span class="category-emoji" aria-hidden="true">${getRequirementCategoryIcon(t.type || t.taskType || 'Requirement')}</span> ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; <span data-due-date="${t.dueDate}">${urgency.label}</span>
                                 </div>
                             </div>
                             <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 8px;">View</a>

@@ -75,7 +75,13 @@ Point out:
 - Overdue
 - Completed
 - Priority Requirement Focus
+- Today's Classes
+- Today's Deadlines
 - Upcoming Academic Tasks
+
+Say:
+
+> Today's Classes shows the subjects scheduled for the current day. Today's Deadlines shows requirements that must be submitted today. These are based on the saved records, so they still show even without internet.
 
 ### 3. Show Subjects
 
@@ -84,6 +90,10 @@ Open the Subjects page.
 Say:
 
 > This page is where the student saves their subjects, teacher names, and class schedules.
+
+Mention:
+
+> The schedule is important because the dashboard can use it to show Today's Classes. Examples are MWF 9:00 AM or TTH 1:00 PM.
 
 Add a sample subject:
 
