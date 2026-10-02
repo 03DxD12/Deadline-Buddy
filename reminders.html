@@ -71,8 +71,8 @@
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Categorized list of urgent requirements needing immediate attention</p>
                 </div>
 
-                <button class="btn btn-primary" id="enablePushBtn">
-                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Enable Deadline Notifications
+                <button class="btn btn-primary device-test-btn" id="sendDeviceTopbarTestBtn">
+                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Send Test Notification
                 </button>
 
                 <div class="notification-wrapper">
@@ -94,7 +94,7 @@
 
             <!-- Container -->
             <div class="container">
-                <!-- Web Push notification settings -->
+                <!-- Device notification settings -->
                 <div class="card" style="margin-bottom: 24px; border-top: 4px solid var(--primary);">
                     <div class="balanced-card-row" style="align-items: flex-start; gap: 16px;">
                         <div style="min-width: 0;">
@@ -102,18 +102,20 @@
                                 <span class="title-with-icon"><span class="app-icon icon-bell" aria-hidden="true"></span>Deadline Notifications</span>
                             </h3>
                             <p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.86rem;">
-                                Use this for real reminders that can appear after the Deadline Buddy tab is closed. The push backend must be running.
+                                Use the Windows app version for offline reminders that continue after the main screen is closed.
                             </p>
                             <div style="font-size: 0.88rem;">
-                                <strong>Status:</strong> <span id="pushStatusText">Checking...</span>
+                                <strong>Status:</strong> <span id="deviceReminderStatusText">Checking...</span>
                             </div>
-                            <p id="pushDetailText" style="margin: 6px 0 0; color: var(--text-muted); font-size: 0.82rem;">
-                                Enable deadline notifications to allow real Web Push reminders.
+                            <p id="deviceReminderDetailText" style="margin: 6px 0 0; color: var(--text-muted); font-size: 0.82rem;">
+                                Checking the available reminder mode.
+                            </p>
+                            <p id="deviceReminderPlatformText" style="margin: 6px 0 0; color: var(--primary); font-size: 0.82rem; font-weight: 800;">
+                                Offline Device Reminders: Checking
                             </p>
                         </div>
                         <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;">
-                            <button class="btn btn-primary" id="sendTestPushBtn" type="button">Send Test Notification</button>
-                            <button class="btn btn-secondary" id="disablePushBtn" type="button">Disable Notifications</button>
+                            <button class="btn btn-primary device-test-btn" id="sendDeviceCardTestBtn" type="button">Send Test Notification</button>
                         </div>
                     </div>
 
@@ -121,17 +123,20 @@
                         <div>
                             <label style="font-weight: 800; display: block; margin-bottom: 8px;">Remind Me</label>
                             <div style="display: grid; gap: 8px;">
-                                <label><input type="checkbox" data-reminder-pref="oneDay"> 1 day before</label>
-                                <label><input type="checkbox" data-reminder-pref="oneHour"> 1 hour before</label>
-                                <label><input type="checkbox" data-reminder-pref="twentyMinutes"> 20 minutes before</label>
-                                <label><input type="checkbox" data-reminder-pref="overdue"> When overdue</label>
+                                <label><input type="checkbox" data-device-reminder-pref="oneDay"> 1 day before</label>
+                                <label><input type="checkbox" data-device-reminder-pref="oneHour"> 1 hour before</label>
+                                <label><input type="checkbox" data-device-reminder-pref="twentyMinutes"> 20 minutes before</label>
+                                <label><input type="checkbox" data-device-reminder-pref="overdue"> When overdue</label>
                             </div>
                         </div>
                         <div>
-                            <label for="pushApiBaseInput" style="font-weight: 800; display: block; margin-bottom: 8px;">Push Backend URL</label>
-                            <input id="pushApiBaseInput" class="form-control" type="url" placeholder="http://localhost:3001">
+                            <label style="font-weight: 800; display: block; margin-bottom: 8px;">Windows Option</label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="startWithWindowsToggle">
+                                Start Deadline Buddy with Windows
+                            </label>
                             <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 0.78rem;">
-                                For local testing, run the Node backend. For production, use an HTTPS backend URL.
+                                This option is available in the packaged Windows app.
                             </p>
                         </div>
                     </div>
@@ -162,13 +167,13 @@
                         </div>
                     </div>
 
-                    <!-- Due Tomorrow Section -->
+                    <!-- Urgent Section -->
                     <div class="card reminder-column" style="border-top: 4px solid #3b82f6;">
                         <h3 class="reminder-column-header" style="margin-top: 0; color: #3b82f6; font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-calendar" aria-hidden="true"></span><span>Due Tomorrow</span></span>
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Urgent</span></span>
                             <span class="badge badge-due-soon" id="dueTomorrowCount">0</span>
                         </h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Requirements within 24h.</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Less than 24 hours left.</p>
                         <div id="dueTomorrowList" style="display: flex; flex-direction: column; gap: 10px;">
                             <!-- Rendered dynamically -->
                         </div>
@@ -177,10 +182,10 @@
                     <!-- Coming Up Section -->
                     <div class="card reminder-column" style="border-top: 4px solid var(--primary);">
                         <h3 class="reminder-column-header" style="margin-top: 0; color: var(--primary); font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-schedule" aria-hidden="true"></span><span>Coming Up Soon</span></span>
+                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-schedule" aria-hidden="true"></span><span>Due Soon & Upcoming</span></span>
                             <span class="badge badge-normal" id="comingUpCount">0</span>
                         </h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Due within 3-7 days.</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Future requirements to prepare for.</p>
                         <div id="comingUpList" style="display: flex; flex-direction: column; gap: 10px;">
                             <!-- Rendered dynamically -->
                         </div>
@@ -230,6 +235,7 @@
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
+    <script src="js/device-reminders.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('clearLogBtn').addEventListener('click', () => {
@@ -246,27 +252,23 @@
 
             const overdue = [];
             const dueToday = [];
-            const dueTomorrow = [];
+            const urgent = [];
             const comingUp = [];
 
             const now = new Date();
-            const todayStr = now.toISOString().split('T')[0];
-
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            const todayStr = localDateKey(now);
 
             tasks.forEach(t => {
                 const urgency = Deadline.getUrgencyState(t.dueDate, t.dueTime, t.status);
                 const taskDate = Deadline.parseTaskDueDateTime(t.dueDate, t.dueTime);
-                const tDateStr = taskDate.toISOString().split('T')[0];
+                const tDateStr = localDateKey(taskDate);
 
                 if (urgency.status === 'Overdue') {
                     overdue.push(t);
                 } else if (tDateStr === todayStr) {
                     dueToday.push(t);
-                } else if (tDateStr === tomorrowStr) {
-                    dueTomorrow.push(t);
+                } else if (urgency.status === 'Urgent') {
+                    urgent.push(t);
                 } else {
                     comingUp.push(t);
                 }
@@ -274,7 +276,7 @@
 
             document.getElementById('overdueCount').textContent = overdue.length;
             document.getElementById('dueTodayCount').textContent = dueToday.length;
-            document.getElementById('dueTomorrowCount').textContent = dueTomorrow.length;
+            document.getElementById('dueTomorrowCount').textContent = urgent.length;
             document.getElementById('comingUpCount').textContent = comingUp.length;
 
             function renderTaskGroup(listElId, groupTasks) {
@@ -303,7 +305,7 @@
 
             renderTaskGroup('overdueList', overdue);
             renderTaskGroup('dueTodayList', dueToday);
-            renderTaskGroup('dueTomorrowList', dueTomorrow);
+            renderTaskGroup('dueTomorrowList', urgent);
             renderTaskGroup('comingUpList', comingUp);
 
             // Render notification log
@@ -321,6 +323,11 @@
                     </div>
                 `).join('');
             }
+        }
+
+        function localDateKey(date) {
+            const d = date instanceof Date ? date : new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
     </script>
 </body>

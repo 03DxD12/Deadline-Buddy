@@ -4,9 +4,9 @@ Use this guide when presenting Deadline Buddy to someone who has never used the 
 
 ## Simple Explanation
 
-Deadline Buddy is a student helper app for Grade 11 and Grade 12 students. It helps students organize school requirements, subjects, deadlines, reminders, and checklist steps. Its main feature is the deadline reminder system, which can use Web Push so reminders can still appear after the Deadline Buddy tab is closed.
+Deadline Buddy is a student helper app for Grade 11 and Grade 12 students. It helps students organize school requirements, subjects, deadlines, reminders, and checklist steps.
 
-The app helps students see:
+It helps students see:
 
 - tasks they still need to finish
 - tasks that are almost due
@@ -15,32 +15,42 @@ The app helps students see:
 - smaller steps needed to finish a big requirement
 - reminders before a deadline
 
+## Important Version Explanation
+
+There are two versions:
+
+- **Website version** - good for normal browser use and presentation.
+- **Windows app version** - needed for real offline reminders when the main screen is closed.
+
+Say this clearly:
+
+> The website version can show reminders while it is open. The Windows app version is the one designed to keep reminders active even when the main Deadline Buddy screen is closed.
+
 ## Before The Demo
 
-Open the project folder, then open this file in a browser:
+For browser demo:
 
 ```text
-index.html
+Open index.html
 ```
 
-This version does not need XAMPP or MySQL. The pages can open directly in the browser for normal demo use, but real closed-tab reminders need the Node Web Push backend running.
+For Windows offline reminder demo:
 
-The records are saved inside the browser on the same laptop. If the student uses another laptop or browser, they should use the saved-records buttons on the Student Profile page.
+```text
+Open Deadline Buddy using the Electron/Windows app version
+```
+
+The app does not need XAMPP, MySQL, PHP, or an online database.
 
 ## Demo Script
 
 ### 1. Start The App
 
-Open `index.html`.
+Open `index.html` or the Windows app.
 
 Say:
 
 > This is the login and sign-up page of Deadline Buddy. A student can create an account, choose Grade 11 or Grade 12, and log in using a username and password.
-
-Show the two tabs:
-
-- Log In
-- Sign Up
 
 Create a sample account:
 
@@ -52,17 +62,11 @@ Grade Level: Grade 12
 Strand / Track: ASSH
 ```
 
-Mention:
-
-> The Remember my login option saves the login on this browser, so the student does not need to type it again next time.
-
-After signing up or logging in, open the dashboard.
-
 ### 2. Show The Dashboard
 
 Say:
 
-> The dashboard shows a quick summary of the student's school requirements. It shows how many tasks are saved, how many are completed, which tasks are late, and which deadline needs attention first.
+> The dashboard gives a quick summary of the student's requirements. It shows total tasks, tasks due today, overdue tasks, completed tasks, and the most urgent requirement.
 
 Point out:
 
@@ -72,10 +76,6 @@ Point out:
 - Completed
 - Priority Requirement Focus
 - Upcoming Academic Tasks
-
-Say:
-
-> The app automatically highlights the most urgent requirement so the student knows what to focus on first.
 
 ### 3. Show Subjects
 
@@ -93,33 +93,23 @@ Teacher: Mr. Ramos
 Schedule: TTH 1:00 PM
 ```
 
-Say:
-
-> Adding subjects helps the student group requirements properly.
-
 ### 4. Add A Requirement
 
-Open the Add Requirement page.
+Open Add Requirement.
 
 Say:
 
-> This is where the student adds assignments, performance tasks, projects, quizzes, research work, and other school requirements.
+> This is where the student adds assignments, projects, quizzes, exams, research work, and other school requirements.
 
-Add a sample requirement:
+Example:
 
 ```text
 Title: Research Chapter 2 Draft
 Subject: Practical Research 2
 Category: Research Requirement
-Due Date: Tomorrow or a few minutes from now
-Priority: High
+Due Date: A few minutes from now for demo
+Priority: Hard
 ```
-
-Point out the reminder preview below the date and time field.
-
-Say:
-
-> The app shows when the deadline is due and when reminders will happen, including 1 day before, 1 hour before, 20 minutes before, and when a deadline becomes overdue.
 
 Add checklist steps:
 
@@ -140,7 +130,7 @@ Open Tasks & Requirements.
 
 Say:
 
-> This page shows all saved requirements. The student can search, filter, and mark tasks as done.
+> This page shows all saved requirements. The student can search, filter, view details, edit tasks, and mark tasks as done.
 
 Show:
 
@@ -154,36 +144,38 @@ Show:
 - Edit button
 - Done button
 
-Say:
-
-> When a task is marked as done, the status updates automatically.
-
 ### 6. Show Reminders And Alerts
 
 Open Reminders & Alerts.
 
 Say:
 
-> This page helps the student see which tasks are overdue, due today, due tomorrow, or coming soon.
+> This page groups requirements by urgency, such as overdue, due today, due tomorrow, and coming soon.
 
 Explain:
 
-- If a task is 1 day before the deadline, the app shows a reminder.
-- If a task is 1 hour before the deadline, the app shows a reminder.
-- If a task is 20 minutes before the deadline, the app shows a stronger reminder.
-- If a task is past the deadline, the app marks it as overdue.
+- 1 day before means the deadline is near.
+- 1 hour before means the student should focus soon.
+- 20 minutes before means the deadline is urgent.
+- Overdue means the deadline already passed.
 
 Say:
 
-> The notification bell shows how many deadline alerts need attention. For the client's main requirement, use Enable Deadline Notifications so the backend can send Web Push reminders even when the app tab is closed.
+> The notification bell shows how many deadline alerts need attention.
 
-Important:
+For Windows app demo, click:
 
-> Live pop-up reminders work while the app is open. Closed-tab reminders require the Web Push backend, notification permission, and the browser/device being able to receive push messages.
+```text
+Send Test Notification
+```
+
+Say:
+
+> In the Windows app version, Deadline Buddy can stay in the system tray and continue checking reminders after the main screen is closed.
 
 ### 7. Show The Calendar
 
-Open the Calendar page.
+Open Calendar.
 
 Say:
 
@@ -191,123 +183,56 @@ Say:
 
 Point out:
 
-- colored deadline labels
 - current date highlight
-- smooth calendar effects
-- responsive mobile calendar layout
-- floating add button on mobile view
+- deadline labels
+- previous and next month controls
+- responsive phone layout
 
-Say:
-
-> On phones, the calendar adjusts to different screen sizes such as Android phones and iPhones.
-
-### 8. Show Student Profile And Saved Records
+### 8. Show Student Profile
 
 Open Student Profile.
 
 Say:
 
-> This page saves the student's profile information. It also lets the student keep a copy of their saved Deadline Buddy records.
+> This page saves the student's profile information, theme, and saved-record tools.
 
-Show that Grade Level can be:
-
-- Grade 11
-- Grade 12
-
-Explain the buttons:
+Explain:
 
 ```text
 Download My Saved Records
 ```
 
-This saves a copy of the student's profile, subjects, tasks, checklist steps, and reminders to the laptop.
+This saves a copy of the student's records.
 
 ```text
 Bring Back My Saved Records
 ```
 
-This brings the saved records back into the app, especially if the student uses another browser or laptop.
+This restores saved records.
 
 ```text
 Bring Back Sample Records
 ```
 
-This resets the app to sample Grade 12 ASSH records for practice or presentation.
+This clears current demo records and brings back sample records.
 
-Say:
+## Offline Reminder Demo For Windows App
 
-> These buttons are useful because this version saves records in the browser, not in an online account.
+Use this only when testing the packaged Windows/Electron version.
 
-## Simple Page Guide
+1. Create a task due 2 minutes from now.
+2. Save the task.
+3. Go to Reminders and click Send Test Notification.
+4. Turn Wi-Fi off.
+5. Close the main Deadline Buddy window.
+6. Confirm Deadline Buddy stays in the system tray.
+7. Wait for the reminder.
+8. A Windows notification should appear.
 
-```text
-index.html
-```
+Important:
 
-Login and sign-up page. Students can create a local account, choose Grade 11 or Grade 12, and log in.
-
-```text
-dashboard.html
-```
-
-Main summary page. Shows important counts, urgent requirements, and upcoming tasks.
-
-```text
-tasks.html
-```
-
-List of all school requirements. Used for searching, filtering, viewing, editing, and marking tasks as done.
-
-```text
-task-form.html
-```
-
-Form for adding or editing a requirement. Includes due date, time, priority, and checklist steps.
-
-```text
-task-details.html
-```
-
-Full view of one requirement, including deadline details and checklist steps.
-
-```text
-subjects.html
-```
-
-Page for adding and managing subjects, teacher names, and schedules.
-
-```text
-calendar.html
-```
-
-Monthly calendar view of deadlines. It is responsive for desktop and mobile screens.
-
-```text
-reminders.html
-```
-
-Page for deadline alerts and reminder history.
-
-```text
-profile.html
-```
-
-Student profile page and saved-records tools.
+> If the laptop is completely powered off, no notification can appear at that exact time.
 
 ## Short Client Explanation
 
-You can say this during the presentation:
-
-> Deadline Buddy is a simple deadline tracker for Grade 11 and Grade 12 students. It helps students create an account, save subjects, list school requirements, set due dates, add checklist steps, and receive reminders before deadlines. It is designed to help students avoid forgetting schoolwork and manage their tasks more clearly.
-
-## Important Notes
-
-- The app can run by opening `index.html`.
-- It does not need XAMPP or MySQL.
-- Login accounts and school records are saved in the browser on the same laptop.
-- The Remember my login option only works on the same browser.
-- To move records to another laptop or browser, use Download My Saved Records first.
-- Live reminder pop-ups work while the app is open in the browser.
-- Real closed-tab reminders use the PWA Web Push backend. Start the Node backend, enable Deadline Notifications on the Reminders page, then use Send Test Notification to confirm the push setup.
-- If the laptop is completely turned off, no notification can appear at that exact time.
-- Desktop and mobile layouts are supported.
+> Deadline Buddy is a simple deadline tracker for Grade 11 and Grade 12 students. It helps students save subjects, list school requirements, set due dates, add checklist steps, and receive reminders before deadlines. The Windows app version is designed for offline reminders even when the main screen is closed.

@@ -403,6 +403,9 @@ function exportBackupJSON() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    if (typeof showFeedbackToast === 'function') {
+        showFeedbackToast('Backup downloaded successfully.', 'success');
+    }
 }
 
 // Import Backup JSON
@@ -418,9 +421,15 @@ function importBackupJSON(jsonStr) {
         if (data.subjects) saveSubjects(data.subjects);
         if (data.tasks) saveTasks(data.tasks);
         if (data.notifications) saveNotifications(data.notifications);
+        if (typeof showFeedbackToast === 'function') {
+            showFeedbackToast('Saved records restored successfully.', 'success');
+        }
         return { success: true };
     } catch (err) {
         console.error('Import failed:', err);
+        if (typeof showFeedbackToast === 'function') {
+            showFeedbackToast('Unable to restore saved records. Please choose a valid Deadline Buddy backup file.', 'error');
+        }
         return { success: false, error: err.message || 'Invalid backup file.' };
     }
 }
@@ -431,6 +440,9 @@ function seedDemoData() {
     localStorage.removeItem(STORAGE_KEYS.TASKS);
     localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
     initStorage();
+    if (typeof showFeedbackToast === 'function') {
+        showFeedbackToast('Sample records restored.', 'success');
+    }
 }
 
 // Auto-init on script load

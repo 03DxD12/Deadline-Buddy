@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     applySavedTheme();
     initCommonUI();
     updateLiveTimers();
-    setInterval(updateLiveTimers, 1000);
+    setInterval(updateLiveTimers, 30000);
 });
 
 function applySavedTheme() {
@@ -79,6 +79,10 @@ function initCommonUI() {
     // Notification Bell Dropdown setup
     setupNotificationBell();
     setupButtonPressEffects();
+    setupTooltips();
+    setupOfflineStatus();
+    setupPwaInstallPrompt();
+    showPendingFeedbackToast();
 
     // Password visibility toggle buttons
     const passToggleBtns = document.querySelectorAll('.password-toggle-btn');
@@ -107,6 +111,141 @@ function initCommonUI() {
         }, 6000);
     });
 }
+
+function showPendingFeedbackToast() {
+    try {
+        const pending = JSON.parse(sessionStorage.getItem('deadlinebuddy_pending_toast'));
+        if (!pending) return;
+        sessionStorage.removeItem('deadlinebuddy_pending_toast');
+        showFeedbackToast(pending.message, pending.type || 'info', pending.title || '');
+    } catch (error) {
+        sessionStorage.removeItem('deadlinebuddy_pending_toast');
+    }
+}
+
+function queueFeedbackToast(message, type = 'info', title = '') {
+    sessionStorage.setItem('deadlinebuddy_pending_toast', JSON.stringify({ message, type, title }));
+}
+
+window.queueFeedbackToast = queueFeedbackToast;
+
+function setupTooltips() {
+    const tooltipTargets = document.querySelectorAll('.icon-btn, .mobile-toggle, .password-toggle-btn, [aria-label]');
+    tooltipTargets.forEach(target => {
+        if (target.dataset.tooltip) return;
+        const label = target.getAttribute('aria-label') || target.getAttribute('title');
+        if (!label) return;
+        target.dataset.tooltip = label;
+    });
+}
+
+function setupOfflineStatus() {
+    let banner = document.getElementById('connectionStatusBanner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'connectionStatusBanner';
+        banner.className = 'connection-status-banner hidden';
+        banner.setAttribute('role', 'status');
+        banner.setAttribute('aria-live', 'polite');
+        document.body.appendChild(banner);
+    }
+
+    const updateStatus = (showToast = false) => {
+        if (navigator.onLine) {
+            banner.classList.add('hidden');
+            banner.textContent = '';
+            if (showToast) showFeedbackToast('You are back online. Deadline Buddy is connected again.', 'success');
+            return;
+        }
+
+        banner.classList.remove('hidden');
+        banner.innerHTML = '<strong>Offline Mode</strong><span>Your saved requirements, calendar, and deadlines are still available.</span>';
+        if (showToast) showFeedbackToast('Offline Mode: your saved requirements are still available.', 'info');
+    };
+
+    updateStatus(false);
+    window.addEventListener('offline', () => updateStatus(true));
+    window.addEventListener('online', () => updateStatus(true));
+}
+
+function setupPwaInstallPrompt() {
+    const DISMISSED_KEY = 'deadlinebuddy_install_prompt_dismissed';
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', event => {
+        if (localStorage.getItem(DISMISSED_KEY) === 'true') return;
+        event.preventDefault();
+        deferredPrompt = event;
+        renderInstallPrompt();
+    });
+
+    function renderInstallPrompt() {
+        if (document.getElementById('pwaInstallPrompt')) return;
+
+        const prompt = document.createElement('div');
+        prompt.id = 'pwaInstallPrompt';
+        prompt.className = 'pwa-install-prompt';
+        prompt.innerHTML = `
+            <div>
+                <strong>Install Deadline Buddy</strong>
+                <span>Open it like an app from your desktop or home screen.</span>
+            </div>
+            <div class="pwa-install-actions">
+                <button class="btn btn-primary" type="button" id="pwaInstallBtn">Install</button>
+                <button class="btn btn-secondary" type="button" id="pwaDismissBtn" aria-label="Dismiss install prompt">Later</button>
+            </div>
+        `;
+        document.body.appendChild(prompt);
+
+        document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            prompt.remove();
+            showFeedbackToast('Deadline Buddy install prompt completed.', 'success');
+        });
+
+        document.getElementById('pwaDismissBtn').addEventListener('click', () => {
+            localStorage.setItem(DISMISSED_KEY, 'true');
+            prompt.remove();
+        });
+    }
+}
+
+function showFeedbackToast(message, type = 'info', title = '') {
+    let container = document.getElementById('feedbackToastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'feedbackToastContainer';
+        container.className = 'feedback-toast-container';
+        container.setAttribute('aria-live', 'polite');
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `feedback-toast toast-${type}`;
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    toast.innerHTML = `
+        <div class="feedback-toast-content">
+            ${title ? `<strong>${escapeHtml(title)}</strong>` : ''}
+            <span>${escapeHtml(message)}</span>
+        </div>
+        <button type="button" aria-label="Dismiss message">x</button>
+    `;
+
+    const dismiss = () => {
+        toast.classList.add('leaving');
+        setTimeout(() => toast.remove(), 180);
+    };
+
+    toast.querySelector('button').addEventListener('click', dismiss);
+    container.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(dismiss, type === 'error' ? 7000 : 4200);
+}
+
+window.showFeedbackToast = showFeedbackToast;
 
 function setupButtonPressEffects() {
     const pressTargets = document.querySelectorAll('.btn, .icon-btn, .mobile-toggle, .nav-item, .mobile-nav-item');
@@ -222,15 +361,16 @@ function renderNotificationWidget() {
 function updateLiveTimers() {
     if (typeof Deadline === 'undefined') return;
 
-    const timerElements = document.querySelectorAll('[data-due-date], [data-due-iso]');
+    const timerElements = document.querySelectorAll('[data-due-date], [data-due-iso], [data-countdown-date]');
     timerElements.forEach(function (el) {
-        const isoStr = el.getAttribute('data-due-date') || el.getAttribute('data-due-iso');
+        const isoStr = el.getAttribute('data-due-date') || el.getAttribute('data-due-iso') || el.getAttribute('data-countdown-date');
         if (!isoStr) return;
 
         const urgency = Deadline.getUrgencyState(isoStr);
 
-        // Update ticker text if element has class or is badge
-        if (el.classList.contains('badge') || el.classList.contains('timer-badge')) {
+        if (el.hasAttribute('data-countdown-date')) {
+            el.textContent = Deadline.getTimeRemainingText({ dueDate: isoStr, status: el.dataset.status || 'Pending' });
+        } else if (el.classList.contains('badge') || el.classList.contains('timer-badge')) {
             el.className = `badge ${urgency.badgeClass}`;
             el.textContent = urgency.label;
         } else if (el.tagName === 'SPAN' || el.tagName === 'DIV') {

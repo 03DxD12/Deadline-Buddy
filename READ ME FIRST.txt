@@ -1,0 +1,23 @@
+DEADLINE BUDDY
+
+HOW TO OPEN:
+
+1. Extract the ZIP file.
+2. Open the Deadline Buddy folder.
+3. Double-click Deadline Buddy.exe.
+4. Allow Windows notifications if asked.
+5. You may now use Deadline Buddy.
+
+IMPORTANT:
+
+Closing the main Deadline Buddy window does not stop reminders.
+
+Deadline Buddy continues running in the Windows system tray.
+
+To completely stop Deadline Buddy:
+
+System Tray > Deadline Buddy > Exit
+
+If you fully exit Deadline Buddy, deadline reminders will stop until the app is opened again.
+
+If the laptop is completely powered off, no notification can appear at that exact time.

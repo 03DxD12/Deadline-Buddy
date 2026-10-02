@@ -8,3 +8,6 @@ node_modules/
 backend/*.sqlite
 backend/*.sqlite-shm
 backend/*.sqlite-wal
+dist/
+release/
+out/

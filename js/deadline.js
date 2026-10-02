@@ -26,6 +26,15 @@ function parseTaskDueDateTime(dueDate, dueTime) {
     return isNaN(d.getTime()) ? new Date() : d;
 }
 
+function toLocalDateKey(date) {
+    const d = date instanceof Date ? date : new Date(date);
+    if (Number.isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function getDeadlineState(task) {
     if (!task) return { status: 'Normal', label: 'Upcoming', badgeClass: 'badge-normal', isOverdue: false };
     if (task.status === 'Completed') {
@@ -41,8 +50,8 @@ function getDeadlineState(task) {
     const dueDateTime = parseTaskDueDateTime(task.dueDate, task.dueTime);
     const diffMs = dueDateTime - now;
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    const isToday = todayStr === (typeof task.dueDate === 'string' ? task.dueDate.split('T')[0] : '');
+    const todayStr = toLocalDateKey(new Date());
+    const isToday = todayStr === toLocalDateKey(dueDateTime);
 
     if (diffMs < 0) {
         return {
@@ -50,6 +59,15 @@ function getDeadlineState(task) {
             urgencyLabel: 'OVERDUE',
             badgeClass: 'badge-urgent',
             isOverdue: true
+        };
+    }
+
+    if (diffMs <= 20 * 60 * 1000) {
+        return {
+            urgencyKey: 'URGENT',
+            urgencyLabel: 'URGENT',
+            badgeClass: 'badge-urgent',
+            isOverdue: false
         };
     }
 
@@ -181,6 +199,7 @@ const Deadline = {
         const diffMs = target - now;
         const diffMins = Math.ceil(diffMs / (1000 * 60));
         const diffHours = diffMs / (1000 * 60 * 60);
+        const isToday = toLocalDateKey(target) === toLocalDateKey(now);
 
         if (diffMs < 0) {
             return {
@@ -193,23 +212,41 @@ const Deadline = {
 
         if (diffMs <= 20 * 60 * 1000) {
             return {
-                status: 'Due in 20 Minutes',
+                status: 'Urgent',
                 label: diffMins <= 0 ? 'Due Now' : `${diffMins}m Left`,
                 badgeClass: 'badge-urgent pulse-urgent',
                 isOverdue: false
             };
         }
 
-        if (diffMs <= 24 * 60 * 60 * 1000) {
+        if (isToday) {
             return {
-                status: 'Due within 1 Day',
-                label: `${Math.ceil(diffHours)}h Left`,
+                status: 'Due Today',
+                label: 'Due Today',
                 badgeClass: 'badge-upcoming',
                 isOverdue: false
             };
         }
 
+        if (diffMs <= 24 * 60 * 60 * 1000) {
+            return {
+                status: 'Urgent',
+                label: `${Math.ceil(diffHours)}h Left`,
+                badgeClass: 'badge-urgent',
+                isOverdue: false
+            };
+        }
+
         const days = Math.ceil(diffHours / 24);
+        if (days <= 3) {
+            return {
+                status: 'Due Soon',
+                label: `${days}d Left`,
+                badgeClass: 'badge-upcoming',
+                isOverdue: false
+            };
+        }
+
         return {
             status: 'Upcoming',
             label: `${days}d Left`,

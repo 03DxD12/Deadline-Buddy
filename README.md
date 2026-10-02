@@ -1,167 +1,109 @@
 # Deadline Buddy
 
-Deadline Buddy is an academic deadline and reminder system for Grade 11 and Grade 12 students. Its core feature is deadline reminders that use PWA, Service Worker, and Web Push technology so students can receive alerts even when the Deadline Buddy page is closed.
+Deadline Buddy is a student deadline tracker for Grade 11 and Grade 12 students. It helps students save subjects, school requirements, due dates, checklist steps, and reminders.
 
-## How To Open
+## Important Reminder Note
 
-This version can still open as a static website for normal interface testing. It does not need XAMPP, PHP, or MySQL.
+There are two ways to use Deadline Buddy:
 
-Open this file in a browser:
+1. **Website / PWA version**
+   - Opens in a browser.
+   - Works offline after the files are loaded.
+   - Saves records on the same browser.
+   - Shows live reminders while the page is open.
 
-```text
-index.html
-```
+2. **Windows app version**
+   - Runs with Electron.
+   - Can stay active in the Windows system tray.
+   - Can show offline Windows notifications while the main Deadline Buddy screen is closed.
+   - Does not need XAMPP, MySQL, PHP, Java, or an online backend.
 
-For the client's main requirement, real background reminders after the tab is closed require the Web Push backend. That part needs Node.js because a browser-only website cannot schedule and send true Web Push reminders by itself.
-
-You can also open:
-
-```text
-dashboard.html
-```
-
-For a simple presentation script, open:
-
-```text
-CLIENT-DEMO-GUIDE.md
-```
+The website alone should not be described as a guaranteed closed-app offline notification system. The Windows packaged app is the correct version for that feature.
 
 ## Main Pages
 
 - `index.html` - login and sign-up page
-- `dashboard.html` - overview of deadlines and tasks
+- `dashboard.html` - summary of deadlines and tasks
 - `tasks.html` - list of requirements
 - `task-form.html` - add or edit a requirement
 - `task-details.html` - view one requirement and checklist
 - `subjects.html` - manage subjects
 - `calendar.html` - view deadlines by date
-- `reminders.html` - deadline alerts and notification history
-- `profile.html` - student profile and saved-records tools
+- `reminders.html` - deadline alerts and notification settings
+- `profile.html` - student profile, theme, and saved-record tools
 
-## Features
+## Data
 
-- Add, edit, and delete academic requirements
-- Create a local student account
-- Log in with username and password
-- Remember login on the same browser
-- Choose Grade 11 or Grade 12
-- Add subjects
-- Add checklist steps for each task
-- Preview reminder times when setting a deadline
-- Deadline status badges
-- Alerts for overdue tasks
-- Alerts 20 minutes before a deadline
-- Alerts 1 hour before a deadline
-- Alerts 1 day before a deadline
-- Browser notification support
-- PWA manifest and service worker
-- Web Push backend for closed-tab reminders
-- Responsive mobile calendar
-- Smooth UI animations and effects
-- Save and restore records using a downloaded file
-- Reset sample records for practice or presentation
+The current shared app saves records in the browser using local storage.
 
-## Where Data Is Saved
-
-The app saves accounts and records in the browser using local storage. This means records stay in the same browser on the same laptop.
-
-If the user changes laptop or browser, they should use:
+The Profile page includes:
 
 - **Download My Saved Records**
 - **Bring Back My Saved Records**
+- **Bring Back Sample Records**
 
-These are found on the Profile page.
+Use these buttons when moving records to another browser or laptop.
 
-## Backup Explanation
+## Developer Commands
 
-**Download My Saved Records** saves a copy of the student's profile, subjects, deadlines, checklist steps, and alerts.
-
-**Bring Back My Saved Records** loads that saved copy back into the app.
-
-**Bring Back Sample Records** clears the records in the current browser and restores sample Grade 12 ASSH tasks. Use this only for practice or presentation.
-
-## Project Structure
-
-```text
-css/
-  style.css
-
-js/
-  app.js
-  deadline.js
-  notifications.js
-  storage.js
-
-*.html
-```
-
-## Notes For The Client
-
-Because the main student records are browser-based, accounts and normal records are saved locally in the browser. To move records to another laptop or browser, use the saved-records feature on the Profile page.
-
-## Real Web Push Reminder Mode
-
-The old live reminders work only while Deadline Buddy is open. The core Web Push reminder mode adds:
-
-- `manifest.json`
-- `service-worker.js`
-- `js/pwa.js`
-- `backend/server.js`
-- `.env.example`
-
-This mode can show reminders after the Deadline Buddy tab is closed, as long as:
-
-- the student enabled notifications
-- the push backend is running
-- the browser/device can receive push messages
-- the device is not completely powered off
-
-### Backend Setup
-
-Install dependencies:
+Install packages:
 
 ```text
 npm install
 ```
 
-Generate VAPID keys:
-
-```text
-npm run web-push:keys
-```
-
-Copy `.env.example` to `.env`, then paste the generated keys:
-
-```text
-VAPID_PUBLIC_KEY=...
-VAPID_PRIVATE_KEY=...
-```
-
-Start the backend:
+Run the Windows desktop development version:
 
 ```text
 npm run dev
 ```
 
-The backend runs at:
+Check JavaScript files:
 
 ```text
-http://localhost:3001
+npm run check
 ```
 
-Then open Deadline Buddy and go to:
+Build a portable Windows app:
 
 ```text
-reminders.html
+npm run build:windows
 ```
 
-Use:
+Create an installer:
 
 ```text
-Enable Deadline Notifications
-Send Test Notification
+npm run dist:windows
 ```
 
-### Important Reminder Note
+## Windows App Behavior
 
-If the laptop is completely turned off, no notification can appear at that exact time. Web Push can work after the app tab is closed, but it still depends on the browser, operating system, internet connection, and push service.
+In the Windows app:
+
+- Closing the main window hides Deadline Buddy.
+- Deadline Buddy keeps running in the system tray.
+- Local reminder checks continue while the app is in the tray.
+- The tray menu includes:
+  - Open Deadline Buddy
+  - Send Test Notification
+  - Start with Windows
+  - Exit
+
+Only using **Exit** from the tray fully stops the app and its reminders.
+
+## Reminder Schedule
+
+Deadline Buddy can remind the student:
+
+- 1 day before
+- 1 hour before
+- 20 minutes before
+- when the requirement is overdue
+
+Completed or deleted requirements should not continue sending future reminders.
+
+## Honest Limitation
+
+No app can show a notification while the laptop is completely powered off.
+
+When Deadline Buddy opens again, it checks unfinished requirements and shows the current deadline state.

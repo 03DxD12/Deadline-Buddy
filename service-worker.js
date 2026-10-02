@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deadline-buddy-shell-v1';
+const CACHE_NAME = 'deadline-buddy-shell-v2';
 const APP_SHELL = [
     './',
     './index.html',
@@ -15,6 +15,7 @@ const APP_SHELL = [
     './js/deadline.js',
     './js/notifications.js',
     './js/pwa.js',
+    './js/device-reminders.js',
     './js/storage.js',
     './images/deadline-buddy-logo.svg',
     './manifest.json'
@@ -37,44 +38,24 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
 
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).then(response => {
+                const copy = response.clone();
+                caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+                return response;
+            }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
+        );
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
             const copy = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
             return response;
-        }).catch(() => {
-            if (event.request.mode === 'navigate') return caches.match('./index.html');
-            return cached;
-        }))
+        }).catch(() => cached))
     );
-});
-
-self.addEventListener('push', event => {
-    let data = {};
-    try {
-        data = event.data ? event.data.json() : {};
-    } catch (error) {
-        data = { title: 'Deadline Buddy', body: event.data ? event.data.text() : 'You have a deadline reminder.' };
-    }
-
-    const title = data.title || 'Deadline Buddy';
-    const options = {
-        body: data.body || 'You have a deadline reminder.',
-        icon: './images/deadline-buddy-logo.svg',
-        badge: './images/deadline-buddy-logo.svg',
-        tag: data.tag || `deadline-${Date.now()}`,
-        renotify: true,
-        requireInteraction: true,
-        data: {
-            url: data.url || './reminders.html',
-            taskId: data.taskId || null
-        },
-        actions: [
-            { action: 'open', title: 'Open Deadline Buddy' }
-        ]
-    };
-
-    event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener('notificationclick', event => {

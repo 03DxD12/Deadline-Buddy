@@ -275,6 +275,7 @@
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
+    <script src="js/device-reminders.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const subjectSelect = document.getElementById('subjectId');
@@ -588,13 +589,28 @@
 
                 const due = new Date(dueDateInput.value);
                 const oneDayBefore = new Date(due.getTime() - 24 * 60 * 60 * 1000);
+                const oneHourBefore = new Date(due.getTime() - 60 * 60 * 1000);
                 const twentyMinsBefore = new Date(due.getTime() - 20 * 60 * 1000);
                 const now = new Date();
 
-                deadlinePreview.classList.add('hidden');
-                deadlinePreview.textContent = '';
+                const previewTask = {
+                    dueDate: due.toISOString(),
+                    status: 'Pending'
+                };
+
+                deadlinePreview.classList.remove('hidden');
+                deadlinePreview.innerHTML = `
+                    <strong>Deadline Preview</strong>
+                    <div class="datetime-preview-list">
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>${formatPreviewDate(due)}</div>
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>Time Remaining: <strong>${Deadline.getTimeRemainingText(previewTask)}</strong></div>
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>1 day before: ${oneDayBefore > now ? formatPreviewDate(oneDayBefore) : 'Already passed'}</div>
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>1 hour before: ${oneHourBefore > now ? formatPreviewDate(oneHourBefore) : 'Already passed'}</div>
+                        <div class="datetime-preview-item"><span class="datetime-preview-dot"></span>20 minutes before: ${twentyMinsBefore > now ? formatPreviewDate(twentyMinsBefore) : 'Already passed'}</div>
+                    </div>
+                `;
                 deadlineDisplay.textContent = formatPreviewDate(due);
-                deadlineDisplaySub.textContent = 'Alerts: 1 day before and 20 minutes before';
+                deadlineDisplaySub.textContent = 'Alerts: 1 day, 1 hour, and 20 minutes before';
             }
 
             dueDateInput.addEventListener('input', updateDeadlinePreview);
@@ -664,8 +680,10 @@
 
                 if (id) {
                     Storage.updateTask(id, taskData);
+                    if (typeof queueFeedbackToast === 'function') queueFeedbackToast('Requirement updated successfully.', 'success');
                 } else {
                     Storage.saveTask(taskData);
+                    if (typeof queueFeedbackToast === 'function') queueFeedbackToast('Requirement added successfully.', 'success');
                 }
 
                 window.location.href = 'tasks.html';

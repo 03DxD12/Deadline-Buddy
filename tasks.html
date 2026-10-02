@@ -167,6 +167,7 @@
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
+    <script src="js/device-reminders.js"></script>
     <script>
         let currentTab = 'All';
 
@@ -211,7 +212,7 @@
             
             const urgentCount = tasks.filter(t => {
                 if (t.status === 'Completed') return false;
-                const state = Deadline.getUrgencyState(t.dueDate);
+                const state = Deadline.getUrgencyState(t.dueDate, t.dueTime, t.status);
                 return ['Overdue', 'Due Today', 'Urgent', 'Due Soon'].includes(state.status);
             }).length;
             document.getElementById('countUrgent').textContent = urgentCount;
@@ -228,7 +229,7 @@
                 if (currentTab === 'Completed' && t.status !== 'Completed') return false;
                 if (currentTab === 'Urgent') {
                     if (t.status === 'Completed') return false;
-                    const state = Deadline.getUrgencyState(t.dueDate);
+                    const state = Deadline.getUrgencyState(t.dueDate, t.dueTime, t.status);
                     if (!['Overdue', 'Due Today', 'Urgent', 'Due Soon'].includes(state.status)) return false;
                 }
 
@@ -292,9 +293,12 @@
 
                             ${subtasks.length > 0 ? `
                                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: 4px;">
-                                    Subtasks progress: <strong>${doneSub} / ${subtasks.length}</strong>
+                                    Checklist: <strong>${doneSub} of ${subtasks.length}</strong> completed
                                 </div>
-                            ` : ''}
+                            ` : `<div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: 4px;">No checklist</div>`}
+                            <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+                                Time Left: <strong data-countdown-date="${t.dueDate}" data-status="${t.status}">${Deadline.getTimeRemainingText(t)}</strong>
+                            </div>
                         </div>
 
                         <div class="balanced-card-row" style="align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-size: 0.8rem;">
@@ -317,6 +321,9 @@
             if (!task) return;
             const newStatus = task.status === 'Completed' ? 'Pending' : 'Completed';
             Storage.updateTask(id, { status: newStatus });
+            if (typeof showFeedbackToast === 'function') {
+                showFeedbackToast(newStatus === 'Completed' ? 'Requirement marked as completed.' : 'Requirement reopened.', 'success');
+            }
             renderTasks();
         };
     </script>

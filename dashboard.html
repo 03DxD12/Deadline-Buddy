@@ -177,6 +177,7 @@
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
+    <script src="js/device-reminders.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             renderDashboard();
@@ -194,13 +195,13 @@
             let overdueCount = 0;
             let dueTodayCount = 0;
 
-            const todayStr = new Date().toISOString().split('T')[0];
+            const todayStr = localDateKey(new Date());
 
             pending.forEach(t => {
                 const urgency = Deadline.getUrgencyState(t.dueDate, t.dueTime, t.status);
                 if (urgency.status === 'Overdue') overdueCount++;
                 const taskDate = Deadline.parseTaskDueDateTime(t.dueDate, t.dueTime);
-                const tDateStr = taskDate.toISOString().split('T')[0];
+                const tDateStr = localDateKey(taskDate);
                 if (tDateStr === todayStr) dueTodayCount++;
             });
 
@@ -209,7 +210,7 @@
             document.getElementById('statOverdue').textContent = overdueCount;
             document.getElementById('statCompleted').textContent = completed;
 
-            // Priority Focus Card (First non-completed task sorted by due date)
+            // Priority Focus Card: unfinished requirement with the nearest deadline.
             const sortedPending = [...pending].sort((a, b) => Deadline.parseTaskDueDateTime(a.dueDate, a.dueTime) - Deadline.parseTaskDueDateTime(b.dueDate, b.dueTime));
 
             if (sortedPending.length > 0) {
@@ -233,16 +234,18 @@
                 document.getElementById('focusBtn').style.display = 'none';
             }
 
-            // Upcoming Tasks Grid (Up to 4 pending tasks)
+            // Upcoming Tasks Grid: future unfinished requirements only.
             const upcomingGrid = document.getElementById('upcomingGrid');
-            const displayTasks = sortedPending.slice(0, 4);
+            const displayTasks = sortedPending
+                .filter(t => Deadline.parseTaskDueDateTime(t.dueDate, t.dueTime) >= new Date())
+                .slice(0, 4);
 
             if (displayTasks.length === 0) {
                 upcomingGrid.innerHTML = `
                     <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 32px;">
                         <p style="font-size: 2rem; margin-bottom: 8px;"></p>
                         <h3 style="color: var(--text-heading);">You're all caught up!</h3>
-                        <p style="color: var(--text-muted); margin-bottom: 16px;">Add a new Grade 12 assignment or project anytime.</p>
+                        <p style="color: var(--text-muted); margin-bottom: 16px;">No upcoming requirements right now.</p>
                         <a href="task-form.html" class="btn btn-primary">Add New Requirement</a>
                     </div>
                 `;
@@ -270,9 +273,12 @@
                             </div>
                             ${subtasks.length > 0 ? `
                                 <div style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-main); padding: 6px 10px; border-radius: 6px; margin-bottom: 12px;">
-                                    Subtasks: <strong>${doneSub} / ${subtasks.length}</strong> done
+                                    Checklist: <strong>${doneSub} of ${subtasks.length}</strong> completed
                                 </div>
                             ` : ''}
+                            <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+                                Time Left: <strong data-countdown-date="${t.dueDate}" data-status="${t.status}">${Deadline.getTimeRemainingText(t)}</strong>
+                            </div>
                         </div>
 
                         <div class="balanced-card-row" style="align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-size: 0.8rem;">
@@ -282,6 +288,11 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function localDateKey(date) {
+            const d = date instanceof Date ? date : new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
     </script>
 </body>
