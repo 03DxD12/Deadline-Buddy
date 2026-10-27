@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deadline-buddy-shell-v19';
+const CACHE_NAME = 'deadline-buddy-shell-v20';
 const APP_SHELL = [
     './',
     './index.html',

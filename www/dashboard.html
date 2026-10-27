@@ -217,6 +217,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             renderDashboard();
+            if (typeof Storage !== 'undefined' && typeof Storage.syncFromCloud === 'function') {
+                Storage.syncFromCloud().then(updated => {
+                    if (updated) renderDashboard();
+                }).catch(() => {});
+            }
         });
 
         function renderDashboard() {

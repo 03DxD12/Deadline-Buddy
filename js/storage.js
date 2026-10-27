@@ -182,6 +182,205 @@ function findAccount(username) {
     return getAccounts().find(acc => (acc.username || '').toLowerCase() === cleanUsername) || null;
 }
 
+// --- Supabase Cloud Sync & Authentication Layer ---
+const SUPABASE_CONFIG = {
+    url: 'https://baswqlchousnnnlguejk.supabase.co',
+    anonKey: 'sb_publishable_F6PlSbHGTt4SrXoT1Yi0ZQ_ndnT85me'
+};
+
+async function supabaseFetch(endpoint, method = 'GET', body = null, extraHeaders = {}) {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
+    try {
+        const url = `${SUPABASE_CONFIG.url}/rest/v1/${endpoint}`;
+        const headers = {
+            'apikey': SUPABASE_CONFIG.anonKey,
+            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+            'Content-Type': 'application/json',
+            ...extraHeaders
+        };
+        const options = { method, headers };
+        if (body) options.body = JSON.stringify(body);
+        const res = await fetch(url, options);
+        if (!res.ok) {
+            const errText = await res.text().catch(() => '');
+            console.warn('[Supabase] Request failed:', res.status, errText);
+            return { error: true, status: res.status, message: errText };
+        }
+        const text = await res.text();
+        return { success: true, data: text ? JSON.parse(text) : null };
+    } catch (e) {
+        console.warn('[Supabase] Network/fetch error:', e);
+        return null;
+    }
+}
+
+async function supabaseFindUser(username) {
+    const clean = (username || '').trim().toLowerCase();
+    if (!clean) return null;
+    const res = await supabaseFetch(`users?username=eq.${encodeURIComponent(clean)}&select=*`);
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        return res.data[0];
+    }
+    return null;
+}
+
+async function supabaseRegisterUser(accountData) {
+    const clean = (accountData.username || '').trim().toLowerCase();
+    const payload = {
+        username: clean,
+        password: accountData.password || '',
+        name: (accountData.name || '').trim(),
+        grade: accountData.gradeLevel || 'Grade 12',
+        section: accountData.strand || 'ASSH'
+    };
+    const res = await supabaseFetch('users', 'POST', payload, {
+        'Prefer': 'return=representation'
+    });
+    if (res && res.success) {
+        // Also initialize student_data row
+        await supabaseFetch('student_data', 'POST', {
+            username: clean,
+            subjects: getSubjects() || [],
+            tasks: getTasks() || [],
+            reminders: []
+        }).catch(() => {});
+        return { success: true, user: res.data ? res.data[0] : payload };
+    }
+    return { success: false, error: res?.message || 'Could not register in cloud database.' };
+}
+
+async function supabasePullData(username) {
+    const clean = (username || '').trim().toLowerCase();
+    if (!clean) return null;
+    const res = await supabaseFetch(`student_data?username=eq.${encodeURIComponent(clean)}&select=*`);
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        const row = res.data[0];
+        let updated = false;
+        if (Array.isArray(row.subjects) && row.subjects.length > 0) {
+            localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(row.subjects));
+            if (typeof AppDB !== 'undefined') AppDB.putAll('subjects', row.subjects);
+            updated = true;
+        }
+        if (Array.isArray(row.tasks) && row.tasks.length > 0) {
+            localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(row.tasks));
+            if (typeof AppDB !== 'undefined') AppDB.putAll('tasks', row.tasks);
+            updated = true;
+        }
+        return updated;
+    }
+    return false;
+}
+
+let supabaseSyncTimeout = null;
+function supabasePushCurrentData() {
+    if (supabaseSyncTimeout) clearTimeout(supabaseSyncTimeout);
+    supabaseSyncTimeout = setTimeout(async () => {
+        const user = getUser();
+        const username = (user?.username || '').trim().toLowerCase();
+        if (!username || username === 'default') return;
+        const payload = {
+            username,
+            subjects: getSubjects(),
+            tasks: getTasks(),
+            updated_at: new Date().toISOString()
+        };
+        await supabaseFetch('student_data?on_conflict=username', 'POST', payload, {
+            'Prefer': 'resolution=merge-duplicates'
+        });
+    }, 1000);
+}
+
+async function supabaseLogin(username, password) {
+    const clean = (username || '').trim().toLowerCase();
+    // 1. Check Supabase first if online
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+        const remoteUser = await supabaseFindUser(clean);
+        if (remoteUser) {
+            if (remoteUser.password !== password) {
+                return { success: false, error: 'Wrong password. Please check your password and try again.' };
+            }
+            // Save into local accounts cache
+            const account = {
+                id: Date.now(),
+                name: remoteUser.name || username,
+                username: remoteUser.username,
+                password: remoteUser.password,
+                gradeLevel: remoteUser.grade || 'Grade 12',
+                strand: remoteUser.section || 'ASSH',
+                school: 'Olinsterg College Inc.',
+                createdAt: remoteUser.created_at || new Date().toISOString()
+            };
+            const accounts = getAccounts();
+            const existingIdx = accounts.findIndex(a => (a.username || '').toLowerCase() === clean);
+            if (existingIdx >= 0) accounts[existingIdx] = account;
+            else accounts.push(account);
+            saveAccounts(accounts);
+
+            // Pull latest subjects/tasks for this student
+            await supabasePullData(clean);
+            return { success: true, account };
+        }
+    }
+
+    // 2. Offline fallback or local account check
+    const localAcc = findAccount(clean);
+    if (localAcc) {
+        if (localAcc.password !== password) {
+            return { success: false, error: 'Wrong password. Please check your password and try again.' };
+        }
+        return { success: true, account: localAcc };
+    }
+
+    return { success: false, error: 'No account found with that username. Please sign up first.' };
+}
+
+async function supabaseRegister(accountData) {
+    let localAccount;
+    try {
+        localAccount = createAccount(accountData);
+    } catch (e) {
+        localAccount = findAccount(accountData.username);
+    }
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+        await supabaseRegisterUser(accountData);
+    }
+    return localAccount;
+}
+
+async function supabaseResetPassword(username, name, newPassword) {
+    const clean = (username || '').trim().toLowerCase();
+    const cleanName = (name || '').trim().toLowerCase();
+
+    // Check remote user first if online
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+        const remoteUser = await supabaseFindUser(clean);
+        if (remoteUser) {
+            const regName = (remoteUser.name || '').trim().toLowerCase();
+            if (cleanName && regName && regName !== cleanName) {
+                return { success: false, error: 'The student name does not match the registered account.' };
+            }
+            await supabaseFetch(`users?username=eq.${encodeURIComponent(clean)}`, 'PATCH', {
+                password: newPassword
+            });
+            // Update local copy too
+            updateAccount(clean, { password: newPassword });
+            return { success: true };
+        }
+    }
+
+    // Local fallback
+    const localAcc = findAccount(clean);
+    if (!localAcc) {
+        return { success: false, error: 'No account found with that username.' };
+    }
+    const registeredName = (localAcc.name || '').trim().toLowerCase();
+    if (cleanName && registeredName && registeredName !== cleanName) {
+        return { success: false, error: 'The student name does not match the registered account.' };
+    }
+    updateAccount(clean, { password: newPassword });
+    return { success: true };
+}
+
 function createAccount(accountData) {
     const username = (accountData.username || '').trim();
     if (!username) throw new Error('Username is required.');
@@ -250,6 +449,9 @@ function saveSubjects(subjects) {
     if (typeof AppDB !== 'undefined') {
         AppDB.putAll('subjects', subjects);
     }
+    if (typeof supabasePushCurrentData === 'function') {
+        supabasePushCurrentData();
+    }
 }
 
 function addSubject(subData) {
@@ -303,6 +505,9 @@ function saveTasks(tasks) {
     }
     if (typeof PushManagerService !== 'undefined' && typeof PushManagerService.syncTasksToServer === 'function') {
         PushManagerService.syncTasksToServer(tasks);
+    }
+    if (typeof supabasePushCurrentData === 'function') {
+        supabasePushCurrentData();
     }
 }
 
@@ -748,5 +953,12 @@ const Storage = {
     // -- Backup / Restore -----------------------------------------------------
     exportBackupJSON()          { return exportBackupJSON(); },
     importBackupJSON(jsonStr)   { return importBackupJSON(jsonStr); },
-    seedDemoData()              { return seedDemoData(); }
+    seedDemoData()              { return seedDemoData(); },
+
+    // -- Supabase Cloud Sync --------------------------------------------------
+    supabaseLogin(u, p)         { return supabaseLogin(u, p); },
+    supabaseRegister(d)         { return supabaseRegister(d); },
+    supabaseResetPassword(u, n, p) { return supabaseResetPassword(u, n, p); },
+    syncFromCloud(u)            { return supabasePullData(u); },
+    syncToCloud()               { return supabasePushCurrentData(); }
 };

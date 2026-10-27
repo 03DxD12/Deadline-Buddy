@@ -911,54 +911,69 @@
             rememberLogin.checked = true;
         }
 
-        if (Storage.getAccounts().length === 0) {
-            showPanel('signup');
-            showMessage('Create your student account first. After that, you can log in anytime on this browser.', 'success');
-        } else {
-            showPanel('login');
-        }
+        showPanel('login');
 
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = loginUsername.value.trim();
             const password = loginPassword.value;
-            const account = Storage.findAccount(username);
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const origText = submitBtn ? submitBtn.textContent : '';
 
-            if (!account) {
-                showMessage('No account found with that username. Please sign up first.');
-                return;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Verifying credentials...';
             }
 
-            if (account.password !== password) {
-                showMessage('Wrong password. Please check your password and try again.');
-                loginPassword.focus();
-                return;
-            }
+            try {
+                const res = await Storage.supabaseLogin(username, password);
+                if (!res.success) {
+                    showMessage(res.error || 'Login failed. Please check your username and password.');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = origText;
+                    }
+                    return;
+                }
 
-            if (rememberLogin.checked) {
-                Storage.saveSavedLogin({ username, password });
-            } else {
-                Storage.clearSavedLogin();
-            }
+                if (rememberLogin.checked) {
+                    Storage.saveSavedLogin({ username, password });
+                } else {
+                    Storage.clearSavedLogin();
+                }
 
-            openDashboardForAccount(account);
+                openDashboardForAccount(res.account);
+            } catch (err) {
+                showMessage(err.message || 'Unable to log in. Please try again.');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = origText;
+                }
+            }
         });
 
-        signupForm.addEventListener('submit', function(e) {
+        signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('signupName').value.trim();
             const username = document.getElementById('signupUsername').value.trim();
             const password = document.getElementById('signupPassword').value;
             const gradeLevel = document.getElementById('signupGrade').value;
             const strand = document.getElementById('signupStrand').value;
+            const submitBtn = signupForm.querySelector('button[type="submit"]');
+            const origText = submitBtn ? submitBtn.textContent : '';
 
             if (password.length < 4) {
                 showMessage('Please use at least 4 characters for the password.');
                 return;
             }
 
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating student account...';
+            }
+
             try {
-                const account = Storage.createAccount({
+                const account = await Storage.supabaseRegister({
                     name,
                     username,
                     password,
@@ -971,48 +986,63 @@
                 openDashboardForAccount(account);
             } catch (err) {
                 showMessage(err.message || 'Could not create the account. Please try again.');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = origText;
+                }
             }
         });
 
         if (forgotForm) {
-            forgotForm.addEventListener('submit', function(e) {
+            forgotForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const username = document.getElementById('forgotUsername').value.trim();
-                const name = document.getElementById('forgotName').value.trim().toLowerCase();
+                const name = document.getElementById('forgotName').value.trim();
                 const newPassword = document.getElementById('forgotNewPassword').value;
+                const submitBtn = forgotForm.querySelector('button[type="submit"]');
+                const origText = submitBtn ? submitBtn.textContent : '';
 
                 if (newPassword.length < 4) {
                     showMessage('Please use at least 4 characters for the new password.');
                     return;
                 }
 
-                const account = Storage.findAccount(username);
-                if (!account) {
-                    showMessage('No account found with username "' + username + '".');
-                    return;
-                }
-
-                const registeredName = (account.name || '').trim().toLowerCase();
-                if (registeredName && registeredName !== name) {
-                    showMessage('The registered student name does not match our records for that username.');
-                    return;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Updating password...';
                 }
 
                 try {
-                    Storage.updateAccount(account.username, { password: newPassword });
-                    showMessage('Password reset successfully! Logging you in...', 'success');
+                    const res = await Storage.supabaseResetPassword(username, name, newPassword);
+                    if (!res.success) {
+                        showMessage(res.error || 'Could not reset password.');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = origText;
+                        }
+                        return;
+                    }
 
-                    loginUsername.value = account.username;
+                    showMessage('Password reset successfully! Redirecting to login...', 'success');
+                    loginUsername.value = username;
                     loginPassword.value = newPassword;
                     if (rememberLogin.checked) {
-                        Storage.saveSavedLogin({ username: account.username, password: newPassword });
+                        Storage.saveSavedLogin({ username, password: newPassword });
                     }
 
                     setTimeout(() => {
-                        openDashboardForAccount(account);
-                    }, 900);
+                        showPanel('login');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = origText;
+                        }
+                    }, 1200);
                 } catch (err) {
-                    showMessage(err.message || 'Could not reset password. Please try again.');
+                    showMessage(err.message || 'Failed to update password.');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = origText;
+                    }
                 }
             });
         }
