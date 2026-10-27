@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deadline-buddy-shell-v18';
+const CACHE_NAME = 'deadline-buddy-shell-v19';
 const APP_SHELL = [
     './',
     './index.html',
@@ -136,11 +136,22 @@ self.addEventListener('push', event => {
         try {
             payload = event.data.json();
         } catch (e) {
-            payload = { title: 'Deadline Buddy Alert', body: event.data.text() };
+            // Plain-text fallback
+            payload = { title: 'Deadline Buddy', body: event.data.text() || 'You have a reminder.' };
         }
     }
 
     const title = payload.title || 'Deadline Buddy Alert';
+    const notifData = payload.data || {};
+
+    // Ensure url is always present in data so notificationclick can navigate
+    if (!notifData.url) {
+        notifData.url = payload.url || 'reminders.html';
+    }
+    if (!notifData.reminderId && payload.reminderId) {
+        notifData.reminderId = payload.reminderId;
+    }
+
     const options = {
         body: payload.body || 'You have an upcoming deadline or study reminder.',
         icon: payload.icon || './images/icon-192.png',
@@ -148,10 +159,10 @@ self.addEventListener('push', event => {
         tag: payload.tag || ('deadline-buddy-' + Date.now()),
         renotify: true,
         vibrate: [200, 100, 200],
-        data: payload.data || { url: './reminders.html' },
+        data: notifData,
         actions: payload.actions || [
-            { action: 'open', title: 'Open' },
-            { action: 'snooze_15', title: 'Snooze 15m' }
+            { action: 'open', title: '📖 Open' },
+            { action: 'snooze_15', title: '⏱ Snooze 15m' }
         ]
     };
 
@@ -160,7 +171,7 @@ self.addEventListener('push', event => {
     );
 });
 
-// Notification click navigation & actions
+// Notification click navigation & deep linking
 self.addEventListener('notificationclick', event => {
     event.notification.close();
 
@@ -170,7 +181,7 @@ self.addEventListener('notificationclick', event => {
     // Handle snooze action directly from system notification button
     if (action === 'snooze_15' && data.reminderId) {
         event.waitUntil(
-            fetch(`./api/reminders/${encodeURIComponent(data.reminderId)}/snooze`, {
+            fetch('/api/reminders/' + encodeURIComponent(data.reminderId) + '/snooze', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ minutes: 15 })
@@ -179,15 +190,16 @@ self.addEventListener('notificationclick', event => {
         return;
     }
 
-    const targetUrl = new URL(
-        data.url ? data.url : './reminders.html',
-        self.location.origin
-    ).href;
+    // Build the absolute target URL for deep linking
+    const targetPath = data.url || 'reminders.html';
+    const targetUrl = new URL(targetPath, self.registration.scope).href;
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+            // Try to find an existing app window and navigate it
             for (const client of clientList) {
-                if ('focus' in client) {
+                // Check if this client is from our app scope
+                if (client.url.startsWith(self.registration.scope)) {
                     client.focus();
                     if ('navigate' in client) {
                         return client.navigate(targetUrl);
@@ -195,11 +207,16 @@ self.addEventListener('notificationclick', event => {
                     return client;
                 }
             }
-            if (clients.openWindow) {
-                return clients.openWindow(targetUrl);
-            }
+            // No existing window found — open a new one at the deep link
+            return clients.openWindow(targetUrl);
         })
     );
+});
+
+// Log when notification is dismissed (for analytics/debug)
+self.addEventListener('notificationclose', event => {
+    const data = event.notification.data || {};
+    console.log('[SW] Notification dismissed, reminderId:', data.reminderId || 'unknown');
 });
 
 // Helper for Service Worker to read IndexedDB if needed

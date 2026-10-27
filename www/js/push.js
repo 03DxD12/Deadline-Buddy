@@ -76,9 +76,17 @@ const PushManagerService = (function() {
             throw new Error('Push notifications are not supported on this browser or device.');
         }
 
-        const perm = await Notification.requestPermission();
-        if (perm !== 'granted') {
-            throw new Error('Notification permission was not granted.');
+        // Check current permission before requesting
+        const currentPerm = Notification.permission;
+        if (currentPerm === 'denied') {
+            throw new Error('Notifications are blocked. Please enable them in your browser or device settings and try again.');
+        }
+
+        if (currentPerm !== 'granted') {
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') {
+                throw new Error('Notification permission was not granted.');
+            }
         }
 
         const reg = await getServiceWorkerRegistration();
@@ -88,7 +96,7 @@ const PushManagerService = (function() {
 
         const publicKey = await fetchVapidPublicKey();
         if (!publicKey) {
-            throw new Error('Could not retrieve push keys from server. Make sure the Deadline Buddy server is running.');
+            throw new Error('Could not retrieve push keys from server. Make sure the Deadline Buddy server is running on port 3000.');
         }
 
         const convertedKey = urlBase64ToUint8Array(publicKey);
@@ -99,6 +107,17 @@ const PushManagerService = (function() {
                 userVisibleOnly: true,
                 applicationServerKey: convertedKey
             });
+        } else {
+            // Verify the existing subscription uses the same key; resubscribe if not
+            const existingKey = btoa(String.fromCharCode(...new Uint8Array(subscription.options.applicationServerKey)));
+            const newKeyBase64 = btoa(String.fromCharCode(...convertedKey));
+            if (existingKey !== newKeyBase64) {
+                await subscription.unsubscribe();
+                subscription = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: convertedKey
+                });
+            }
         }
 
         // Send subscription to server
@@ -116,10 +135,11 @@ const PushManagerService = (function() {
         });
 
         if (!res.ok) {
-            throw new Error('Failed saving push subscription to server.');
+            throw new Error('Failed saving push subscription to server. Server may not be running.');
         }
 
         localStorage.setItem('deadlinebuddy_push_subscribed', 'true');
+        localStorage.setItem('deadlinebuddy_push_ready', 'true');
         return subscription;
     }
 
@@ -151,13 +171,13 @@ const PushManagerService = (function() {
         return data;
     }
 
-    async function syncTasksToServer(tasks) {
-        if (!Array.isArray(tasks) || tasks.length === 0) return;
+    async function syncTasksToServer(tasks, deletedIds = []) {
+        if (!Array.isArray(tasks)) return;
         try {
             await fetch(`${API_BASE}/api/sync-tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tasks })
+                body: JSON.stringify({ tasks, deletedTaskIds: deletedIds })
             });
         } catch (e) {
             // Silently wait for next sync if offline

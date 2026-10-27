@@ -139,7 +139,8 @@ async function processDueReminders() {
             continue;
         }
 
-        // Prepare push payload
+        // Prepare push payload - include reminderId at top level AND in data
+        // so both the service worker snooze button and notificationclick handler can access it
         const payload = {
             type: reminder.type,
             title: reminder.title || 'Deadline Buddy Alert',
@@ -147,6 +148,8 @@ async function processDueReminders() {
             icon: 'images/icon-192.png',
             badge: 'images/icon-192.png',
             tag: `deadline-buddy-${reminder.id}`,
+            reminderId: reminder.id,
+            url: reminder.url || 'dashboard.html',
             data: {
                 url: reminder.url || 'dashboard.html',
                 reminderId: reminder.id,
@@ -155,8 +158,8 @@ async function processDueReminders() {
                 type: reminder.type
             },
             actions: [
-                { action: 'open', title: 'Open' },
-                { action: 'snooze_15', title: 'Snooze 15m' }
+                { action: 'open', title: '📖 Open' },
+                { action: 'snooze_15', title: '⏱ Snooze 15m' }
             ]
         };
 
@@ -191,8 +194,18 @@ async function processDueReminders() {
 
 function calculateReminderDate(dueDateStr, dueTimeStr, offsetKey) {
     if (!dueDateStr) return null;
-    const timePart = dueTimeStr || '23:59';
-    const dueDateTime = new Date(`${dueDateStr}T${timePart}:00`);
+
+    let dueDateTime;
+    // Handle both 'YYYY-MM-DD' and full ISO strings (e.g. '2026-10-30T15:00:00.000Z')
+    if (dueDateStr.includes('T')) {
+        // Full ISO string - parse directly and extract local date+time parts
+        dueDateTime = new Date(dueDateStr);
+    } else {
+        const timePart = dueTimeStr || '23:59';
+        // Treat as a local datetime (not UTC) by appending timezone offset
+        dueDateTime = new Date(`${dueDateStr}T${timePart}:00`);
+    }
+
     if (isNaN(dueDateTime.getTime())) return null;
 
     const baseMs = dueDateTime.getTime();
@@ -201,14 +214,22 @@ function calculateReminderDate(dueDateStr, dueTimeStr, offsetKey) {
         case 'at_deadline':
         case 'at_due_time':
             return new Date(baseMs);
+        case '5_min_before':
+            return new Date(baseMs - 5 * 60 * 1000);
         case '10_min_before':
             return new Date(baseMs - 10 * 60 * 1000);
+        case '15_min_before':
+            return new Date(baseMs - 15 * 60 * 1000);
         case '30_min_before':
             return new Date(baseMs - 30 * 60 * 1000);
         case '1_hour_before':
             return new Date(baseMs - 60 * 60 * 1000);
         case '3_hours_before':
             return new Date(baseMs - 3 * 60 * 60 * 1000);
+        case '6_hours_before':
+            return new Date(baseMs - 6 * 60 * 60 * 1000);
+        case '12_hours_before':
+            return new Date(baseMs - 12 * 60 * 60 * 1000);
         case '1_day_before':
             return new Date(baseMs - 24 * 60 * 60 * 1000);
         case '2_days_before':
@@ -239,6 +260,20 @@ function syncTaskReminders(task) {
         return [];
     }
 
+    // Resolve dueDate and dueTime - support both ISO strings and plain YYYY-MM-DD
+    let dueDateStr = task.dueDate || '';
+    let dueTimeStr = task.dueTime || '23:59';
+
+    if (dueDateStr.includes('T')) {
+        // Full ISO datetime string - extract local date and time parts
+        const dt = new Date(dueDateStr);
+        if (!isNaN(dt.getTime())) {
+            const pad2 = n => String(n).padStart(2, '0');
+            dueDateStr = `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`;
+            dueTimeStr = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
+        }
+    }
+
     const offsets = Array.isArray(task.reminderOffsets) && task.reminderOffsets.length > 0
         ? task.reminderOffsets
         : ['1_day_before', '1_hour_before'];
@@ -246,30 +281,51 @@ function syncTaskReminders(task) {
     const newReminders = [];
 
     offsets.forEach(offset => {
-        const schedDate = calculateReminderDate(task.dueDate, task.dueTime, offset);
+        const schedDate = calculateReminderDate(dueDateStr, dueTimeStr, offset);
         if (!schedDate || schedDate.getTime() <= Date.now()) {
             return; // Ignore past dates
         }
 
-        let label = offset.replace(/_/g, ' ');
-        if (offset === '1_day_before') label = 'in 1 day';
-        else if (offset === '1_hour_before') label = 'in 1 hour';
-        else if (offset === 'at_deadline') label = 'now';
+        const friendlyLabels = {
+            'at_deadline':    'at deadline time',
+            '5_min_before':   'in 5 minutes',
+            '10_min_before':  'in 10 minutes',
+            '15_min_before':  'in 15 minutes',
+            '30_min_before':  'in 30 minutes',
+            '1_hour_before':  'in 1 hour',
+            '3_hours_before': 'in 3 hours',
+            '6_hours_before': 'in 6 hours',
+            '12_hours_before':'in 12 hours',
+            '1_day_before':   'tomorrow',
+            '2_days_before':  'in 2 days',
+            '3_days_before':  'in 3 days',
+            '1_week_before':  'in 1 week'
+        };
+        const label = friendlyLabels[offset] || offset.replace(/_/g, ' ');
+
+        // Format human-readable due time for notification body
+        const dueHour = parseInt(dueTimeStr.split(':')[0], 10);
+        const dueMin  = dueTimeStr.split(':')[1] || '00';
+        const period  = dueHour >= 12 ? 'PM' : 'AM';
+        const dispHour = dueHour % 12 || 12;
+        const dueFriendly = `${dispHour}:${dueMin} ${period}`;
 
         const rem = {
-            id: 'rem-' + task.id + '-' + offset + '-' + Date.now().toString(36),
-            userId: task.userId || 'default',
-            taskId: String(task.id),
-            type: 'deadline',
-            title: offset === 'at_deadline' ? 'Deadline Now Due!' : `Upcoming Deadline (${label})`,
-            body: `${task.title} is due ${task.dueDate} at ${task.dueTime || '11:59 PM'}.`,
-            scheduledAt: schedDate.toISOString(),
+            id:           'rem-' + task.id + '-' + offset + '-' + Date.now().toString(36),
+            userId:       task.userId || 'default',
+            taskId:       String(task.id),
+            type:         'deadline',
+            title:        offset === 'at_deadline'
+                              ? `Deadline Now: ${task.title}`
+                              : `Deadline ${label}: ${task.title}`,
+            body:         `${task.title} is due on ${dueDateStr} at ${dueFriendly}.`,
+            scheduledAt:  schedDate.toISOString(),
             relativeTime: offset,
-            status: 'scheduled',
-            url: `task-details.html?id=${task.id}`,
-            targetId: String(task.id),
-            priority: task.priority || 'Normal',
-            createdAt: new Date().toISOString()
+            status:       'scheduled',
+            url:          `task-details.html?id=${task.id}`,
+            targetId:     String(task.id),
+            priority:     task.priority || 'Normal',
+            createdAt:    new Date().toISOString()
         };
 
         db.reminders.push(rem);
@@ -277,6 +333,7 @@ function syncTaskReminders(task) {
     });
 
     saveDb();
+    console.log(`[Scheduler] Synced ${newReminders.length} reminder(s) for task ${task.id} ("${task.title}")`);
     return newReminders;
 }
 

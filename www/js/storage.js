@@ -428,11 +428,7 @@ function deleteTask(id) {
         LocalNotificationService.cancelTaskReminders(id);
     }
     if (typeof PushManagerService !== 'undefined') {
-        fetch(`${PushManagerService.API_BASE}/api/sync-tasks`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tasks, deletedTaskIds: [String(id)] })
-        }).catch(() => {});
+        PushManagerService.syncTasksToServer(tasks, [String(id)]).catch(() => {});
     }
 }
 
@@ -642,24 +638,41 @@ const Storage = {
 
     saveTask(data) {
         const tasks = getTasks();
+        // Parse ISO dueDate into separate date + time parts so server calculateReminderDate works
+        const dueDateISO = data.dueDate || new Date().toISOString();
+        const dueDateObj = new Date(dueDateISO);
+        const dueDateStr  = dueDateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+        const dueTimeHrs  = String(dueDateObj.getHours()).padStart(2, '0');
+        const dueTimeMins = String(dueDateObj.getMinutes()).padStart(2, '0');
+        const dueTimeStr  = `${dueTimeHrs}:${dueTimeMins}`;          // HH:MM
+
         const newTask = {
-            id:          Date.now(),
-            subjectId:   data.subjectId ? parseInt(data.subjectId) : null,
-            title:       (data.title || '').trim(),
-            type:        data.type || data.taskType || 'Assignment',
-            description: (data.description || '').trim(),
-            priority:    data.priority || 'Medium',
-            status:      data.status || 'Pending',
-            completedAt: data.status === 'Completed' ? new Date().toISOString() : null,
-            dueDate:     data.dueDate || new Date().toISOString(),
-            notes:       (data.notes || '').trim(),
-            createdAt:   new Date().toISOString(),
-            subtasks:    data.subtasks || []
+            id:              Date.now(),
+            userId:          'default',
+            subjectId:       data.subjectId ? parseInt(data.subjectId) : null,
+            title:           (data.title || '').trim(),
+            type:            data.type || data.taskType || 'Assignment',
+            description:     (data.description || '').trim(),
+            priority:        data.priority || 'Medium',
+            status:          data.status || 'Pending',
+            completedAt:     data.status === 'Completed' ? new Date().toISOString() : null,
+            dueDate:         dueDateStr,
+            dueTime:         dueTimeStr,
+            reminderOffsets: Array.isArray(data.reminderOffsets) && data.reminderOffsets.length > 0
+                                 ? data.reminderOffsets
+                                 : ['1_day_before', '1_hour_before'],
+            notes:           (data.notes || '').trim(),
+            createdAt:       new Date().toISOString(),
+            subtasks:        data.subtasks || []
         };
         tasks.push(newTask);
         saveTasks(tasks);
         if (typeof LocalNotificationService !== 'undefined') {
             LocalNotificationService.scheduleTaskReminders(newTask);
+        }
+        // Sync new task + its reminder offsets to the backend scheduler
+        if (typeof PushManagerService !== 'undefined' && typeof PushManagerService.syncTasksToServer === 'function') {
+            PushManagerService.syncTasksToServer(tasks).catch(() => {});
         }
         return newTask;
     },
@@ -670,18 +683,38 @@ const Storage = {
         if (idx !== -1) {
             const nextStatus = data.status || tasks[idx].status;
             const wasCompleted = tasks[idx].status === 'Completed';
+
+            // Re-parse dueDate into separate date + time parts if provided
+            let dueDateStr  = tasks[idx].dueDate;
+            let dueTimeStr  = tasks[idx].dueTime || '23:59';
+            if (data.dueDate) {
+                const dueDateObj = new Date(data.dueDate);
+                if (!isNaN(dueDateObj.getTime())) {
+                    dueDateStr  = dueDateObj.toISOString().split('T')[0];
+                    const hrs   = String(dueDateObj.getHours()).padStart(2, '0');
+                    const mins  = String(dueDateObj.getMinutes()).padStart(2, '0');
+                    dueTimeStr  = `${hrs}:${mins}`;
+                }
+            }
+
             tasks[idx] = {
                 ...tasks[idx],
-                subjectId:   data.subjectId ? parseInt(data.subjectId) : tasks[idx].subjectId,
-                title:       data.title !== undefined ? (data.title || '').trim() : tasks[idx].title,
-                type:        data.type || data.taskType || tasks[idx].type,
-                description: data.description !== undefined ? (data.description || '').trim() : tasks[idx].description,
-                priority:    data.priority || tasks[idx].priority,
-                status:      nextStatus,
-                completedAt: nextStatus === 'Completed' ? (wasCompleted && tasks[idx].completedAt ? tasks[idx].completedAt : new Date().toISOString()) : null,
-                dueDate:     data.dueDate  || tasks[idx].dueDate,
-                notes:       data.notes !== undefined ? (data.notes || '').trim() : tasks[idx].notes,
-                subtasks:    data.subtasks !== undefined ? data.subtasks : tasks[idx].subtasks
+                userId:          tasks[idx].userId || 'default',
+                subjectId:       data.subjectId ? parseInt(data.subjectId) : tasks[idx].subjectId,
+                title:           data.title !== undefined ? (data.title || '').trim() : tasks[idx].title,
+                type:            data.type || data.taskType || tasks[idx].type,
+                description:     data.description !== undefined ? (data.description || '').trim() : tasks[idx].description,
+                priority:        data.priority || tasks[idx].priority,
+                status:          nextStatus,
+                completedAt:     nextStatus === 'Completed' ? (wasCompleted && tasks[idx].completedAt ? tasks[idx].completedAt : new Date().toISOString()) : null,
+                dueDate:         dueDateStr,
+                dueTime:         dueTimeStr,
+                reminderOffsets: Array.isArray(data.reminderOffsets) && data.reminderOffsets.length > 0
+                                     ? data.reminderOffsets
+                                     : (tasks[idx].reminderOffsets || ['1_day_before', '1_hour_before']),
+                notes:           data.notes !== undefined ? (data.notes || '').trim() : tasks[idx].notes,
+                subtasks:        data.subtasks !== undefined ? data.subtasks : tasks[idx].subtasks,
+                updatedAt:       new Date().toISOString()
             };
             saveTasks(tasks);
             if (typeof LocalNotificationService !== 'undefined') {
@@ -690,6 +723,10 @@ const Storage = {
                 } else {
                     LocalNotificationService.scheduleTaskReminders(tasks[idx]);
                 }
+            }
+            // Sync updated task to backend scheduler (cancels old reminders, creates new ones)
+            if (typeof PushManagerService !== 'undefined' && typeof PushManagerService.syncTasksToServer === 'function') {
+                PushManagerService.syncTasksToServer(tasks).catch(() => {});
             }
         }
     },

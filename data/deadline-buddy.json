@@ -1,17 +1,18 @@
 {
   "tasks": [
     {
-      "id": 999,
-      "title": "Computer Networks Lab 3",
-      "subjectId": 1,
-      "dueDate": "2026-10-30",
-      "dueTime": "23:59",
-      "priority": "High",
-      "status": "Pending",
+      "dueTime": "20:00",
+      "id": 99901,
       "reminderOffsets": [
         "1_day_before",
-        "1_hour_before"
-      ]
+        "1_hour_before",
+        "15_min_before"
+      ],
+      "dueDate": "2026-10-30",
+      "userId": "default",
+      "title": "IT Security Final Report",
+      "priority": "High",
+      "status": "Pending"
     }
   ],
   "reminders": [
@@ -24,13 +25,19 @@
       "body": "Computer Networks Lab 3 is due 2026-10-30 at 23:59.",
       "scheduledAt": "2026-10-26T16:34:33.729Z",
       "relativeTime": "1_day_before",
-      "status": "scheduled",
+      "status": "sent",
       "url": "task-details.html?id=999",
       "targetId": "999",
       "priority": "High",
       "createdAt": "2026-10-26T16:19:33.698Z",
       "snoozedAt": "2026-10-26T16:19:33.729Z",
-      "snoozeMinutes": 15
+      "snoozeMinutes": 15,
+      "sentAt": "2026-10-27T05:47:04.873Z",
+      "deliveryStats": {
+        "total": 0,
+        "successCount": 0,
+        "failCount": 0
+      }
     },
     {
       "id": "rem-999-1_hour_before-mvpgpcqq",
@@ -59,6 +66,51 @@
       "url": "reminders.html?tab=study&id=study-mvpgpcr3",
       "priority": "Normal",
       "createdAt": "2026-10-26T16:19:33.711Z"
+    },
+    {
+      "id": "rem-99901-1_day_before-mvq9kcao",
+      "userId": "default",
+      "taskId": "99901",
+      "type": "deadline",
+      "title": "Deadline tomorrow: IT Security Final Report",
+      "body": "IT Security Final Report is due on 2026-10-30 at 8:00 PM.",
+      "scheduledAt": "2026-10-29T12:00:00.000Z",
+      "relativeTime": "1_day_before",
+      "status": "scheduled",
+      "url": "task-details.html?id=99901",
+      "targetId": "99901",
+      "priority": "High",
+      "createdAt": "2026-10-27T05:47:28.704Z"
+    },
+    {
+      "id": "rem-99901-1_hour_before-mvq9kcao",
+      "userId": "default",
+      "taskId": "99901",
+      "type": "deadline",
+      "title": "Deadline in 1 hour: IT Security Final Report",
+      "body": "IT Security Final Report is due on 2026-10-30 at 8:00 PM.",
+      "scheduledAt": "2026-10-30T11:00:00.000Z",
+      "relativeTime": "1_hour_before",
+      "status": "scheduled",
+      "url": "task-details.html?id=99901",
+      "targetId": "99901",
+      "priority": "High",
+      "createdAt": "2026-10-27T05:47:28.704Z"
+    },
+    {
+      "id": "rem-99901-15_min_before-mvq9kcao",
+      "userId": "default",
+      "taskId": "99901",
+      "type": "deadline",
+      "title": "Deadline in 15 minutes: IT Security Final Report",
+      "body": "IT Security Final Report is due on 2026-10-30 at 8:00 PM.",
+      "scheduledAt": "2026-10-30T11:45:00.000Z",
+      "relativeTime": "15_min_before",
+      "status": "scheduled",
+      "url": "task-details.html?id=99901",
+      "targetId": "99901",
+      "priority": "High",
+      "createdAt": "2026-10-27T05:47:28.704Z"
     }
   ],
   "studySessions": [
@@ -79,7 +131,19 @@
     }
   ],
   "pushSubscriptions": [],
-  "notifications": [],
+  "notifications": [
+    {
+      "id": "notif-1793080024873-likl4d",
+      "userId": "default",
+      "type": "deadline",
+      "title": "Upcoming Deadline (in 1 day)",
+      "body": "Computer Networks Lab 3 is due 2026-10-30 at 23:59.",
+      "url": "task-details.html?id=999",
+      "read": false,
+      "reminderId": "rem-999-1_day_before-mvpgpcqq",
+      "createdAt": "2026-10-27T05:47:04.873Z"
+    }
+  ],
   "preferences": {
     "userId": "default",
     "pushEnabled": true,
