@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8ba7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
+    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
+    <title>Student Profile - Deadline Buddy</title>
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
+    </script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><img src="images/deadline-buddy-logo.svg" alt="Deadline Buddy logo"></div>
+                <div>
+                    <div class="brand-title">Deadline Buddy</div>
+                    <div class="brand-sub">Olinsterg College Inc.</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-home" aria-hidden="true"></span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="tasks.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
+                    <span>Tasks & Requirements</span>
+                </a>
+                <a href="subjects.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
+                    <span>Subjects</span>
+                </a>
+                <a href="calendar.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
+                    <span>Calendar</span>
+                </a>
+                <a href="reminders.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
+                    <span>Reminders & Alerts</span>
+                </a>
+                <a href="profile.html" class="nav-item active">
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
+                    <span>Student Profile</span>
+                </a>
+            </nav>
+
+            <div class="user-pill">
+                <div class="avatar" id="sidebarAvatar">G12</div>
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-weight: 600; font-size: 0.88rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="sidebarName">Student</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);" id="sidebarTrack">Grade 12 - ASSH</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
+                <div style="flex: 1;">
+                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-profile" aria-hidden="true"></span>Student Profile</span></h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Manage your profile and keep a copy of your saved schoolwork</p>
+                </div>
+
+                <div class="notification-wrapper">
+                    <button class="icon-btn" id="notifBtn" title="Notifications">
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
+                        <span class="badge-dot hidden" id="notifBadge"></span>
+                    </button>
+                    <div class="notif-dropdown hidden" id="notifDropdown">
+                        <div class="notif-header">
+                            <span style="font-weight: 600;">Deadline Alerts</span>
+                            <button class="btn btn-secondary" style="font-size: 0.72rem; padding: 2px 8px;" id="clearNotifsBtn">Clear All</button>
+                        </div>
+                        <div class="notif-list" id="notifList">
+                            <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No active alerts</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Container -->
+            <div class="container" style="max-width: 900px;">
+                <div class="grid grid-2">
+                    <!-- Academic Profile Form -->
+                    <div class="card">
+                        <h3 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                            <span class="title-with-icon"><span class="app-icon icon-profile" aria-hidden="true"></span>Academic Profile Information</span>
+                        </h3>
+                        <form id="profileForm">
+                            <div class="profile-photo-row">
+                                <div class="profile-photo-preview" id="profilePhotoPreview">S</div>
+                                <div class="profile-photo-actions">
+                                    <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-secondary" id="uploadProfilePhotoBtn">Upload Profile Picture</button>
+                                    <button type="button" class="btn btn-secondary" id="removeProfilePhotoBtn">Remove Picture</button>
+                                    <div class="profile-photo-note">Saved only in this browser, so it works even on GitHub Pages.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="studentName">Student Name *</label>
+                                <input type="text" id="studentName" class="form-control" placeholder="e.g., Juan Dela Cruz" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gradeLevel">Grade Level</label>
+                                <select id="gradeLevel" class="form-control">
+                                    <option value="Grade 11">Grade 11</option>
+                                    <option value="Grade 12">Grade 12</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="trackStrand">Strand / Track *</label>
+                                <select id="trackStrand" class="form-control" required>
+                                    <option value="ASSH (Arts, Social Sciences & Humanities)" selected>ASSH (Arts, Social Sciences & Humanities)</option>
+                                    <option value="STEM (Science, Tech, Engineering & Math)">STEM (Science, Tech, Engineering & Math)</option>
+                                    <option value="ABM (Accountancy, Business & Management)">ABM (Accountancy, Business & Management)</option>
+                                    <option value="HUMSS (Humanities & Social Sciences)">HUMSS (Humanities & Social Sciences)</option>
+                                    <option value="GAS (General Academic Strand)">GAS (General Academic Strand)</option>
+                                    <option value="TVL (Technical-Vocational-Livelihood)">TVL (Technical-Vocational-Livelihood)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="schoolName">School Name</label>
+                                <input type="text" id="schoolName" class="form-control" value="Olinsterg College Inc." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="section">Section / Room</label>
+                                <input type="text" id="section" class="form-control" placeholder="e.g., 12-St. Augustine">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">Save Profile Updates</button>
+                        </form>
+                    </div>
+
+                    <!-- Backup & Data Management Card -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="card">
+                            <h3 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <span class="title-with-icon"><span class="app-icon icon-save" aria-hidden="true"></span>Save & Bring Back Records</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                                Save a copy of your Deadline Buddy records so you can bring them back later, even if you use another laptop or browser.
+                            </p>
+
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <button class="btn btn-primary" id="exportBtn" style="justify-content: center; gap: 8px;">
+                                    <span class="app-icon icon-download" aria-hidden="true"></span>
+                                    Download My Saved Records
+                                </button>
+
+                                <div style="position: relative;">
+                                    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                                    <button class="btn btn-secondary" id="importBtn" style="width: 100%; justify-content: center; gap: 8px;">
+                                        <span class="app-icon icon-upload" aria-hidden="true"></span>
+                                        Bring Back My Saved Records
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Preferences & PWA Status Card -->
+                        <div class="card" style="border-top: 3px solid var(--primary);">
+                            <h3 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <span class="title-with-icon"><span class="app-icon icon-alerts" aria-hidden="true"></span>Notifications & System Status</span>
+                            </h3>
+
+                            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--text-muted);">Notification Permission:</span>
+                                    <strong id="permStatusBadge" style="color: var(--primary);">Checking...</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--text-muted);">PWA Installation:</span>
+                                    <strong id="pwaStatusBadge" style="color: var(--success);">Installed</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--text-muted);">Offline Files:</span>
+                                    <strong id="offlineStatusBadge" style="color: var(--success);">Ready</strong>
+                                </div>
+                            </div>
+
+                            <h4 style="font-size: 0.95rem; margin: 12px 0 8px 0; color: var(--text-heading);">Deadline Schedule Reminders</h4>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Deadline Notifications</span>
+                                    <input type="checkbox" id="prefMasterNotifications" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Precise Deadline Reminders</span>
+                                    <input type="checkbox" id="prefPreciseReminders" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>1-Day Reminder</span>
+                                    <input type="checkbox" id="pref1Day" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>1-Hour Reminder</span>
+                                    <input type="checkbox" id="pref1Hour" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>20-Minute Reminder</span>
+                                    <input type="checkbox" id="pref20Min" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Overdue Alert</span>
+                                    <input type="checkbox" id="prefOverdue" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Sound</span>
+                                    <input type="checkbox" id="prefSound" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Vibration</span>
+                                    <input type="checkbox" id="prefVibration" checked style="width: 18px; height: 18px;">
+                                </label>
+                            </div>
+
+                            <button type="button" class="btn btn-secondary" id="profileSendTestNotifBtn" style="width: 100%; margin-top: 14px; justify-content: center; gap: 8px;">
+                                <span class="app-icon icon-bell" aria-hidden="true"></span>
+                                Send Test Notification
+                            </button>
+                        </div>
+
+                        <!-- PWA App Installation Card -->
+                        <div class="card" style="border-top: 3px solid var(--primary);">
+                            <h3 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <span class="title-with-icon"><span class="app-icon icon-download" aria-hidden="true"></span>Install Deadline Buddy</span>
+                            </h3>
+                            <p id="installDescText" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+                                Install Deadline Buddy on your device for faster access and an app-like experience.
+                            </p>
+                            <div id="installButtonContainer">
+                                <button type="button" class="btn btn-primary" id="profileInstallAppBtn" style="width: 100%; justify-content: center; gap: 8px;">
+                                    <span class="app-icon icon-download" aria-hidden="true"></span>
+                                    Install App
+                                </button>
+                            </div>
+                            <div id="installedBadgeContainer" style="display: none; padding: 10px; background: rgba(46, 204, 113, 0.12); border-radius: var(--radius-sm); color: var(--success); font-weight: 600; text-align: center; font-size: 0.88rem;">
+                                <span class="app-icon icon-check" aria-hidden="true"></span>
+                                Deadline Buddy is installed on this device.
+                            </div>
+                        </div>
+
+                        <!-- System Reset Card -->
+                        <div class="card" style="border-top: 3px solid var(--warning);">
+                            <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-heading);">
+                                <span class="title-with-icon"><span class="app-icon icon-reset" aria-hidden="true"></span>Clean All Records</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                                Use this only for practice or presentation. It clears the records saved in this browser and brings back the sample records.
+                            </p>
+                            <button class="btn btn-secondary" id="resetDemoBtn" style="width: 100%; justify-content: center; color: var(--warning); border-color: var(--warning); gap: 8px;">
+                                <span class="app-icon icon-reset" aria-hidden="true"></span>
+                                Clean All & Bring Back Sample Records
+                            </button>
+                        </div>
+
+                        <!-- Theme Card -->
+                        <div class="card" style="border-top: 3px solid var(--primary);">
+                            <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-heading);">
+                                <span class="title-with-icon"><span class="app-icon icon-theme" aria-hidden="true"></span>Change Theme</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                                Choose the color style you want to use in Deadline Buddy.
+                            </p>
+                            <div class="theme-options" role="group" aria-label="Choose theme">
+                                <button type="button" class="theme-option" data-theme-choice="pink">
+                                    <span class="theme-swatch-row" aria-hidden="true">
+                                        <span class="theme-swatch" style="background:#faeee7;"></span>
+                                        <span class="theme-swatch" style="background:#ff8ba7;"></span>
+                                        <span class="theme-swatch" style="background:#f3d2c1;"></span>
+                                        <span class="theme-swatch" style="background:#2b2c34;"></span>
+                                    </span>
+                                    <strong>Default Pink</strong>
+                                    <small>Soft Deadline Buddy colors.</small>
+                                </button>
+                                <button type="button" class="theme-option" data-theme-choice="blue">
+                                    <span class="theme-swatch-row" aria-hidden="true">
+                                        <span class="theme-swatch" style="background:#fffffe;"></span>
+                                        <span class="theme-swatch" style="background:#094067;"></span>
+                                        <span class="theme-swatch" style="background:#3da9fc;"></span>
+                                        <span class="theme-swatch" style="background:#ef4565;"></span>
+                                    </span>
+                                    <strong>Clean Blue</strong>
+                                    <small>White, blue, and bright study colors.</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bottom Mobile Nav (5 core items) -->
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
+        <a href="dashboard.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-home" aria-hidden="true"></span>
+            <span>Home</span>
+        </a>
+        <a href="tasks.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
+            <span>Tasks</span>
+        </a>
+        <a href="calendar.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
+            <span>Calendar</span>
+        </a>
+        <a href="reminders.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
+            <span>Alerts</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item active">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="js/storage.js"></script>
+    <script src="js/deadline.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/local-notifications.js"></script>
+    <script src="js/push.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/pwa.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = Storage.getUser();
+            let avatarDataUrl = user.avatarDataUrl || '';
+            const profilePhotoPreview = document.getElementById('profilePhotoPreview');
+            const profilePhotoInput = document.getElementById('profilePhotoInput');
+            const uploadProfilePhotoBtn = document.getElementById('uploadProfilePhotoBtn');
+            const removeProfilePhotoBtn = document.getElementById('removeProfilePhotoBtn');
+
+            document.getElementById('studentName').value = user.name || '';
+            document.getElementById('gradeLevel').value = user.gradeLevel || 'Grade 12';
+            document.getElementById('trackStrand').value = user.strand || 'ASSH (Arts, Social Sciences & Humanities)';
+            document.getElementById('schoolName').value = user.school || 'Olinsterg College Inc.';
+            document.getElementById('section').value = user.section || '';
+
+            function renderProfilePhoto() {
+                if (avatarDataUrl) {
+                    profilePhotoPreview.classList.add('has-image');
+                    profilePhotoPreview.innerHTML = `<img src="${avatarDataUrl}" alt="Profile picture preview">`;
+                    removeProfilePhotoBtn.style.display = 'inline-flex';
+                } else {
+                    profilePhotoPreview.classList.remove('has-image');
+                    profilePhotoPreview.textContent = (document.getElementById('studentName').value || user.name || 'S').charAt(0).toUpperCase();
+                    removeProfilePhotoBtn.style.display = 'none';
+                }
+            }
+
+            function saveProfilePhotoNow() {
+                const currentUser = Storage.getUser();
+                const updatedUser = { ...currentUser, avatarDataUrl };
+                Storage.saveUser(updatedUser);
+                if (updatedUser.username) {
+                    Storage.updateAccount(updatedUser.username, updatedUser);
+                }
+
+                const sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar && typeof renderAvatar === 'function') {
+                    renderAvatar(sidebarAvatar, updatedUser);
+                }
+            }
+
+            function resizeImageToDataUrl(file, callback) {
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const size = 360;
+                        const scale = Math.max(size / img.width, size / img.height);
+                        const width = img.width * scale;
+                        const height = img.height * scale;
+                        const x = (size - width) / 2;
+                        const y = (size - height) / 2;
+
+                        canvas.width = size;
+                        canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#fffffe';
+                        ctx.fillRect(0, 0, size, size);
+                        ctx.drawImage(img, x, y, width, height);
+                        callback(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            uploadProfilePhotoBtn.addEventListener('click', () => profilePhotoInput.click());
+
+            profilePhotoInput.addEventListener('change', event => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Please choose an image file.');
+                    return;
+                }
+
+                resizeImageToDataUrl(file, dataUrl => {
+                    avatarDataUrl = dataUrl;
+                    renderProfilePhoto();
+                    try {
+                        saveProfilePhotoNow();
+                        alert('Profile picture saved successfully.');
+                    } catch (err) {
+                        console.error('Profile picture save failed:', err);
+                        alert('The picture is too large for this browser to save. Please try a smaller image.');
+                    }
+                });
+            });
+
+            removeProfilePhotoBtn.addEventListener('click', () => {
+                avatarDataUrl = '';
+                profilePhotoInput.value = '';
+                renderProfilePhoto();
+                saveProfilePhotoNow();
+            });
+
+            document.getElementById('studentName').addEventListener('input', () => {
+                if (!avatarDataUrl) renderProfilePhoto();
+            });
+
+            renderProfilePhoto();
+
+            const themeButtons = document.querySelectorAll('[data-theme-choice]');
+
+            function renderThemeButtons() {
+                const selectedTheme = Storage.getTheme();
+                document.documentElement.setAttribute('data-theme', selectedTheme);
+                document.body.setAttribute('data-theme', selectedTheme);
+                themeButtons.forEach(button => {
+                    const isActive = button.dataset.themeChoice === selectedTheme;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            }
+
+            themeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    Storage.saveTheme(button.dataset.themeChoice);
+                    renderThemeButtons();
+                });
+            });
+
+            renderThemeButtons();
+
+            // Profile form save
+            document.getElementById('profileForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('studentName').value.trim();
+                const gradeLevel = document.getElementById('gradeLevel').value;
+                const strand = document.getElementById('trackStrand').value;
+                const school = document.getElementById('schoolName').value.trim();
+                const section = document.getElementById('section').value.trim();
+
+                const updatedUser = { ...user, name, gradeLevel, strand, school, section, avatarDataUrl };
+                Storage.saveUser(updatedUser);
+                if (updatedUser.username) {
+                    Storage.updateAccount(updatedUser.username, updatedUser);
+                }
+                alert('Profile updated successfully!');
+                window.location.reload();
+            });
+
+            // Export JSON
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                Storage.exportBackupJSON();
+            });
+
+            // Install PWA
+            const profileInstallBtn = document.getElementById('profileInstallAppBtn');
+            if (profileInstallBtn) {
+                profileInstallBtn.addEventListener('click', () => {
+                    if (typeof window.installDeadlineBuddyPwa === 'function') {
+                        window.installDeadlineBuddyPwa();
+                    }
+                });
+            }
+
+            // Import JSON
+            const fileInput = document.getElementById('importFileInput');
+            document.getElementById('importBtn').addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const res = Storage.importBackupJSON(event.target.result);
+                    if (res.success) {
+                        alert('Your saved records were restored successfully!');
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert('We could not restore the selected file. Please choose a valid Deadline Buddy saved-records file.');
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Reset demo data
+            document.getElementById('resetDemoBtn').addEventListener('click', () => {
+                if (confirm('Clean all records saved in this browser?\n\nThis will remove your current subjects, requirements, checklist steps, and notification history, then bring back the sample records.\n\nChoose OK only if you are sure.')) {
+                    Storage.seedDemoData();
+                    alert('Sample records restored.');
+                    window.location.href = 'dashboard.html';
+                }
+            });
+
+            // Update System & PWA Status Badges
+            function updateSystemStatusBadges() {
+                const permBadge = document.getElementById('permStatusBadge');
+                const pwaBadge = document.getElementById('pwaStatusBadge');
+                const installContainer = document.getElementById('installButtonContainer');
+                const installedBadge = document.getElementById('installedBadgeContainer');
+
+                if ('Notification' in window) {
+                    if (Notification.permission === 'granted') {
+                        permBadge.textContent = 'Allowed';
+                        permBadge.style.color = 'var(--success)';
+                    } else if (Notification.permission === 'denied') {
+                        permBadge.textContent = 'Blocked';
+                        permBadge.style.color = 'var(--danger)';
+                    } else {
+                        permBadge.textContent = 'Not requested';
+                        permBadge.style.color = 'var(--warning)';
+                    }
+                } else {
+                    permBadge.textContent = 'Unsupported';
+                    permBadge.style.color = 'var(--danger)';
+                }
+
+                const isInstalled = (typeof window.isPwaStandalone === 'function' && window.isPwaStandalone()) || window.isPwaInstalled;
+                if (isInstalled) {
+                    pwaBadge.textContent = 'Installed';
+                    pwaBadge.style.color = 'var(--success)';
+                    if (installContainer) installContainer.style.display = 'none';
+                    if (installedBadge) installedBadge.style.display = 'block';
+                } else {
+                    pwaBadge.textContent = 'Available to install';
+                    pwaBadge.style.color = 'var(--primary)';
+                    if (installContainer) installContainer.style.display = 'block';
+                    if (installedBadge) installedBadge.style.display = 'none';
+                }
+            }
+
+            // Bind Notification Preference Toggles
+            const prefMaster = document.getElementById('prefMasterNotifications');
+            const prefPrecise = document.getElementById('prefPreciseReminders');
+            const pref1Day = document.getElementById('pref1Day');
+            const pref1Hour = document.getElementById('pref1Hour');
+            const pref20Min = document.getElementById('pref20Min');
+            const prefOverdue = document.getElementById('prefOverdue');
+            const prefSound = document.getElementById('prefSound');
+            const prefVibration = document.getElementById('prefVibration');
+
+            const savedPrefs = JSON.parse(localStorage.getItem('deadlinebuddy_notif_prefs') || '{}');
+            if (prefMaster) prefMaster.checked = savedPrefs.master !== false;
+            if (prefPrecise) prefPrecise.checked = savedPrefs.precise !== false;
+            if (pref1Day) pref1Day.checked = savedPrefs.day1 !== false;
+            if (pref1Hour) pref1Hour.checked = savedPrefs.hour1 !== false;
+            if (pref20Min) pref20Min.checked = savedPrefs.min20 !== false;
+            if (prefOverdue) prefOverdue.checked = savedPrefs.overdue !== false;
+            if (prefSound) prefSound.checked = savedPrefs.sound !== false;
+            if (prefVibration) prefVibration.checked = savedPrefs.vibration !== false;
+
+            function saveLocalPrefs() {
+                const prefs = {
+                    master: prefMaster ? prefMaster.checked : true,
+                    precise: prefPrecise ? prefPrecise.checked : true,
+                    day1: pref1Day ? pref1Day.checked : true,
+                    hour1: pref1Hour ? pref1Hour.checked : true,
+                    min20: pref20Min ? pref20Min.checked : true,
+                    overdue: prefOverdue ? prefOverdue.checked : true,
+                    sound: prefSound ? prefSound.checked : true,
+                    vibration: prefVibration ? prefVibration.checked : true
+                };
+                localStorage.setItem('deadlinebuddy_notif_prefs', JSON.stringify(prefs));
+                if (typeof LocalNotificationService !== 'undefined' && typeof Storage !== 'undefined') {
+                    LocalNotificationService.rescheduleAllActiveTasks(Storage.getTasks());
+                }
+            }
+
+            [prefMaster, prefPrecise, pref1Day, pref1Hour, pref20Min, prefOverdue, prefSound, prefVibration].forEach(el => {
+                if (el) el.addEventListener('change', saveLocalPrefs);
+            });
+
+            // Send Test Notification Button
+            const testNotifBtn = document.getElementById('profileSendTestNotifBtn');
+            if (testNotifBtn) {
+                testNotifBtn.addEventListener('click', async () => {
+                    try {
+                        testNotifBtn.disabled = true;
+                        testNotifBtn.textContent = 'Scheduling Test...';
+                        if (typeof LocalNotificationService !== 'undefined') {
+                            const res = await LocalNotificationService.sendTestNotification();
+                            alert(res.message || 'Test notification scheduled successfully!');
+                        } else {
+                            alert('Local notification service is initializing. Please wait a moment.');
+                        }
+                    } catch (err) {
+                        alert('Could not schedule notification: ' + err.message);
+                    } finally {
+                        testNotifBtn.disabled = false;
+                        testNotifBtn.innerHTML = '<span class="app-icon icon-bell" aria-hidden="true"></span> Send Test Notification';
+                    }
+                });
+            }
+
+            updateSystemStatusBadges();
+            document.addEventListener('pwa-installed', updateSystemStatusBadges);
+            document.addEventListener('pwa-installable', updateSystemStatusBadges);
+        });
+    </script>
+</body>
+</html>

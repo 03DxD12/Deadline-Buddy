@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8ba7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
+    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
     <title>Tasks & Requirements - Deadline Buddy</title>
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
@@ -139,8 +144,8 @@
         </main>
     </div>
 
-    <!-- Bottom Mobile Nav -->
-    <div class="mobile-nav">
+    <!-- Bottom Mobile Nav (5 core items) -->
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
         <a href="dashboard.html" class="mobile-nav-item">
             <span class="icon app-icon icon-home" aria-hidden="true"></span>
             <span>Home</span>
@@ -148,10 +153,6 @@
         <a href="tasks.html" class="mobile-nav-item active">
             <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
-        </a>
-        <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
-            <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
             <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
@@ -165,14 +166,15 @@
             <span class="icon app-icon icon-profile" aria-hidden="true"></span>
             <span>Profile</span>
         </a>
-    </div>
+    </nav>
 
     <script src="js/storage.js"></script>
     <script src="js/deadline.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/local-notifications.js"></script>
+    <script src="js/push.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
-    <script src="js/device-reminders.js"></script>
     <script>
         let currentTab = 'All';
 

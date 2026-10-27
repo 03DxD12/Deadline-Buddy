@@ -1,23 +1,25 @@
-DEADLINE BUDDY
+DEADLINE BUDDY (PWA + Installed Android Mobile App)
 
-HOW TO OPEN:
+TWO WAYS TO USE DEADLINE BUDDY:
 
-1. Extract the ZIP file.
-2. Open the Deadline Buddy folder.
-3. Double-click Deadline Buddy.exe.
-4. Allow Windows notifications if asked.
-5. You may now use Deadline Buddy.
+1. WEBSITE / PWA (Browser):
+   - Open index.html in any modern web browser (Google Chrome, Microsoft Edge, Safari, or Firefox).
+   - Click "Install App" on the login screen or in the browser menu ("Add to Home screen").
+   - Works offline with cached records in IndexedDB & LocalStorage.
+   - Closed-app notifications online use Web Push.
 
-IMPORTANT:
+2. INSTALLED ANDROID MOBILE APP (Capacitor):
+   - Native Android application built with Capacitor.
+   - Reminders are scheduled directly with Android's AlarmManager.
+   - Alerts pop up with sound and vibration even when:
+     • The app is completely closed
+     • Removed from the recent-apps switcher
+     • Phone is locked / in sleep mode
+     • Wi-Fi and mobile data are OFF (100% offline!)
+   - No continuous background battery drain.
 
-Closing the main Deadline Buddy window does not stop reminders.
-
-Deadline Buddy continues running in the Windows system tray.
-
-To completely stop Deadline Buddy:
-
-System Tray > Deadline Buddy > Exit
-
-If you fully exit Deadline Buddy, deadline reminders will stop until the app is opened again.
-
-If the laptop is completely powered off, no notification can appear at that exact time.
+HOW TO BUILD & RUN ANDROID:
+   - Run: npm install
+   - Run: npm run cap:sync
+   - Run: npm run cap:open:android
+   - Connect phone or emulator and click Run in Android Studio.

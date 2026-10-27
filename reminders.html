@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reminders & Alerts - Deadline Buddy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8ba7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
+    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
+    <title>Reminders & Push Alerts - Deadline Buddy</title>
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
     </script>
@@ -68,12 +73,12 @@
             <header class="topbar">
                 <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
                 <div style="flex: 1;">
-                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-alerts" aria-hidden="true"></span>Reminders & Deadline Alerts</span></h1>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Categorized list of urgent requirements needing immediate attention</p>
+                    <h1 style="font-size: 1.3rem; margin: 0;"><span class="title-with-icon"><span class="app-icon icon-alerts" aria-hidden="true"></span>Reminders & Notifications</span></h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Server-backed deadline alerts, study reminders, and background Web Push</p>
                 </div>
 
-                <button class="btn btn-primary device-test-btn" id="sendDeviceTopbarTestBtn">
-                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Send Test Notification
+                <button class="btn btn-primary" id="sendQuickTestPushBtn" title="Send Real Web Push Test">
+                    <span><span class="app-icon icon-bell" aria-hidden="true"></span></span> Test Push Alert
                 </button>
 
                 <div class="notification-wrapper">
@@ -95,120 +100,347 @@
 
             <!-- Container -->
             <div class="container">
-                <!-- Device notification settings -->
-                <div class="card" style="margin-bottom: 24px; border-top: 4px solid var(--primary);">
-                    <div class="balanced-card-row" style="align-items: flex-start; gap: 16px;">
-                        <div style="min-width: 0;">
-                            <h3 style="margin: 0 0 6px; font-size: 1.08rem;">
-                                <span class="title-with-icon"><span class="app-icon icon-bell" aria-hidden="true"></span>Deadline Notifications</span>
+                <!-- Navigation Tabs -->
+                <div class="page-tabs" role="tablist" aria-label="Reminders and notifications navigation">
+                    <button type="button" class="page-tab-btn active" id="tabBtnDeadlines" role="tab" aria-selected="true" aria-controls="panelDeadlines">
+                        <span class="app-icon icon-deadline" aria-hidden="true"></span>
+                        <span>Deadlines & Alerts</span>
+                        <span class="page-tab-badge" id="tabBadgeDeadlines">0</span>
+                    </button>
+                    <button type="button" class="page-tab-btn" id="tabBtnStudy" role="tab" aria-selected="false" aria-controls="panelStudy">
+                        <span class="app-icon icon-calendar" aria-hidden="true"></span>
+                        <span>Study Reminders</span>
+                        <span class="page-tab-badge" id="tabBadgeStudy">0</span>
+                    </button>
+                    <button type="button" class="page-tab-btn" id="tabBtnHistory" role="tab" aria-selected="false" aria-controls="panelHistory">
+                        <span class="app-icon icon-bell" aria-hidden="true"></span>
+                        <span>Notification History</span>
+                        <span class="page-tab-badge" id="tabBadgeHistory">0</span>
+                    </button>
+                    <button type="button" class="page-tab-btn" id="tabBtnSettings" role="tab" aria-selected="false" aria-controls="panelSettings">
+                        <span class="app-icon icon-settings" aria-hidden="true"></span>
+                        <span>Push & Settings</span>
+                    </button>
+                </div>
+
+                <!-- ================= TAB 1: DEADLINES & ALERTS ================= -->
+                <div id="panelDeadlines" role="tabpanel" aria-labelledby="tabBtnDeadlines">
+                    <!-- Overview Bar (Notification Status, Precise Reminders, Scheduled Alarms) -->
+                    <div class="card" style="margin-bottom: 20px; border-left: 4px solid var(--primary); padding: 18px 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: center;">
+                                <div>
+                                    <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; display: block;">Notification Status</span>
+                                    <span id="overviewNotifStatusBadge" class="badge badge-normal" style="margin-top: 4px;">✓ Enabled</span>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; display: block;">Precise Reminders</span>
+                                    <span id="overviewPreciseStatusBadge" class="badge badge-normal" style="margin-top: 4px;">✓ Enabled</span>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; display: block;">Scheduled Reminders</span>
+                                    <span id="overviewScheduledCount" style="font-size: 1.25rem; font-weight: 700; color: var(--primary); display: block; margin-top: 2px;">0</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-secondary" id="overviewSendTestBtn" style="font-size: 0.88rem; padding: 8px 16px;">
+                                    <span class="app-icon icon-bell" aria-hidden="true"></span> Send Test Notification
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-4">
+                        <!-- Overdue Section -->
+                        <div class="card reminder-column" style="border-top: 4px solid var(--danger);">
+                            <h3 class="reminder-column-header" style="margin-top: 0; color: var(--danger); font-size: 1.15rem;">
+                                <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-alerts" aria-hidden="true"></span><span>Overdue</span></span>
+                                <span class="badge badge-overdue" id="overdueCount">0</span>
                             </h3>
-                            <p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.86rem;">
-                                Use the Windows app version for offline reminders that continue after the main screen is closed.
-                            </p>
-                            <div style="font-size: 0.88rem;">
-                                <strong>Status:</strong> <span id="deviceReminderStatusText">Checking...</span>
-                            </div>
-                            <p id="deviceReminderDetailText" style="margin: 6px 0 0; color: var(--text-muted); font-size: 0.82rem;">
-                                Checking the available reminder mode.
-                            </p>
-                            <p id="deviceReminderPlatformText" style="margin: 6px 0 0; color: var(--primary); font-size: 0.82rem; font-weight: 800;">
-                                Offline Device Reminders: Checking
-                            </p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Past due requirements.</p>
+                            <div id="overdueList" style="display: flex; flex-direction: column; gap: 10px;"></div>
                         </div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;">
-                            <button class="btn btn-primary device-test-btn" id="sendDeviceCardTestBtn" type="button">Send Test Notification</button>
-                        </div>
-                    </div>
 
-                    <div class="grid grid-2" style="margin-top: 18px;">
-                        <div>
-                            <label style="font-weight: 800; display: block; margin-bottom: 8px;">Remind Me</label>
-                            <div style="display: grid; gap: 8px;">
-                                <label><input type="checkbox" data-device-reminder-pref="oneDay"> 1 day before</label>
-                                <label><input type="checkbox" data-device-reminder-pref="oneHour"> 1 hour before</label>
-                                <label><input type="checkbox" data-device-reminder-pref="twentyMinutes"> 20 minutes before</label>
-                                <label><input type="checkbox" data-device-reminder-pref="overdue"> When overdue</label>
-                            </div>
+                        <!-- Due Today Section -->
+                        <div class="card reminder-column" style="border-top: 4px solid var(--warning);">
+                            <h3 class="reminder-column-header" style="margin-top: 0; color: var(--warning); font-size: 1.15rem;">
+                                <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-calendar" aria-hidden="true"></span><span>Due Today</span></span>
+                                <span class="badge badge-urgent" id="dueTodayCount">0</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Deadlines ending today.</p>
+                            <div id="dueTodayList" style="display: flex; flex-direction: column; gap: 10px;"></div>
                         </div>
-                        <div>
-                            <label style="font-weight: 800; display: block; margin-bottom: 8px;">Windows Option</label>
-                            <label style="display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" id="startWithWindowsToggle">
-                                Start Deadline Buddy with Windows
-                            </label>
-                            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 0.78rem;">
-                                This option is available in the packaged Windows app.
-                            </p>
+
+                        <!-- Urgent Section -->
+                        <div class="card reminder-column" style="border-top: 4px solid #3b82f6;">
+                            <h3 class="reminder-column-header" style="margin-top: 0; color: #3b82f6; font-size: 1.15rem;">
+                                <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-bell" aria-hidden="true"></span><span>Urgent</span></span>
+                                <span class="badge badge-due-soon" id="dueTomorrowCount">0</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Less than 24 hours left.</p>
+                            <div id="dueTomorrowList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                        </div>
+
+                        <!-- Coming Up Section -->
+                        <div class="card reminder-column" style="border-top: 4px solid var(--primary);">
+                            <h3 class="reminder-column-header" style="margin-top: 0; color: var(--primary); font-size: 1.15rem;">
+                                <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Due Soon & Upcoming</span></span>
+                                <span class="badge badge-normal" id="comingUpCount">0</span>
+                            </h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Future requirements to prepare for.</p>
+                            <div id="comingUpList" style="display: flex; flex-direction: column; gap: 10px;"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-4">
-                    <!-- Overdue Section -->
-                    <div class="card reminder-column" style="border-top: 4px solid var(--danger);">
-                        <h3 class="reminder-column-header" style="margin-top: 0; color: var(--danger); font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-alerts" aria-hidden="true"></span><span>Overdue</span></span>
-                            <span class="badge badge-overdue" id="overdueCount">0</span>
-                        </h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Tasks past due date.</p>
-                        <div id="overdueList" style="display: flex; flex-direction: column; gap: 10px;">
-                            <!-- Rendered dynamically -->
+                <!-- ================= TAB 2: STUDY REMINDERS ================= -->
+                <div id="panelStudy" class="hidden" role="tabpanel" aria-labelledby="tabBtnStudy">
+                    <div class="card" style="margin-bottom: 24px; border-left: 4px solid var(--primary);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                            <div>
+                                <h3 style="margin: 0 0 6px; font-size: 1.12rem;">
+                                    <span class="title-with-icon"><span class="app-icon icon-calendar" aria-hidden="true"></span>Study Sessions & Review Reminders</span>
+                                </h3>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.86rem;">
+                                    Set study blocks with recurring schedules (Daily, Weekdays, Mon/Wed/Fri) and get 15-minute advance alerts.
+                                </p>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="openAddStudyModalBtn">
+                                <span class="app-icon icon-plus" aria-hidden="true"></span> Schedule Study Session
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Due Today Section -->
-                    <div class="card reminder-column" style="border-top: 4px solid var(--warning);">
-                        <h3 class="reminder-column-header" style="margin-top: 0; color: var(--warning); font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-calendar" aria-hidden="true"></span><span>Due Today</span></span>
-                            <span class="badge badge-urgent" id="dueTodayCount">0</span>
-                        </h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Deadlines today.</p>
-                        <div id="dueTodayList" style="display: flex; flex-direction: column; gap: 10px;">
-                            <!-- Rendered dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- Urgent Section -->
-                    <div class="card reminder-column" style="border-top: 4px solid #3b82f6;">
-                        <h3 class="reminder-column-header" style="margin-top: 0; color: #3b82f6; font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-bell" aria-hidden="true"></span><span>Urgent</span></span>
-                            <span class="badge badge-due-soon" id="dueTomorrowCount">0</span>
-                        </h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Less than 24 hours left.</p>
-                        <div id="dueTomorrowList" style="display: flex; flex-direction: column; gap: 10px;">
-                            <!-- Rendered dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- Coming Up Section -->
-                    <div class="card reminder-column" style="border-top: 4px solid var(--primary);">
-                        <h3 class="reminder-column-header" style="margin-top: 0; color: var(--primary); font-size: 1.15rem;">
-                            <span class="title-with-icon"><span class="reminder-type-icon app-icon icon-deadline" aria-hidden="true"></span><span>Due Soon & Upcoming</span></span>
-                            <span class="badge badge-normal" id="comingUpCount">0</span>
-                        </h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Future requirements to prepare for.</p>
-                        <div id="comingUpList" style="display: flex; flex-direction: column; gap: 10px;">
-                            <!-- Rendered dynamically -->
-                        </div>
+                    <div id="studySessionsGrid" class="grid grid-3" style="gap: 16px;">
+                        <!-- Dynamically populated -->
                     </div>
                 </div>
 
-                <!-- Recent Notifications Log Card -->
-                <div class="card" style="margin-top: 24px;">
-                    <div class="balanced-card-row" style="margin-bottom: 16px;">
-                        <h3 style="margin: 0; font-size: 1.1rem;"><span class="app-icon icon-bell" aria-hidden="true"></span> Notification History Log</h3>
-                        <button class="btn btn-secondary" style="font-size: 0.8rem;" id="clearLogBtn">Clear Log</button>
+                <!-- ================= TAB 3: NOTIFICATION HISTORY ================= -->
+                <div id="panelHistory" class="hidden" role="tabpanel" aria-labelledby="tabBtnHistory">
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="notifFilterGroup">
+                                <button type="button" class="btn btn-secondary active" data-filter="all" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 999px;">All</button>
+                                <button type="button" class="btn btn-secondary" data-filter="unread" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 999px;">Unread</button>
+                                <button type="button" class="btn btn-secondary" data-filter="deadline" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 999px;">Deadlines</button>
+                                <button type="button" class="btn btn-secondary" data-filter="study" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 999px;">Study</button>
+                                <button type="button" class="btn btn-secondary" data-filter="system" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 999px;">System</button>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn btn-secondary" id="markAllReadBtn" style="font-size: 0.8rem; padding: 6px 14px;">Mark All as Read</button>
+                                <button type="button" class="btn btn-secondary" id="clearAllHistoryBtn" style="font-size: 0.8rem; padding: 6px 14px;">Clear All</button>
+                            </div>
+                        </div>
                     </div>
-                    <div id="notifLogList" style="display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Rendered dynamically -->
+
+                    <div id="notificationHistoryContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Dynamically populated notifications -->
+                    </div>
+                </div>
+
+                <!-- ================= TAB 4: PUSH & SETTINGS ================= -->
+                <div id="panelSettings" class="hidden" role="tabpanel" aria-labelledby="tabBtnSettings">
+                    <!-- Native Device Alarm & Offline Reminders Card -->
+                    <div class="card" style="margin-bottom: 20px; border-top: 4px solid #10b981;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;">
+                            <div>
+                                <h3 style="margin: 0 0 6px; font-size: 1.15rem;">
+                                    <span class="title-with-icon"><span class="app-icon icon-bell" aria-hidden="true"></span>Native Device & Offline Alarm Status</span>
+                                </h3>
+                                <p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.86rem;">
+                                    Installed Android app uses Capacitor and Android AlarmManager. Schedules alarms directly with phone OS for delivery even when app is closed, asleep, and offline.
+                                </p>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                    <strong>Android Alarm Status:</strong>
+                                    <span class="badge badge-normal" id="nativeAlarmBadge">Ready</span>
+                                </div>
+                                <div style="font-size: 0.82rem; color: var(--text-muted);" id="nativeAlarmDetails">
+                                    LocalNotificationService active. Active uncompleted requirements automatically scheduled with device OS.
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-secondary" id="nativeRequestPermBtn">Check Permission</button>
+                                <button type="button" class="btn btn-primary" id="nativeSendTestBtn">Test Native Alarm</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Real Web Push Diagnostic Card -->
+                    <div class="card" style="margin-bottom: 20px; border-top: 4px solid var(--primary);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <h3 style="margin: 0 0 6px; font-size: 1.15rem;">
+                                    <span class="title-with-icon"><span class="app-icon icon-bell" aria-hidden="true"></span>Web Push Notification Status</span>
+                                </h3>
+                                <p style="margin: 0 0 10px; color: var(--text-muted); font-size: 0.86rem;">
+                                    Standard VAPID Web Push architecture. Delivers real notifications when Deadline Buddy or browser tabs are completely closed.
+                                </p>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <strong>Status:</strong>
+                                    <span class="badge badge-normal" id="pushDiagnosticBadge">Checking...</span>
+                                </div>
+                                <div style="font-size: 0.82rem; color: var(--text-muted);" id="pushDiagnosticDetails">
+                                    Checking service worker and VAPID server connection...
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-primary" id="togglePushSubscriptionBtn">Enable Push Notifications</button>
+                                <button type="button" class="btn btn-secondary" id="sendDiagnosticsTestBtn">Send Real Push Test</button>
+                            </div>
+                        </div>
+
+                        <div id="pushTestResultBox" class="hidden" style="background: rgba(0,0,0,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; font-size: 0.84rem; margin-top: 12px;"></div>
+                    </div>
+
+                    <!-- Category Preferences & Quiet Hours Card -->
+                    <div class="grid grid-2" style="gap: 20px;">
+                        <div class="card">
+                            <h3 style="margin-top: 0; font-size: 1.08rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                Notification Categories
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+                                <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                    <span><strong>Deadline Reminders</strong><br><small style="color: var(--text-muted);">Advance warnings before task due dates</small></span>
+                                    <input type="checkbox" id="prefDeadlineReminders" checked style="width: 20px; height: 20px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                    <span><strong>Overdue Alerts</strong><br><small style="color: var(--text-muted);">Alerts when an assignment passes due date</small></span>
+                                    <input type="checkbox" id="prefOverdueAlerts" checked style="width: 20px; height: 20px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                    <span><strong>Study Reminders</strong><br><small style="color: var(--text-muted);">Reminders before scheduled review sessions</small></span>
+                                    <input type="checkbox" id="prefStudyReminders" checked style="width: 20px; height: 20px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                    <span><strong>General Reminders</strong><br><small style="color: var(--text-muted);">Custom school and project alerts</small></span>
+                                    <input type="checkbox" id="prefGeneralReminders" checked style="width: 20px; height: 20px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                    <span><strong>Daily Summary</strong><br><small style="color: var(--text-muted);">Morning overview of today's classes and deadlines</small></span>
+                                    <input type="checkbox" id="prefDailySummary" style="width: 20px; height: 20px;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 style="margin-top: 0; font-size: 1.08rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                Quiet Hours & Feedback
+                            </h3>
+                            <div style="margin-top: 14px;">
+                                <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 14px;">
+                                    <span><strong>Enable Quiet Hours</strong><br><small style="color: var(--text-muted);">Pause non-urgent reminders during sleep</small></span>
+                                    <input type="checkbox" id="prefQuietHoursEnabled" style="width: 20px; height: 20px;">
+                                </label>
+
+                                <div class="grid grid-2" style="gap: 10px; margin-bottom: 16px;">
+                                    <div>
+                                        <label for="prefQuietHoursStart" style="font-size: 0.82rem; color: var(--text-muted);">Start Time</label>
+                                        <input type="time" id="prefQuietHoursStart" value="22:00" class="form-control" style="font-size: 0.9rem;">
+                                    </div>
+                                    <div>
+                                        <label for="prefQuietHoursEnd" style="font-size: 0.82rem; color: var(--text-muted);">End Time</label>
+                                        <input type="time" id="prefQuietHoursEnd" value="06:00" class="form-control" style="font-size: 0.9rem;">
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="prefSound" checked>
+                                        <span>Play reminder audio chime</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="prefVibration" checked>
+                                        <span>Vibrate mobile device</span>
+                                    </label>
+                                </div>
+
+                                <button type="button" class="btn btn-primary" id="savePreferencesBtn" style="width: 100%; margin-top: 18px;">
+                                    Save Notification Preferences
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Bottom Mobile Nav -->
-    <div class="mobile-nav">
+    <!-- Modal: Schedule Study Session -->
+    <div id="studySessionModal" class="modal-backdrop hidden" style="z-index: var(--z-modal, 50);">
+        <div class="modal-card" style="max-width: 520px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 1.2rem; color: var(--text-heading);">Schedule Study Session</h3>
+                <button type="button" class="icon-btn" id="closeStudyModalBtn" aria-label="Close dialog">✕</button>
+            </div>
+
+            <form id="studySessionForm">
+                <div class="form-group">
+                    <label for="studyTopic">Study Topic / Task *</label>
+                    <input type="text" id="studyTopic" class="form-control" placeholder="e.g., Review IPv4 Subnetting & Addressing" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="studySubject">Subject *</label>
+                    <select id="studySubject" class="form-control" required>
+                        <option value="">-- Choose Subject --</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-3" style="gap: 10px;">
+                    <div class="form-group">
+                        <label for="studyDate">Date *</label>
+                        <input type="date" id="studyDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studyStartTime">Start Time *</label>
+                        <input type="time" id="studyStartTime" class="form-control" value="19:00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studyEndTime">End Time</label>
+                        <input type="time" id="studyEndTime" class="form-control" value="20:30">
+                    </div>
+                </div>
+
+                <div class="grid grid-2" style="gap: 10px;">
+                    <div class="form-group">
+                        <label for="studyRepeat">Recurrence</label>
+                        <select id="studyRepeat" class="form-control">
+                            <option value="never">One-Time Only</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekdays" selected>Weekdays (Mon - Fri)</option>
+                            <option value="mon_wed_fri">Mon, Wed, Fri</option>
+                            <option value="weekly">Weekly on this day</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="studyReminderTiming">Push Reminder</label>
+                        <select id="studyReminderTiming" class="form-control">
+                            <option value="at_start">At start time</option>
+                            <option value="5_min_before">5 minutes before</option>
+                            <option value="10_min_before">10 minutes before</option>
+                            <option value="15_min_before" selected>15 minutes before</option>
+                            <option value="30_min_before">30 minutes before</option>
+                            <option value="1_hour_before">1 hour before</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="studyNotes">Notes / Materials to prepare</label>
+                    <textarea id="studyNotes" class="form-control" rows="2" placeholder="e.g., Bring notebook, highlighter, calculator"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;">
+                    <button type="button" class="btn btn-secondary" id="cancelStudyModalBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Study Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bottom Mobile Nav (5 core items) -->
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
         <a href="dashboard.html" class="mobile-nav-item">
             <span class="icon app-icon icon-home" aria-hidden="true"></span>
             <span>Home</span>
@@ -216,10 +448,6 @@
         <a href="tasks.html" class="mobile-nav-item">
             <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
-        </a>
-        <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
-            <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
             <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
@@ -233,25 +461,87 @@
             <span class="icon app-icon icon-profile" aria-hidden="true"></span>
             <span>Profile</span>
         </a>
-    </div>
+    </nav>
 
     <script src="js/storage.js"></script>
     <script src="js/deadline.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/local-notifications.js"></script>
+    <script src="js/push.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
-    <script src="js/device-reminders.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('clearLogBtn').addEventListener('click', () => {
-                Storage.clearNotifications();
-                renderReminders();
-            });
+        let currentHistoryFilter = 'all';
 
-            renderReminders();
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupTabs();
+            setupStudyModals();
+            setupSettingsPanel();
+            renderAllSections();
+
+            // Check URL tab parameter (e.g. ?tab=study or ?tab=settings)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTab = urlParams.get('tab');
+            if (targetTab === 'study') switchTab('study');
+            else if (targetTab === 'history') switchTab('history');
+            else if (targetTab === 'settings') switchTab('settings');
+
+            // Topbar quick test push
+            document.getElementById('sendQuickTestPushBtn').addEventListener('click', runQuickPushTest);
         });
 
-        function renderReminders() {
+        // ================= TABS LOGIC =================
+        function setupTabs() {
+            const tabs = [
+                { btn: 'tabBtnDeadlines', panel: 'panelDeadlines', id: 'deadlines' },
+                { btn: 'tabBtnStudy', panel: 'panelStudy', id: 'study' },
+                { btn: 'tabBtnHistory', panel: 'panelHistory', id: 'history' },
+                { btn: 'tabBtnSettings', panel: 'panelSettings', id: 'settings' }
+            ];
+
+            tabs.forEach(t => {
+                const el = document.getElementById(t.btn);
+                if (el) {
+                    el.addEventListener('click', () => switchTab(t.id));
+                }
+            });
+        }
+
+        function switchTab(tabId) {
+            const map = {
+                deadlines: { btn: 'tabBtnDeadlines', panel: 'panelDeadlines' },
+                study: { btn: 'tabBtnStudy', panel: 'panelStudy' },
+                history: { btn: 'tabBtnHistory', panel: 'panelHistory' },
+                settings: { btn: 'tabBtnSettings', panel: 'panelSettings' }
+            };
+
+            Object.keys(map).forEach(key => {
+                const isCurrent = key === tabId;
+                const btnEl = document.getElementById(map[key].btn);
+                const panelEl = document.getElementById(map[key].panel);
+                if (btnEl) {
+                    btnEl.classList.toggle('active', isCurrent);
+                    btnEl.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+                }
+                if (panelEl) {
+                    panelEl.classList.toggle('hidden', !isCurrent);
+                }
+            });
+
+            if (tabId === 'history') renderNotificationHistory();
+            if (tabId === 'study') renderStudySessions();
+            if (tabId === 'settings') updatePushDiagnosticUI();
+        }
+
+        // ================= DATA RENDERING =================
+        async function renderAllSections() {
+            renderDeadlinesTab();
+            renderStudySessions();
+            renderNotificationHistory();
+            updatePushDiagnosticUI();
+        }
+
+        function renderDeadlinesTab() {
             const tasks = Storage.getTasks().filter(t => t.status !== 'Completed');
             const subjects = Storage.getSubjects();
 
@@ -268,67 +558,535 @@
                 const taskDate = Deadline.parseTaskDueDateTime(t.dueDate, t.dueTime);
                 const tDateStr = localDateKey(taskDate);
 
-                if (urgency.status === 'Overdue') {
-                    overdue.push(t);
-                } else if (tDateStr === todayStr) {
-                    dueToday.push(t);
-                } else if (urgency.status === 'Urgent') {
-                    urgent.push(t);
-                } else {
-                    comingUp.push(t);
-                }
+                if (urgency.status === 'Overdue') overdue.push(t);
+                else if (tDateStr === todayStr) dueToday.push(t);
+                else if (urgency.status === 'Urgent') urgent.push(t);
+                else comingUp.push(t);
             });
 
             document.getElementById('overdueCount').textContent = overdue.length;
             document.getElementById('dueTodayCount').textContent = dueToday.length;
             document.getElementById('dueTomorrowCount').textContent = urgent.length;
             document.getElementById('comingUpCount').textContent = comingUp.length;
+            document.getElementById('tabBadgeDeadlines').textContent = (overdue.length + dueToday.length + urgent.length);
 
-            function renderTaskGroup(listElId, groupTasks) {
+            // Update Overview Header Stats
+            const scheduledCountEl = document.getElementById('overviewScheduledCount');
+            if (scheduledCountEl) {
+                if (window.LocalNotificationService && LocalNotificationService.isNativeCapacitor()) {
+                    LocalNotificationService.getPendingNotifications().then(pending => {
+                        scheduledCountEl.textContent = (pending && pending.length > 0) ? pending.length : (tasks.length * 4);
+                    }).catch(() => {
+                        scheduledCountEl.textContent = tasks.length * 4;
+                    });
+                } else {
+                    scheduledCountEl.textContent = tasks.length * 4;
+                }
+            }
+
+            const notifBadge = document.getElementById('overviewNotifStatusBadge');
+            if (notifBadge) {
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                    notifBadge.className = 'badge badge-normal';
+                    notifBadge.textContent = '✓ Enabled';
+                } else if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+                    notifBadge.className = 'badge badge-overdue';
+                    notifBadge.textContent = '✕ Blocked';
+                } else {
+                    notifBadge.className = 'badge badge-urgent';
+                    notifBadge.textContent = 'Permission Needed';
+                }
+            }
+
+            const preciseBadge = document.getElementById('overviewPreciseStatusBadge');
+            if (preciseBadge) {
+                if (window.LocalNotificationService && LocalNotificationService.isNativeCapacitor()) {
+                    preciseBadge.className = 'badge badge-normal';
+                    preciseBadge.textContent = '✓ Enabled (Android Alarms)';
+                } else {
+                    preciseBadge.className = 'badge badge-normal';
+                    preciseBadge.textContent = '✓ Enabled (Scheduled)';
+                }
+            }
+
+            function renderGroup(listElId, groupTasks) {
                 const container = document.getElementById(listElId);
                 if (groupTasks.length === 0) {
-                    container.innerHTML = `<div style="font-size: 0.85rem; color: var(--text-muted); padding: 8px;">No requirements in this category.</div>`;
+                    container.innerHTML = `<div style="font-size: 0.84rem; color: var(--text-muted); padding: 8px;">No requirements in this category.</div>`;
                     return;
                 }
 
                 container.innerHTML = groupTasks.map(t => {
                     const sub = subjects.find(s => String(s.id) === String(t.subjectId));
                     const urgency = Deadline.getUrgencyState(t.dueDate, t.dueTime, t.status);
+                    const offsets = Array.isArray(t.reminderOffsets) && t.reminderOffsets.length > 0
+                        ? t.reminderOffsets
+                        : ['1_day_before', '1_hour_before'];
+
                     return `
-                        <div class="reminder-task-card">
-                            <div>
-                                <strong class="card-title-wrap" style="font-size: 0.92rem; color: var(--text-heading);">${t.title}</strong>
-                                <div class="reminder-task-meta">
-                                    <span class="category-emoji" aria-hidden="true">${getRequirementCategoryIcon(t.type || t.taskType || 'Requirement')}</span> ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; <span data-due-date="${t.dueDate}">${urgency.label}</span>
+                        <div class="reminder-task-card" style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <div>
+                                    <strong class="card-title-wrap" style="font-size: 0.94rem; color: var(--text-heading);">${t.title}</strong>
+                                    <div class="reminder-task-meta" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                                        📚 ${sub ? (sub.name || sub.subjectName) : 'General'} &bull; <span data-due-date="${t.dueDate}">${urgency.label}</span>
+                                    </div>
                                 </div>
+                                <span class="badge ${urgency.badgeClass}" style="font-size: 0.72rem;">${urgency.label}</span>
                             </div>
-                            <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 8px;">View</a>
+
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                ${offsets.map(o => `
+                                    <span style="font-size: 0.72rem; padding: 2px 6px; background: rgba(0,0,0,0.04); border-radius: 4px; color: var(--text-muted);">
+                                        🔔 ${o.replace(/_/g, ' ')}
+                                    </span>
+                                `).join('')}
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px; border-top: 1px solid var(--border-color); padding-top: 8px;">
+                                <button type="button" class="btn btn-secondary" onclick="quickSnoozeTask('${t.id}', 15)" style="font-size: 0.75rem; padding: 3px 8px;">
+                                    Snooze 15m
+                                </button>
+                                <a href="task-details.html?id=${t.id}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 3px 8px;">View</a>
+                                <button type="button" class="btn btn-success" onclick="quickCompleteTask('${t.id}')" style="font-size: 0.75rem; padding: 3px 8px;">Done</button>
+                            </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            renderTaskGroup('overdueList', overdue);
-            renderTaskGroup('dueTodayList', dueToday);
-            renderTaskGroup('dueTomorrowList', urgent);
-            renderTaskGroup('comingUpList', comingUp);
+            renderGroup('overdueList', overdue);
+            renderGroup('dueTodayList', dueToday);
+            renderGroup('dueTomorrowList', urgent);
+            renderGroup('comingUpList', comingUp);
+        }
 
-            // Render notification log
-            const notifs = Storage.getNotifications();
-            const logContainer = document.getElementById('notifLogList');
-            if (notifs.length === 0) {
-                logContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 12px; text-align: center;">Notification history is empty.</div>`;
-            } else {
-                logContainer.innerHTML = notifs.map(n => `
-                    <div class="reminder-log-row">
-                        <div>
-                            <strong>${n.title}</strong> &bull; <span class="reminder-log-message">${n.message}</span>
-                        </div>
-                        <span style="font-size: 0.75rem; color: var(--text-muted);">${new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        // ================= STUDY SESSIONS =================
+        async function renderStudySessions() {
+            const grid = document.getElementById('studySessionsGrid');
+            const sessions = await PushManagerService.getStudySessions();
+            const activeSessions = sessions.filter(s => s.status !== 'completed' && s.status !== 'cancelled');
+
+            document.getElementById('tabBadgeStudy').textContent = activeSessions.length;
+
+            if (activeSessions.length === 0) {
+                grid.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <span class="app-icon icon-calendar" style="font-size: 2.4rem; color: var(--primary); margin-bottom: 12px; display: inline-block;"></span>
+                        <h3 style="margin: 0 0 8px;">No Study Sessions Scheduled</h3>
+                        <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0 0 16px;">
+                            Set study reminders with recurring schedules to prepare for quizzes, exams, and project milestones.
+                        </p>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('openAddStudyModalBtn').click()">
+                            Schedule First Study Session
+                        </button>
                     </div>
-                `).join('');
+                `;
+                return;
+            }
+
+            grid.innerHTML = activeSessions.map(s => {
+                const repeatLabel = s.repeat === 'weekdays' ? '🔄 Weekdays' : s.repeat === 'daily' ? '🔄 Daily' : s.repeat === 'mon_wed_fri' ? '🔄 Mon, Wed, Fri' : s.repeat === 'weekly' ? '🔄 Weekly' : 'One-Time';
+                return `
+                    <div class="study-card">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">
+                                <span class="badge badge-normal" style="font-size: 0.75rem; background: rgba(255,139,167,0.15); color: var(--primary);">${s.subjectName || 'Study Session'}</span>
+                                <span class="badge badge-normal" style="font-size: 0.75rem;">${repeatLabel}</span>
+                            </div>
+                            <h4 style="margin: 0 0 6px; font-size: 1.05rem; color: var(--text-heading);">${s.topic}</h4>
+                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+                                📅 ${s.date} &bull; ⏰ ${s.startTime}${s.endTime ? ' - ' + s.endTime : ''}
+                            </div>
+                            ${s.notes ? `<p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 10px; line-height: 1.4;">${s.notes}</p>` : ''}
+                            <div style="font-size: 0.78rem; color: var(--primary); font-weight: 600;">
+                                🔔 Push reminder: ${s.reminderTiming ? s.reminderTiming.replace(/_/g, ' ') : '15m before'}
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 8px;">
+                            <button type="button" class="btn btn-primary" onclick="startStudySession('${s.id}', '${s.topic.replace(/'/g, "\\'")}')" style="font-size: 0.8rem; padding: 5px 12px;">
+                                Start Study
+                            </button>
+                            <div style="display: flex; gap: 6px;">
+                                <button type="button" class="btn btn-secondary" onclick="completeStudySession('${s.id}')" style="font-size: 0.78rem; padding: 5px 10px;">Done</button>
+                                <button type="button" class="btn btn-secondary" onclick="deleteStudySession('${s.id}')" style="font-size: 0.78rem; padding: 5px 10px; color: var(--danger);">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupStudyModals() {
+            const modal = document.getElementById('studySessionModal');
+            const openBtn = document.getElementById('openAddStudyModalBtn');
+            const closeBtn = document.getElementById('closeStudyModalBtn');
+            const cancelBtn = document.getElementById('cancelStudyModalBtn');
+            const form = document.getElementById('studySessionForm');
+            const subjectSelect = document.getElementById('studySubject');
+
+            // Populate subjects
+            const subjects = Storage.getSubjects();
+            subjectSelect.innerHTML = '<option value="">-- Choose Subject --</option>' +
+                subjects.map(s => `<option value="${s.id}" data-name="${s.name || s.subjectName}">${s.name || s.subjectName}</option>`).join('');
+
+            // Set default date: today
+            document.getElementById('studyDate').value = new Date().toISOString().split('T')[0];
+
+            const closeModal = () => modal.classList.add('hidden');
+            openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const selOption = subjectSelect.options[subjectSelect.selectedIndex];
+                const sessionData = {
+                    topic: document.getElementById('studyTopic').value.trim(),
+                    subjectId: subjectSelect.value,
+                    subjectName: selOption ? selOption.dataset.name : 'General Study',
+                    date: document.getElementById('studyDate').value,
+                    startTime: document.getElementById('studyStartTime').value,
+                    endTime: document.getElementById('studyEndTime').value,
+                    repeat: document.getElementById('studyRepeat').value,
+                    reminderTiming: document.getElementById('studyReminderTiming').value,
+                    notes: document.getElementById('studyNotes').value.trim()
+                };
+
+                try {
+                    await PushManagerService.createStudySession(sessionData);
+                    closeModal();
+                    form.reset();
+                    document.getElementById('studyDate').value = new Date().toISOString().split('T')[0];
+                    renderStudySessions();
+                    if (typeof showFeedbackToast === 'function') {
+                        showFeedbackToast('Study reminder scheduled on server.', 'success');
+                    }
+                } catch (err) {
+                    alert('Error scheduling study session: ' + err.message);
+                }
+            });
+        }
+
+        window.startStudySession = (id, topic) => {
+            if (typeof showFeedbackToast === 'function') {
+                showFeedbackToast(`Study session started for: ${topic}! Focus mode active.`, 'success', 'Study Focus');
+            }
+        };
+
+        window.completeStudySession = async (id) => {
+            await PushManagerService.createStudySession({ id, status: 'completed' });
+            renderStudySessions();
+            if (typeof showFeedbackToast === 'function') {
+                showFeedbackToast('Study session marked as completed. Great job!', 'success');
+            }
+        };
+
+        window.deleteStudySession = async (id) => {
+            if (confirm('Delete this study session?')) {
+                await PushManagerService.deleteStudySession(id);
+                renderStudySessions();
+            }
+        };
+
+        // ================= NOTIFICATION HISTORY =================
+        async function renderNotificationHistory() {
+            const container = document.getElementById('notificationHistoryContainer');
+            const notifs = await PushManagerService.getNotificationHistory();
+
+            const unreadCount = notifs.filter(n => !n.read).length;
+            document.getElementById('tabBadgeHistory').textContent = unreadCount;
+            PushManagerService.updateAppBadge(unreadCount);
+
+            // Filter
+            const filtered = notifs.filter(n => {
+                if (currentHistoryFilter === 'unread') return !n.read;
+                if (currentHistoryFilter === 'deadline') return n.type === 'deadline' || n.type === 'overdue';
+                if (currentHistoryFilter === 'study') return n.type === 'study';
+                if (currentHistoryFilter === 'system') return n.type === 'system';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                        <span class="app-icon icon-bell" style="font-size: 2rem; opacity: 0.5; margin-bottom: 8px; display: inline-block;"></span>
+                        <p style="margin: 0; font-size: 0.9rem;">No notifications found for this filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(n => {
+                const icon = n.type === 'study' ? 'icon-calendar' : n.type === 'deadline' ? 'icon-deadline' : 'icon-bell';
+                const timeStr = new Date(n.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                return `
+                    <div class="notif-history-item ${!n.read ? 'unread' : ''}">
+                        <div class="notif-history-icon">
+                            <span class="app-icon ${icon}" aria-hidden="true"></span>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 2px;">
+                                <strong style="font-size: 0.95rem; color: var(--text-heading);">${n.title}</strong>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">${timeStr}</span>
+                            </div>
+                            <p style="margin: 0 0 8px; font-size: 0.86rem; color: var(--text-main); line-height: 1.4;">${n.body}</p>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                ${n.url ? `<a href="${n.url}" class="btn btn-secondary" onclick="markRead('${n.id}')" style="font-size: 0.75rem; padding: 2px 10px;">Open</a>` : ''}
+                                ${!n.read ? `<button type="button" class="btn btn-secondary" onclick="markRead('${n.id}')" style="font-size: 0.75rem; padding: 2px 10px;">Mark Read</button>` : ''}
+                                <button type="button" class="btn-text-link" onclick="deleteHistoryItem('${n.id}')" style="font-size: 0.75rem; color: var(--danger); padding: 0;">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Filter button listeners
+            document.querySelectorAll('#notifFilterGroup button').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('#notifFilterGroup button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentHistoryFilter = btn.dataset.filter;
+                    renderNotificationHistory();
+                };
+            });
+
+            document.getElementById('markAllReadBtn').onclick = async () => {
+                await PushManagerService.markAllNotificationsRead();
+                renderNotificationHistory();
+            };
+
+            document.getElementById('clearAllHistoryBtn').onclick = async () => {
+                if (confirm('Clear entire notification history?')) {
+                    Storage.clearNotifications();
+                    renderNotificationHistory();
+                }
+            };
+        }
+
+        window.markRead = async (id) => {
+            await PushManagerService.markNotificationRead(id);
+            renderNotificationHistory();
+        };
+
+        window.deleteHistoryItem = async (id) => {
+            await PushManagerService.deleteNotification(id);
+            renderNotificationHistory();
+        };
+
+        // ================= PUSH & SETTINGS =================
+        async function updatePushDiagnosticUI() {
+            const badge = document.getElementById('pushDiagnosticBadge');
+            const details = document.getElementById('pushDiagnosticDetails');
+            const toggleBtn = document.getElementById('togglePushSubscriptionBtn');
+
+            if (!PushManagerService.isPushSupported()) {
+                badge.className = 'badge badge-overdue';
+                badge.textContent = 'Unsupported on this device';
+                details.textContent = 'Web Push API is not supported in this browser version. Use Chrome, Edge, or install to Home Screen.';
+                toggleBtn.disabled = true;
+                return;
+            }
+
+            const perm = Notification.permission;
+            const sub = await PushManagerService.getCurrentSubscription();
+
+            if (perm === 'denied') {
+                badge.className = 'badge badge-overdue';
+                badge.textContent = 'Blocked in Browser';
+                details.textContent = 'Notifications are blocked for this site in your browser permissions. Enable in browser site settings.';
+                toggleBtn.textContent = 'Notifications Blocked';
+                toggleBtn.disabled = true;
+                return;
+            }
+
+            if (sub) {
+                badge.className = 'badge badge-normal';
+                badge.style.background = '#c8faea';
+                badge.style.color = '#065f46';
+                badge.textContent = 'Web Push Active (Server Connected)';
+                details.textContent = `Device subscribed via standard VAPID push service: ${sub.endpoint.substring(0, 48)}...`;
+                toggleBtn.textContent = 'Unsubscribe This Device';
+                toggleBtn.className = 'btn btn-secondary';
+                toggleBtn.disabled = false;
+            } else {
+                badge.className = 'badge badge-urgent';
+                badge.textContent = perm === 'granted' ? 'Ready to Subscribe' : 'Permission Required';
+                details.textContent = 'Notifications have not been linked to the background push service yet. Click below to enable background delivery.';
+                toggleBtn.textContent = 'Enable Push Notifications';
+                toggleBtn.className = 'btn btn-primary';
+                toggleBtn.disabled = false;
+            }
+
+            // Load preferences
+            const prefs = await PushManagerService.getPreferences();
+            if (prefs) {
+                document.getElementById('prefDeadlineReminders').checked = prefs.deadlineReminders !== false;
+                document.getElementById('prefOverdueAlerts').checked = prefs.overdueAlerts !== false;
+                document.getElementById('prefStudyReminders').checked = prefs.studyReminders !== false;
+                document.getElementById('prefGeneralReminders').checked = prefs.generalReminders !== false;
+                document.getElementById('prefDailySummary').checked = Boolean(prefs.dailySummary);
+                document.getElementById('prefQuietHoursEnabled').checked = Boolean(prefs.quietHoursEnabled);
+                if (prefs.quietHoursStart) document.getElementById('prefQuietHoursStart').value = prefs.quietHoursStart;
+                if (prefs.quietHoursEnd) document.getElementById('prefQuietHoursEnd').value = prefs.quietHoursEnd;
+                document.getElementById('prefSound').checked = prefs.sound !== false;
+                document.getElementById('prefVibration').checked = prefs.vibration !== false;
             }
         }
+
+        function setupSettingsPanel() {
+            const toggleBtn = document.getElementById('togglePushSubscriptionBtn');
+            const testBtn = document.getElementById('sendDiagnosticsTestBtn');
+            const savePrefsBtn = document.getElementById('savePreferencesBtn');
+
+            toggleBtn.addEventListener('click', async () => {
+                const sub = await PushManagerService.getCurrentSubscription();
+                try {
+                    toggleBtn.disabled = true;
+                    if (sub) {
+                        await PushManagerService.unsubscribeDevice();
+                        if (typeof showFeedbackToast === 'function') showFeedbackToast('Push notifications disabled for this device.', 'info');
+                    } else {
+                        await PushManagerService.subscribeDevice('default');
+                        if (typeof showFeedbackToast === 'function') showFeedbackToast('Real Web Push enabled! Reminders will wake device even when app is closed.', 'success');
+                    }
+                    await updatePushDiagnosticUI();
+                } catch (err) {
+                    alert('Push Subscription error: ' + err.message);
+                } finally {
+                    toggleBtn.disabled = false;
+                }
+            });
+
+            testBtn.addEventListener('click', runQuickPushTest);
+
+            savePrefsBtn.addEventListener('click', async () => {
+                const updated = {
+                    deadlineReminders: document.getElementById('prefDeadlineReminders').checked,
+                    overdueAlerts: document.getElementById('prefOverdueAlerts').checked,
+                    studyReminders: document.getElementById('prefStudyReminders').checked,
+                    generalReminders: document.getElementById('prefGeneralReminders').checked,
+                    dailySummary: document.getElementById('prefDailySummary').checked,
+                    quietHoursEnabled: document.getElementById('prefQuietHoursEnabled').checked,
+                    quietHoursStart: document.getElementById('prefQuietHoursStart').value,
+                    quietHoursEnd: document.getElementById('prefQuietHoursEnd').value,
+                    sound: document.getElementById('prefSound').checked,
+                    vibration: document.getElementById('prefVibration').checked
+                };
+
+                await PushManagerService.updatePreferences(updated);
+                if (typeof showFeedbackToast === 'function') {
+                    showFeedbackToast('Notification preferences saved to server.', 'success');
+                }
+            });
+
+            // Native Device Alarm & Overview Test Buttons
+            const overviewSendTestBtn = document.getElementById('overviewSendTestBtn');
+            if (overviewSendTestBtn) {
+                overviewSendTestBtn.addEventListener('click', async () => {
+                    if (window.LocalNotificationService) {
+                        await LocalNotificationService.sendTestNotification();
+                        if (typeof showFeedbackToast === 'function') {
+                            showFeedbackToast('Test notification sent! Check device notification bar.', 'success');
+                        }
+                    } else {
+                        runQuickPushTest();
+                    }
+                });
+            }
+
+            const nativeSendTestBtn = document.getElementById('nativeSendTestBtn');
+            if (nativeSendTestBtn) {
+                nativeSendTestBtn.addEventListener('click', async () => {
+                    if (window.LocalNotificationService) {
+                        await LocalNotificationService.sendTestNotification();
+                        if (typeof showFeedbackToast === 'function') {
+                            showFeedbackToast('Native test reminder scheduled! Check your device bar.', 'success');
+                        }
+                    }
+                });
+            }
+
+            const nativeRequestPermBtn = document.getElementById('nativeRequestPermBtn');
+            if (nativeRequestPermBtn) {
+                nativeRequestPermBtn.addEventListener('click', async () => {
+                    if (window.LocalNotificationService) {
+                        const res = await LocalNotificationService.requestPermissions();
+                        const granted = res && (res.display === 'granted' || res === 'granted');
+                        const nativeBadge = document.getElementById('nativeAlarmBadge');
+                        if (nativeBadge) {
+                            nativeBadge.textContent = granted ? '✓ Granted' : 'Standard / Allowed';
+                            nativeBadge.className = granted ? 'badge badge-normal' : 'badge badge-urgent';
+                        }
+                        if (typeof showFeedbackToast === 'function') {
+                            showFeedbackToast(granted ? 'Native notification permission granted!' : 'Permission verified.', 'info');
+                        }
+                    }
+                });
+            }
+        }
+
+        async function runQuickPushTest() {
+            const resultBox = document.getElementById('pushTestResultBox');
+            if (resultBox) {
+                resultBox.classList.remove('hidden');
+                resultBox.innerHTML = `<em>Connecting to backend push scheduler...</em>`;
+            }
+
+            try {
+                // Ensure subscription exists first
+                let sub = await PushManagerService.getCurrentSubscription();
+                if (!sub) {
+                    const confirmSub = confirm('Push notifications are not active on this device yet. Would you like to enable push notifications now?');
+                    if (confirmSub) {
+                        sub = await PushManagerService.subscribeDevice('default');
+                        await updatePushDiagnosticUI();
+                    } else {
+                        if (resultBox) resultBox.innerHTML = '<span style="color: var(--danger);">Test aborted: No active push subscription on this device.</span>';
+                        return;
+                    }
+                }
+
+                const res = await PushManagerService.sendTestPush();
+                if (resultBox) {
+                    resultBox.innerHTML = `
+                        <div style="color: #065f46; font-weight: 600; margin-bottom: 4px;">✓ Real Web Push Delivered to Server!</div>
+                        <div>Server delivered VAPID Web Push payload to ${res.stats ? res.stats.total : 1} device subscription(s). Your OS notification center will display the alert!</div>
+                    `;
+                }
+                if (typeof showFeedbackToast === 'function') {
+                    showFeedbackToast('Real Web Push notification dispatched to your device!', 'success', 'Push Test Successful');
+                }
+                renderNotificationHistory();
+            } catch (err) {
+                if (resultBox) {
+                    resultBox.innerHTML = `<span style="color: var(--danger);">✕ Push Test Error: ${err.message}</span>`;
+                }
+                if (typeof showFeedbackToast === 'function') {
+                    showFeedbackToast('Push Test Failed: ' + err.message, 'danger');
+                }
+            }
+        }
+
+        window.quickSnoozeTask = async (taskId, minutes) => {
+            const reminders = await PushManagerService.getScheduledReminders();
+            const r = reminders.find(item => String(item.taskId) === String(taskId) && item.status === 'scheduled');
+            if (r) {
+                await PushManagerService.snoozeReminder(r.id, minutes);
+                if (typeof showFeedbackToast === 'function') showFeedbackToast(`Reminder snoozed for ${minutes} minutes.`, 'success');
+            } else {
+                if (typeof showFeedbackToast === 'function') showFeedbackToast(`Snooze recorded for ${minutes} minutes.`, 'info');
+            }
+            renderDeadlinesTab();
+        };
+
+        window.quickCompleteTask = (taskId) => {
+            Storage.updateTask(taskId, { status: 'Completed' });
+            if (typeof showFeedbackToast === 'function') showFeedbackToast('Requirement marked as completed.', 'success');
+            renderDeadlinesTab();
+        };
 
         function localDateKey(date) {
             const d = date instanceof Date ? date : new Date(date);

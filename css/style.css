@@ -3090,7 +3090,7 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
         margin-left: 0;
         width: 100%;
         max-width: 100%;
-        padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     .sidebar .brand {
@@ -3480,15 +3480,15 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
 
     .mobile-nav {
         display: grid !important;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(5, 1fr) !important;
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 900;
-        height: calc(60px + env(safe-area-inset-bottom, 0px));
-        padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px));
-        background: rgba(255, 255, 254, 0.94);
+        z-index: 30;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+        padding: 4px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+        background: rgba(255, 255, 254, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid var(--border-color);
@@ -3505,13 +3505,14 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 2px;
-        height: 50px;
+        gap: 3px;
+        height: 52px;
+        min-height: 48px;
         padding: 4px 2px;
         border-radius: 12px;
         color: var(--text-muted);
         text-decoration: none;
-        font-size: 0.68rem;
+        font-size: 0.72rem;
         font-weight: 600;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
@@ -3938,3 +3939,317 @@ input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator:hov
     justify-content: center;
 }
 .icon-star::before { content: "\f005"; }
+
+/* ==========================================================================
+   MOBILE-FIRST PWA & ACCESSIBILITY ENHANCEMENTS
+   ========================================================================== */
+
+/* Universal Touch & Safe Area Tokens */
+:root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    
+    --z-base: 1;
+    --z-sticky: 10;
+    --z-dropdown: 20;
+    --z-bottom-nav: 30;
+    --z-fab: 35;
+    --z-backdrop: 40;
+    --z-modal: 50;
+    --z-toast: 60;
+    --z-banner: 70;
+}
+
+/* Touch feedback for modern mobile interaction */
+.btn:active,
+.icon-btn:active,
+.mobile-nav-item:active,
+.card-interactive:active {
+    transform: scale(0.97);
+}
+
+/* Toast container on mobile stays safely above bottom nav */
+@media (max-width: 768px) {
+    .feedback-toast-container,
+    #deadlineToastContainer {
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 14px !important;
+        right: 14px !important;
+        max-width: none !important;
+        z-index: var(--z-toast, 60) !important;
+    }
+
+    /* Prevent mobile browser zoom on focus */
+    input, select, textarea, .form-control, .pill-control {
+        font-size: 16px !important;
+    }
+
+    /* Transform centered modals into mobile bottom sheets */
+    .modal-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: auto 0 0 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        max-height: calc(88dvh - env(safe-area-inset-top, 0px)) !important;
+        padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mobile FAB positioning */
+    .calendar-mobile-fab,
+    .mobile-fab {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+        right: 16px !important;
+        z-index: var(--z-fab, 35) !important;
+    }
+
+    /* Grids collapse cleanly on narrow phones */
+    .grid-2, .grid-3, .grid-4, .today-overview-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Mobile typography scaling */
+    h1 {
+        font-size: clamp(1.2rem, 5vw, 1.55rem) !important;
+    }
+}
+
+/* In-App Notification Permission Prompt Banner */
+.inapp-permission-prompt {
+    position: fixed;
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    left: 14px;
+    right: 14px;
+    max-width: 520px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1.5px solid var(--primary);
+    border-radius: 20px;
+    padding: 16px 18px;
+    box-shadow: 0 14px 40px rgba(43, 44, 52, 0.16);
+    z-index: var(--z-toast, 60);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: permissionSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:root[data-theme="blue"] .inapp-permission-prompt {
+    border-color: var(--primary);
+    background: #fffffe;
+}
+
+.permission-prompt-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.permission-prompt-content strong {
+    display: block;
+    font-size: 0.96rem;
+    color: var(--text-heading);
+    margin-bottom: 2px;
+}
+
+.permission-prompt-content p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+    margin: 0;
+}
+
+.permission-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.permission-prompt-actions .btn {
+    min-height: 38px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    border-radius: 999px;
+}
+
+@keyframes permissionSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* PWA Install Banner & Toast */
+.pwa-install-prompt {
+    position: fixed;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 440px);
+    background: var(--bg-surface, #fffffe);
+    border: 1px solid var(--border-color, #e7dbd5);
+    border-radius: 18px;
+    padding: 14px 18px;
+    box-shadow: 0 16px 36px rgba(43, 44, 52, 0.16);
+    z-index: var(--z-toast, 60);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    animation: pwaPromptIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pwaPromptIn {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.pwa-install-prompt strong {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--text-heading);
+    margin-bottom: 2px;
+}
+
+.pwa-install-prompt span {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.pwa-install-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.pwa-install-actions .btn {
+    min-height: 38px;
+    padding: 6px 14px;
+    font-size: 0.84rem;
+    border-radius: 999px;
+}
+
+@media (min-width: 769px) {
+    .pwa-install-prompt {
+        bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        right: 24px;
+        left: auto;
+        transform: none;
+    }
+    @keyframes pwaPromptIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* Page Segmented Tabs */
+.page-tabs {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-surface, #fffffe);
+    padding: 6px;
+    border: 1px solid var(--border-color, #e7dbd5);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.page-tabs::-webkit-scrollbar {
+    display: none;
+}
+.page-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-muted, #72757e);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+.page-tab-btn:hover {
+    color: var(--text-heading, #2b2c34);
+    background: rgba(0, 0, 0, 0.03);
+}
+.page-tab-btn.active {
+    background: var(--primary, #ff8ba7);
+    color: #fffffe;
+    box-shadow: 0 4px 12px rgba(255, 139, 167, 0.35);
+}
+.page-tab-badge {
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.08);
+}
+.page-tab-btn.active .page-tab-badge {
+    background: rgba(255, 255, 255, 0.28);
+    color: #fffffe;
+}
+
+/* Study Session Card */
+.study-card {
+    background: var(--bg-surface, #fffffe);
+    border: 1px solid var(--border-color, #e7dbd5);
+    border-left: 5px solid var(--primary, #ff8ba7);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.study-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(43, 44, 52, 0.06);
+}
+
+/* Notification Item */
+.notif-history-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg-surface, #fffffe);
+    border: 1px solid var(--border-color, #e7dbd5);
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+.notif-history-item.unread {
+    background: rgba(255, 139, 167, 0.05);
+    border-color: rgba(255, 139, 167, 0.3);
+}
+.notif-history-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(255, 139, 167, 0.15);
+    color: var(--primary, #ff8ba7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

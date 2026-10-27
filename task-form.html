@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8ba7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
+    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
     <title>Save Requirement - Deadline Buddy</title>
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
@@ -236,6 +241,43 @@
                             </div>
                         </div>
 
+                        <!-- Multi-Reminder Timings -->
+                        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 6px;">
+                                <span class="app-icon icon-bell" aria-hidden="true"></span>
+                                Push Notification Reminders
+                            </label>
+                            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 12px;">
+                                Choose when you want Deadline Buddy to deliver background push alerts to your device:
+                            </p>
+                            <div class="grid grid-3" style="gap: 10px;">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="1_day_before" checked>
+                                    <span>1 day before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="3_hours_before">
+                                    <span>3 hours before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="1_hour_before" checked>
+                                    <span>1 hour before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="30_min_before">
+                                    <span>30 mins before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="10_min_before">
+                                    <span>10 mins before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="at_deadline">
+                                    <span>At deadline</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
                             <a href="tasks.html" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary" style="padding: 10px 24px;">Save Requirement</button>
@@ -246,8 +288,8 @@
         </main>
     </div>
 
-    <!-- Bottom Mobile Nav -->
-    <div class="mobile-nav">
+    <!-- Bottom Mobile Nav (5 core items) -->
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
         <a href="dashboard.html" class="mobile-nav-item">
             <span class="icon app-icon icon-home" aria-hidden="true"></span>
             <span>Home</span>
@@ -255,10 +297,6 @@
         <a href="tasks.html" class="mobile-nav-item active">
             <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
-        </a>
-        <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
-            <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
             <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
@@ -272,14 +310,15 @@
             <span class="icon app-icon icon-profile" aria-hidden="true"></span>
             <span>Profile</span>
         </a>
-    </div>
+    </nav>
 
     <script src="js/storage.js"></script>
     <script src="js/deadline.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/local-notifications.js"></script>
+    <script src="js/push.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
-    <script src="js/device-reminders.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const subjectSelect = document.getElementById('subjectId');
@@ -367,6 +406,12 @@
                     if (task.subtasks && task.subtasks.length > 0) {
                         task.subtasks.forEach(s => createSubtaskRow(s.title, s.completed || s.isCompleted));
                     }
+
+                    // Populate reminder offset checkboxes
+                    const activeOffsets = Array.isArray(task.reminderOffsets) ? task.reminderOffsets : ['1_day_before', '1_hour_before'];
+                    document.querySelectorAll('input[name="reminderOffset"]').forEach(cb => {
+                        cb.checked = activeOffsets.includes(cb.value);
+                    });
                 }
             } else {
                 // Default date: tomorrow 5:00 PM
@@ -650,6 +695,8 @@
                     };
                 }).filter(s => s.title.length > 0);
 
+                const reminderOffsets = Array.from(document.querySelectorAll('input[name="reminderOffset"]:checked')).map(cb => cb.value);
+
                 const taskData = {
                     title,
                     subjectId,
@@ -658,7 +705,8 @@
                     priority,
                     status,
                     description,
-                    subtasks
+                    subtasks,
+                    reminderOffsets
                 };
 
                 if (id) {

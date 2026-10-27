@@ -1,0 +1,97 @@
+{
+  "tasks": [
+    {
+      "id": 999,
+      "title": "Computer Networks Lab 3",
+      "subjectId": 1,
+      "dueDate": "2026-10-30",
+      "dueTime": "23:59",
+      "priority": "High",
+      "status": "Pending",
+      "reminderOffsets": [
+        "1_day_before",
+        "1_hour_before"
+      ]
+    }
+  ],
+  "reminders": [
+    {
+      "id": "rem-999-1_day_before-mvpgpcqq",
+      "userId": "default",
+      "taskId": "999",
+      "type": "deadline",
+      "title": "Upcoming Deadline (in 1 day)",
+      "body": "Computer Networks Lab 3 is due 2026-10-30 at 23:59.",
+      "scheduledAt": "2026-10-26T16:34:33.729Z",
+      "relativeTime": "1_day_before",
+      "status": "scheduled",
+      "url": "task-details.html?id=999",
+      "targetId": "999",
+      "priority": "High",
+      "createdAt": "2026-10-26T16:19:33.698Z",
+      "snoozedAt": "2026-10-26T16:19:33.729Z",
+      "snoozeMinutes": 15
+    },
+    {
+      "id": "rem-999-1_hour_before-mvpgpcqq",
+      "userId": "default",
+      "taskId": "999",
+      "type": "deadline",
+      "title": "Upcoming Deadline (in 1 hour)",
+      "body": "Computer Networks Lab 3 is due 2026-10-30 at 23:59.",
+      "scheduledAt": "2026-10-30T14:59:00.000Z",
+      "relativeTime": "1_hour_before",
+      "status": "scheduled",
+      "url": "task-details.html?id=999",
+      "targetId": "999",
+      "priority": "High",
+      "createdAt": "2026-10-26T16:19:33.698Z"
+    },
+    {
+      "id": "rem-study-study-mvpgpcr3",
+      "userId": "default",
+      "studyId": "study-mvpgpcr3",
+      "type": "study",
+      "title": "Study Session (Starting Soon)",
+      "body": "Computer Networks: Subnetting Practice starts at 19:00.",
+      "scheduledAt": "2026-10-28T10:45:00.000Z",
+      "status": "scheduled",
+      "url": "reminders.html?tab=study&id=study-mvpgpcr3",
+      "priority": "Normal",
+      "createdAt": "2026-10-26T16:19:33.711Z"
+    }
+  ],
+  "studySessions": [
+    {
+      "id": "study-mvpgpcr3",
+      "userId": "default",
+      "subjectId": null,
+      "subjectName": "Computer Networks",
+      "topic": "Subnetting Practice",
+      "date": "2026-10-28",
+      "startTime": "19:00",
+      "endTime": "20:30",
+      "repeat": "weekdays",
+      "reminderTiming": "15_min_before",
+      "notes": "",
+      "status": "scheduled",
+      "createdAt": "2026-10-26T16:19:33.711Z"
+    }
+  ],
+  "pushSubscriptions": [],
+  "notifications": [],
+  "preferences": {
+    "userId": "default",
+    "pushEnabled": true,
+    "deadlineReminders": true,
+    "studyReminders": true,
+    "overdueAlerts": true,
+    "generalReminders": true,
+    "dailySummary": false,
+    "quietHoursEnabled": false,
+    "quietHoursStart": "22:00",
+    "quietHoursEnd": "06:00",
+    "sound": true,
+    "vibration": true
+  }
+}

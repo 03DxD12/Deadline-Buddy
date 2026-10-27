@@ -1,51 +1,19 @@
 {
   "name": "deadline-buddy",
-  "version": "3.0.0",
-  "private": true,
-  "description": "Deadline Buddy offline student deadline app with PWA shell and Electron Windows reminders.",
-  "main": "electron/main.js",
+  "version": "4.0.0",
+  "description": "Deadline Buddy - Installable PWA and Android App with Native Scheduled Alarms",
   "scripts": {
-    "dev": "electron .",
-    "start": "electron .",
-    "check": "node --check electron/main.js && node --check electron/preload.js && node --check js/app.js && node --check js/storage.js && node --check js/deadline.js && node --check js/notifications.js && node --check js/pwa.js && node --check js/device-reminders.js",
-    "build:windows": "electron-builder --win portable",
-    "dist:windows": "electron-builder --win nsis"
-  },
-  "devDependencies": {
-    "electron": "^32.3.3",
-    "electron-builder": "^25.1.8"
-  },
-  "build": {
-    "appId": "com.deadlinebuddy.app",
-    "productName": "Deadline Buddy",
-    "files": [
-      "index.html",
-      "dashboard.html",
-      "tasks.html",
-      "task-form.html",
-      "task-details.html",
-      "subjects.html",
-      "calendar.html",
-      "reminders.html",
-      "profile.html",
-      "css/**/*",
-      "webfonts/**/*",
-      "js/**/*",
-      "images/**/*",
-      "electron/**/*",
-      "manifest.json",
-      "service-worker.js",
-      "README.md",
-      "CLIENT-DEMO-GUIDE.md"
-    ],
-    "win": {
-      "target": [
-        "portable",
-        "nsis"
-      ]
-    }
+    "build:www": "powershell -Command \"Copy-Item -Path *.html, manifest.json, service-worker.js -Destination www/ -Force; Copy-Item -Path css, js, images, webfonts -Destination www/ -Recurse -Force\"",
+    "cap:sync": "npm run build:www && cap sync android",
+    "cap:open:android": "cap open android"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.3.1"
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/local-notifications": "^6.1.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "typescript": "^5.6.3"
   }
 }

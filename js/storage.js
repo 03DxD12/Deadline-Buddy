@@ -15,6 +15,72 @@ const STORAGE_KEYS = {
 
 const COMPLETED_TASK_KEEP_MS = 30 * 24 * 60 * 60 * 1000;
 
+// --- IndexedDB Structured Storage Layer for PWA & Service Worker ---
+const DB_NAME = 'DeadlineBuddyDB';
+const DB_VERSION = 1;
+
+const AppDB = {
+    open() {
+        return new Promise((resolve) => {
+            if (typeof indexedDB === 'undefined') return resolve(null);
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('tasks')) db.createObjectStore('tasks', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains('subjects')) db.createObjectStore('subjects', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains('user')) db.createObjectStore('user', { keyPath: 'key' });
+                if (!db.objectStoreNames.contains('notifications')) db.createObjectStore('notifications', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        });
+    },
+
+    async putAll(storeName, items) {
+        const db = await this.open();
+        if (!db) return;
+        try {
+            const tx = db.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            store.clear();
+            if (Array.isArray(items)) {
+                items.forEach(item => {
+                    if (item && item.id !== undefined) store.put(item);
+                });
+            }
+        } catch (_) {}
+    },
+
+    async putSingle(storeName, key, value) {
+        const db = await this.open();
+        if (!db) return;
+        try {
+            const tx = db.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            store.put({ key, ...value });
+        } catch (_) {}
+    },
+
+    async getAll(storeName) {
+        const db = await this.open();
+        if (!db) return [];
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            } catch (_) {
+                resolve([]);
+            }
+        });
+    }
+};
+
+window.AppDB = AppDB;
+
 // Seed initial Grade 12 ASSH demo data if storage is empty
 function initStorage() {
     if (!localStorage.getItem(STORAGE_KEYS.USER)) {
@@ -98,6 +164,9 @@ function getUser() {
 
 function saveUser(user) {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+    if (typeof AppDB !== 'undefined') {
+        AppDB.putSingle('user', 'current', user);
+    }
 }
 
 function getAccounts() {
@@ -178,6 +247,9 @@ function getSubjects() {
 
 function saveSubjects(subjects) {
     localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+    if (typeof AppDB !== 'undefined') {
+        AppDB.putAll('subjects', subjects);
+    }
 }
 
 function addSubject(subData) {
@@ -226,6 +298,12 @@ function getTasks() {
 
 function saveTasks(tasks) {
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+    if (typeof AppDB !== 'undefined') {
+        AppDB.putAll('tasks', tasks);
+    }
+    if (typeof PushManagerService !== 'undefined' && typeof PushManagerService.syncTasksToServer === 'function') {
+        PushManagerService.syncTasksToServer(tasks);
+    }
 }
 
 function cleanExpiredCompletedTasks(tasks) {
@@ -291,6 +369,13 @@ function saveTaskForm(taskData) {
                 notes: taskData.notes ? taskData.notes.trim() : ''
             };
             saveTasks(tasks);
+            if (typeof LocalNotificationService !== 'undefined') {
+                if (nextStatus === 'Completed') {
+                    LocalNotificationService.cancelTaskReminders(tasks[index].id);
+                } else {
+                    LocalNotificationService.scheduleTaskReminders(tasks[index]);
+                }
+            }
             return tasks[index];
         }
     } else {
@@ -312,6 +397,9 @@ function saveTaskForm(taskData) {
         };
         tasks.push(newTask);
         saveTasks(tasks);
+        if (typeof LocalNotificationService !== 'undefined') {
+            LocalNotificationService.scheduleTaskReminders(newTask);
+        }
         return newTask;
     }
 }
@@ -323,12 +411,29 @@ function updateTaskStatus(id, newStatus) {
         tasks[index].status = newStatus;
         tasks[index].completedAt = newStatus === 'Completed' ? new Date().toISOString() : null;
         saveTasks(tasks);
+        if (typeof LocalNotificationService !== 'undefined') {
+            if (newStatus === 'Completed') {
+                LocalNotificationService.cancelTaskReminders(id);
+            } else {
+                LocalNotificationService.scheduleTaskReminders(tasks[index]);
+            }
+        }
     }
 }
 
 function deleteTask(id) {
     const tasks = getTasks().filter(t => t.id !== parseInt(id));
     saveTasks(tasks);
+    if (typeof LocalNotificationService !== 'undefined') {
+        LocalNotificationService.cancelTaskReminders(id);
+    }
+    if (typeof PushManagerService !== 'undefined') {
+        fetch(`${PushManagerService.API_BASE}/api/sync-tasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tasks, deletedTaskIds: [String(id)] })
+        }).catch(() => {});
+    }
 }
 
 // Subtask Operations
@@ -375,6 +480,9 @@ function getNotifications() {
 
 function saveNotifications(notifs) {
     localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+    if (typeof AppDB !== 'undefined') {
+        AppDB.putAll('notifications', notifs);
+    }
 }
 
 function clearNotifications() {
@@ -440,6 +548,12 @@ function seedDemoData() {
     localStorage.removeItem(STORAGE_KEYS.TASKS);
     localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
     initStorage();
+    if (typeof AppDB !== 'undefined') {
+        AppDB.putSingle('user', 'current', getUser());
+        AppDB.putAll('subjects', getSubjects());
+        AppDB.putAll('tasks', getTasks());
+        AppDB.putAll('notifications', getNotifications());
+    }
     if (typeof showFeedbackToast === 'function') {
         showFeedbackToast('Sample records restored.', 'success');
     }
@@ -454,6 +568,8 @@ initStorage();
 // and normalises field names between storage format and UI format.
 // -----------------------------------------------------------------------------
 const Storage = {
+    db: AppDB,
+
     // -- Helpers --------------------------------------------------------------
     generateId() {
         return Date.now() + Math.floor(Math.random() * 9999);
@@ -542,6 +658,9 @@ const Storage = {
         };
         tasks.push(newTask);
         saveTasks(tasks);
+        if (typeof LocalNotificationService !== 'undefined') {
+            LocalNotificationService.scheduleTaskReminders(newTask);
+        }
         return newTask;
     },
 
@@ -565,6 +684,13 @@ const Storage = {
                 subtasks:    data.subtasks !== undefined ? data.subtasks : tasks[idx].subtasks
             };
             saveTasks(tasks);
+            if (typeof LocalNotificationService !== 'undefined') {
+                if (nextStatus === 'Completed') {
+                    LocalNotificationService.cancelTaskReminders(id);
+                } else {
+                    LocalNotificationService.scheduleTaskReminders(tasks[idx]);
+                }
+            }
         }
     },
 

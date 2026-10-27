@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8ba7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
+    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
     <title>Student Profile - Deadline Buddy</title>
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
@@ -173,6 +178,89 @@
                             </div>
                         </div>
 
+                        <!-- Notification Preferences & PWA Status Card -->
+                        <div class="card" style="border-top: 3px solid var(--primary);">
+                            <h3 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <span class="title-with-icon"><span class="app-icon icon-alerts" aria-hidden="true"></span>Notifications & System Status</span>
+                            </h3>
+
+                            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--text-muted);">Notification Permission:</span>
+                                    <strong id="permStatusBadge" style="color: var(--primary);">Checking...</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--text-muted);">PWA Installation:</span>
+                                    <strong id="pwaStatusBadge" style="color: var(--success);">Installed</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--text-muted);">Offline Files:</span>
+                                    <strong id="offlineStatusBadge" style="color: var(--success);">Ready</strong>
+                                </div>
+                            </div>
+
+                            <h4 style="font-size: 0.95rem; margin: 12px 0 8px 0; color: var(--text-heading);">Deadline Schedule Reminders</h4>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Deadline Notifications</span>
+                                    <input type="checkbox" id="prefMasterNotifications" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Precise Deadline Reminders</span>
+                                    <input type="checkbox" id="prefPreciseReminders" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>1-Day Reminder</span>
+                                    <input type="checkbox" id="pref1Day" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>1-Hour Reminder</span>
+                                    <input type="checkbox" id="pref1Hour" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>20-Minute Reminder</span>
+                                    <input type="checkbox" id="pref20Min" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Overdue Alert</span>
+                                    <input type="checkbox" id="prefOverdue" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Sound</span>
+                                    <input type="checkbox" id="prefSound" checked style="width: 18px; height: 18px;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                    <span>Vibration</span>
+                                    <input type="checkbox" id="prefVibration" checked style="width: 18px; height: 18px;">
+                                </label>
+                            </div>
+
+                            <button type="button" class="btn btn-secondary" id="profileSendTestNotifBtn" style="width: 100%; margin-top: 14px; justify-content: center; gap: 8px;">
+                                <span class="app-icon icon-bell" aria-hidden="true"></span>
+                                Send Test Notification
+                            </button>
+                        </div>
+
+                        <!-- PWA App Installation Card -->
+                        <div class="card" style="border-top: 3px solid var(--primary);">
+                            <h3 style="margin-top: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <span class="title-with-icon"><span class="app-icon icon-download" aria-hidden="true"></span>Install Deadline Buddy</span>
+                            </h3>
+                            <p id="installDescText" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+                                Install Deadline Buddy on your device for faster access and an app-like experience.
+                            </p>
+                            <div id="installButtonContainer">
+                                <button type="button" class="btn btn-primary" id="profileInstallAppBtn" style="width: 100%; justify-content: center; gap: 8px;">
+                                    <span class="app-icon icon-download" aria-hidden="true"></span>
+                                    Install App
+                                </button>
+                            </div>
+                            <div id="installedBadgeContainer" style="display: none; padding: 10px; background: rgba(46, 204, 113, 0.12); border-radius: var(--radius-sm); color: var(--success); font-weight: 600; text-align: center; font-size: 0.88rem;">
+                                <span class="app-icon icon-check" aria-hidden="true"></span>
+                                Deadline Buddy is installed on this device.
+                            </div>
+                        </div>
+
                         <!-- System Reset Card -->
                         <div class="card" style="border-top: 3px solid var(--warning);">
                             <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-heading);">
@@ -224,8 +312,8 @@
         </main>
     </div>
 
-    <!-- Bottom Mobile Nav -->
-    <div class="mobile-nav">
+    <!-- Bottom Mobile Nav (5 core items) -->
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
         <a href="dashboard.html" class="mobile-nav-item">
             <span class="icon app-icon icon-home" aria-hidden="true"></span>
             <span>Home</span>
@@ -233,10 +321,6 @@
         <a href="tasks.html" class="mobile-nav-item">
             <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
             <span>Tasks</span>
-        </a>
-        <a href="subjects.html" class="mobile-nav-item">
-            <span class="icon app-icon icon-subjects" aria-hidden="true"></span>
-            <span>Subjects</span>
         </a>
         <a href="calendar.html" class="mobile-nav-item">
             <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
@@ -250,14 +334,15 @@
             <span class="icon app-icon icon-profile" aria-hidden="true"></span>
             <span>Profile</span>
         </a>
-    </div>
+    </nav>
 
     <script src="js/storage.js"></script>
     <script src="js/deadline.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/local-notifications.js"></script>
+    <script src="js/push.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
-    <script src="js/device-reminders.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const user = Storage.getUser();
@@ -407,6 +492,16 @@
                 Storage.exportBackupJSON();
             });
 
+            // Install PWA
+            const profileInstallBtn = document.getElementById('profileInstallAppBtn');
+            if (profileInstallBtn) {
+                profileInstallBtn.addEventListener('click', () => {
+                    if (typeof window.installDeadlineBuddyPwa === 'function') {
+                        window.installDeadlineBuddyPwa();
+                    }
+                });
+            }
+
             // Import JSON
             const fileInput = document.getElementById('importFileInput');
             document.getElementById('importBtn').addEventListener('click', () => {
@@ -438,6 +533,110 @@
                     window.location.href = 'dashboard.html';
                 }
             });
+
+            // Update System & PWA Status Badges
+            function updateSystemStatusBadges() {
+                const permBadge = document.getElementById('permStatusBadge');
+                const pwaBadge = document.getElementById('pwaStatusBadge');
+                const installContainer = document.getElementById('installButtonContainer');
+                const installedBadge = document.getElementById('installedBadgeContainer');
+
+                if ('Notification' in window) {
+                    if (Notification.permission === 'granted') {
+                        permBadge.textContent = 'Allowed';
+                        permBadge.style.color = 'var(--success)';
+                    } else if (Notification.permission === 'denied') {
+                        permBadge.textContent = 'Blocked';
+                        permBadge.style.color = 'var(--danger)';
+                    } else {
+                        permBadge.textContent = 'Not requested';
+                        permBadge.style.color = 'var(--warning)';
+                    }
+                } else {
+                    permBadge.textContent = 'Unsupported';
+                    permBadge.style.color = 'var(--danger)';
+                }
+
+                const isInstalled = (typeof window.isPwaStandalone === 'function' && window.isPwaStandalone()) || window.isPwaInstalled;
+                if (isInstalled) {
+                    pwaBadge.textContent = 'Installed';
+                    pwaBadge.style.color = 'var(--success)';
+                    if (installContainer) installContainer.style.display = 'none';
+                    if (installedBadge) installedBadge.style.display = 'block';
+                } else {
+                    pwaBadge.textContent = 'Available to install';
+                    pwaBadge.style.color = 'var(--primary)';
+                    if (installContainer) installContainer.style.display = 'block';
+                    if (installedBadge) installedBadge.style.display = 'none';
+                }
+            }
+
+            // Bind Notification Preference Toggles
+            const prefMaster = document.getElementById('prefMasterNotifications');
+            const prefPrecise = document.getElementById('prefPreciseReminders');
+            const pref1Day = document.getElementById('pref1Day');
+            const pref1Hour = document.getElementById('pref1Hour');
+            const pref20Min = document.getElementById('pref20Min');
+            const prefOverdue = document.getElementById('prefOverdue');
+            const prefSound = document.getElementById('prefSound');
+            const prefVibration = document.getElementById('prefVibration');
+
+            const savedPrefs = JSON.parse(localStorage.getItem('deadlinebuddy_notif_prefs') || '{}');
+            if (prefMaster) prefMaster.checked = savedPrefs.master !== false;
+            if (prefPrecise) prefPrecise.checked = savedPrefs.precise !== false;
+            if (pref1Day) pref1Day.checked = savedPrefs.day1 !== false;
+            if (pref1Hour) pref1Hour.checked = savedPrefs.hour1 !== false;
+            if (pref20Min) pref20Min.checked = savedPrefs.min20 !== false;
+            if (prefOverdue) prefOverdue.checked = savedPrefs.overdue !== false;
+            if (prefSound) prefSound.checked = savedPrefs.sound !== false;
+            if (prefVibration) prefVibration.checked = savedPrefs.vibration !== false;
+
+            function saveLocalPrefs() {
+                const prefs = {
+                    master: prefMaster ? prefMaster.checked : true,
+                    precise: prefPrecise ? prefPrecise.checked : true,
+                    day1: pref1Day ? pref1Day.checked : true,
+                    hour1: pref1Hour ? pref1Hour.checked : true,
+                    min20: pref20Min ? pref20Min.checked : true,
+                    overdue: prefOverdue ? prefOverdue.checked : true,
+                    sound: prefSound ? prefSound.checked : true,
+                    vibration: prefVibration ? prefVibration.checked : true
+                };
+                localStorage.setItem('deadlinebuddy_notif_prefs', JSON.stringify(prefs));
+                if (typeof LocalNotificationService !== 'undefined' && typeof Storage !== 'undefined') {
+                    LocalNotificationService.rescheduleAllActiveTasks(Storage.getTasks());
+                }
+            }
+
+            [prefMaster, prefPrecise, pref1Day, pref1Hour, pref20Min, prefOverdue, prefSound, prefVibration].forEach(el => {
+                if (el) el.addEventListener('change', saveLocalPrefs);
+            });
+
+            // Send Test Notification Button
+            const testNotifBtn = document.getElementById('profileSendTestNotifBtn');
+            if (testNotifBtn) {
+                testNotifBtn.addEventListener('click', async () => {
+                    try {
+                        testNotifBtn.disabled = true;
+                        testNotifBtn.textContent = 'Scheduling Test...';
+                        if (typeof LocalNotificationService !== 'undefined') {
+                            const res = await LocalNotificationService.sendTestNotification();
+                            alert(res.message || 'Test notification scheduled successfully!');
+                        } else {
+                            alert('Local notification service is initializing. Please wait a moment.');
+                        }
+                    } catch (err) {
+                        alert('Could not schedule notification: ' + err.message);
+                    } finally {
+                        testNotifBtn.disabled = false;
+                        testNotifBtn.innerHTML = '<span class="app-icon icon-bell" aria-hidden="true"></span> Send Test Notification';
+                    }
+                });
+            }
+
+            updateSystemStatusBadges();
+            document.addEventListener('pwa-installed', updateSystemStatusBadges);
+            document.addEventListener('pwa-installable', updateSystemStatusBadges);
         });
     </script>
 </body>

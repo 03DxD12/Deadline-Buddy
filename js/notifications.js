@@ -193,7 +193,12 @@ function fireBrowserNotification(title, message) {
     if (!('Notification' in window)) return;
     if (Notification.permission === 'granted') {
         try {
-            new Notification(title, { body: message });
+            new Notification(title, {
+                body: message,
+                icon: 'images/deadline-buddy-logo.svg',
+                badge: 'images/deadline-buddy-logo.svg',
+                data: { url: 'reminders.html' }
+            });
         } catch (error) {
             console.warn('Browser notification failed:', error);
         }
@@ -202,9 +207,48 @@ function fireBrowserNotification(title, message) {
 
 function requestBrowserNotificationPermission() {
     if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-        Notification.requestPermission();
-    }
+    if (Notification.permission !== 'default') return;
+    if (localStorage.getItem('deadlinebuddy_notif_prompt_dismissed') === 'true') return;
+    if (document.getElementById('notifPermissionPrompt')) return;
+
+    // Polite in-app explanation before browser prompt (as per PWA guidelines)
+    const prompt = document.createElement('div');
+    prompt.id = 'notifPermissionPrompt';
+    prompt.className = 'inapp-permission-prompt';
+    prompt.innerHTML = `
+        <div class="permission-prompt-content">
+            <span class="app-icon icon-bell" style="font-size: 1.4rem; color: var(--primary);" aria-hidden="true"></span>
+            <div>
+                <strong>Enable Deadline Reminders</strong>
+                <p>Get notified 1 day, 1 hour, and 20 minutes before tasks are due so you never miss a submission.</p>
+            </div>
+        </div>
+        <div class="permission-prompt-actions">
+            <button class="btn btn-secondary" type="button" id="notifDismissBtn">Not Now</button>
+            <button class="btn btn-primary" type="button" id="notifEnableBtn">Enable Notifications</button>
+        </div>
+    `;
+    document.body.appendChild(prompt);
+
+    document.getElementById('notifEnableBtn').addEventListener('click', async () => {
+        prompt.remove();
+        try {
+            const perm = await Notification.requestPermission();
+            if (perm === 'granted') {
+                if (typeof showFeedbackToast === 'function') {
+                    showFeedbackToast('Deadline notifications enabled successfully!', 'success');
+                }
+                fireBrowserNotification('Deadline Buddy', 'Notifications are now enabled! We will remind you when tasks are due.');
+            }
+        } catch (e) {
+            console.warn(e);
+        }
+    });
+
+    document.getElementById('notifDismissBtn').addEventListener('click', () => {
+        localStorage.setItem('deadlinebuddy_notif_prompt_dismissed', 'true');
+        prompt.remove();
+    });
 }
 
 function getNotificationSummary() {
@@ -235,4 +279,9 @@ const NotificationsEngine = {
 (function startNotificationLoop() {
     setTimeout(checkAndGenerateNotifications, 1200);
     setInterval(checkAndGenerateNotifications, DEADLINE_ALERTS.CHECK_INTERVAL_MS);
+    setTimeout(() => {
+        if (typeof requestBrowserNotificationPermission === 'function') {
+            requestBrowserNotificationPermission();
+        }
+    }, 3500);
 })();

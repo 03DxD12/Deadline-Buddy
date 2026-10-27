@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8ba7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
+    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
+    <title>Save Requirement - Deadline Buddy</title>
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
+    </script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><img src="images/deadline-buddy-logo.svg" alt="Deadline Buddy logo"></div>
+                <div>
+                    <div class="brand-title">Deadline Buddy</div>
+                    <div class="brand-sub">Olinsterg College Inc.</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-home" aria-hidden="true"></span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="tasks.html" class="nav-item active">
+                    <span class="nav-icon app-icon icon-tasks" aria-hidden="true"></span>
+                    <span>Tasks & Requirements</span>
+                </a>
+                <a href="subjects.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-subjects" aria-hidden="true"></span>
+                    <span>Subjects</span>
+                </a>
+                <a href="calendar.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-calendar" aria-hidden="true"></span>
+                    <span>Calendar</span>
+                </a>
+                <a href="reminders.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-alerts" aria-hidden="true"></span>
+                    <span>Reminders & Alerts</span>
+                </a>
+                <a href="profile.html" class="nav-item">
+                    <span class="nav-icon app-icon icon-profile" aria-hidden="true"></span>
+                    <span>Student Profile</span>
+                </a>
+            </nav>
+
+            <div class="user-pill">
+                <div class="avatar" id="sidebarAvatar">G12</div>
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-weight: 600; font-size: 0.88rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="sidebarName">Student</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);" id="sidebarTrack">Grade 12 - ASSH</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="mobile-toggle" id="menuToggle" aria-label="Toggle Navigation"><span class="app-icon icon-menu" aria-hidden="true"></span></button>
+                <div style="flex: 1;">
+                    <h1 style="font-size: 1.3rem; margin: 0;" id="formHeading"><span class="title-with-icon"><span class="app-icon icon-tasks" aria-hidden="true"></span>Add Academic Requirement</span></h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Fill in the details below to set up your deadline reminder</p>
+                </div>
+
+                <a href="tasks.html" class="btn btn-secondary btn-return" aria-label="Return to tasks list">
+                    <span class="app-icon icon-back" aria-hidden="true"></span>
+                    <span class="btn-return-text">
+                        <strong>Tasks List</strong>
+                        <small>Go back</small>
+                    </span>
+                </a>
+            </header>
+
+            <!-- Container -->
+            <div class="container" style="max-width: 800px;">
+                <div class="card">
+                    <form id="taskForm">
+                        <input type="hidden" id="taskId">
+                        
+                        <div class="form-group">
+                            <label for="taskTitle">Requirement Title *</label>
+                            <input type="text" id="taskTitle" class="form-control" placeholder="e.g., Practical Research 2 Chapter 1-3 Draft" required>
+                        </div>
+
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="subjectId">Subject *</label>
+                                <select id="subjectId" class="form-control" required>
+                                    <option value="">-- Select Subject --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="taskType">Category / Type *</label>
+                                <select id="taskType" class="form-control" required>
+                                    <option value="Assignment">📝 Assignment</option>
+                                    <option value="Project">📊 Project</option>
+                                    <option value="Quiz">🧠 Quiz</option>
+                                    <option value="Exam">💯 Exam</option>
+                                    <option value="Activity">🎯 Activity</option>
+                                    <option value="Performance Task">🎭 Performance Task</option>
+                                    <option value="Research">🔍 Research Requirement</option>
+                                    <option value="Presentation">🗣️ Presentation</option>
+                                    <option value="Written Work">✍️ Written Work</option>
+                                    <option value="Other">✨ Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-3">
+                            <div class="form-group due-date-group">
+                                <label for="dueDate">Due Date & Time *</label>
+                                <input type="hidden" id="dueDate" required>
+                                <button type="button" class="deadline-picker-trigger" id="deadlinePickerTrigger" aria-expanded="false" aria-controls="deadlinePickerPanel">
+                                    <span class="deadline-trigger-icon app-icon icon-calendar" aria-hidden="true"></span>
+                                    <span class="deadline-trigger-text">
+                                        <strong id="deadlineDisplay">Choose due date and time</strong>
+                                        <small id="deadlineDisplaySub">Reminders will be prepared automatically</small>
+                                    </span>
+                                    <span class="deadline-trigger-action">Change</span>
+                                </button>
+                                <div class="deadline-picker-panel hidden" id="deadlinePickerPanel">
+                                    <div class="deadline-picker-grid">
+                                        <section class="deadline-picker-card">
+                                            <div class="deadline-picker-head">
+                                                <div>
+                                                    <span class="deadline-picker-eyebrow">Select Date</span>
+                                                    <h3 id="pickerMonthLabel">October 2026</h3>
+                                                </div>
+                                                <div class="deadline-picker-controls">
+                                                    <button type="button" class="icon-btn deadline-small-btn" id="pickerPrevMonth" aria-label="Previous month">&lsaquo;</button>
+                                                    <button type="button" class="icon-btn deadline-small-btn" id="pickerNextMonth" aria-label="Next month">&rsaquo;</button>
+                                                </div>
+                                            </div>
+                                            <div class="deadline-weekdays">
+                                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                                            </div>
+                                            <div class="deadline-date-grid" id="deadlineDateGrid"></div>
+                                        </section>
+
+                                        <section class="deadline-picker-card deadline-time-card">
+                                            <div class="deadline-picker-head">
+                                                <div>
+                                                    <span class="deadline-picker-eyebrow">Set Time</span>
+                                                    <h3>Deadline Clock</h3>
+                                                </div>
+                                                <span class="app-icon icon-bell" aria-hidden="true"></span>
+                                            </div>
+                                            <div class="deadline-clock" aria-hidden="true">
+                                                <span class="clock-hand-hour" id="clockHourHand"></span>
+                                                <span class="clock-hand-minute" id="clockMinuteHand"></span>
+                                                <span class="clock-center"></span>
+                                            </div>
+                                            <div class="deadline-time-stepper" aria-label="Set deadline time">
+                                                <div class="time-stepper-unit">
+                                                    <button type="button" class="time-step-btn" data-time-part="hour" data-time-step="up" aria-label="Increase hour">&#9650;</button>
+                                                    <button type="button" class="time-step-value" id="pickerHourDisplay" data-time-part="hour" aria-label="Selected hour">05</button>
+                                                    <button type="button" class="time-step-btn" data-time-part="hour" data-time-step="down" aria-label="Decrease hour">&#9660;</button>
+                                                    <span>Hour</span>
+                                                </div>
+                                                <span class="time-step-divider">:</span>
+                                                <div class="time-stepper-unit">
+                                                    <button type="button" class="time-step-btn" data-time-part="minute" data-time-step="up" aria-label="Increase minute">&#9650;</button>
+                                                    <button type="button" class="time-step-value" id="pickerMinuteDisplay" data-time-part="minute" aria-label="Selected minute">00</button>
+                                                    <button type="button" class="time-step-btn" data-time-part="minute" data-time-step="down" aria-label="Decrease minute">&#9660;</button>
+                                                    <span>Minute</span>
+                                                </div>
+                                                <div class="time-stepper-unit period-unit">
+                                                    <button type="button" class="time-step-btn" data-time-part="period" data-time-step="up" aria-label="Change AM or PM">&#9650;</button>
+                                                    <button type="button" class="time-step-value" id="pickerPeriodDisplay" data-time-part="period" aria-label="Selected AM or PM">PM</button>
+                                                    <button type="button" class="time-step-btn" data-time-part="period" data-time-step="down" aria-label="Change AM or PM">&#9660;</button>
+                                                    <span>AM/PM</span>
+                                                </div>
+                                            </div>
+                                            <div class="deadline-time-selects native-time-values" aria-hidden="true">
+                                                <select id="pickerHour" aria-label="Hour"></select>
+                                                <select id="pickerMinute" aria-label="Minute"></select>
+                                                <select id="pickerPeriod" aria-label="AM or PM">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="deadline-picker-actions">
+                                                <button type="button" class="btn btn-secondary" id="cancelDeadlinePicker">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="saveDeadlinePicker">Save Date & Time</button>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group priority-group">
+                                <label for="priority">Priority Level</label>
+                                <select id="priority" class="form-control priority-select priority-medium">
+                                    <option value="Low" class="priority-option-low">Easy</option>
+                                    <option value="Medium" class="priority-option-medium" selected>Medium</option>
+                                    <option value="High" class="priority-option-high">Hard</option>
+                                </select>
+                                <div class="priority-preview priority-medium" id="priorityPreview">
+                                    Medium tasks need steady progress. Plan a little time each day.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Current Status</label>
+                                <select id="status" class="form-control">
+                                    <option value="Pending" selected>Pending</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Requirement Notes & Instructions</label>
+                            <textarea id="description" class="form-control" rows="4" placeholder="Add specific guidelines, rubrics, link references, or teacher notes..."></textarea>
+                        </div>
+
+                        <!-- Subtasks Builder -->
+                        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <label style="margin: 0;">Subtasks / Breakdown Steps</label>
+                                <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px;" id="addSubtaskBtn">
+                                    <span class="app-icon icon-plus" aria-hidden="true"></span> Add Step
+                                </button>
+                            </div>
+                            <div id="subtasksList" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Subtask items rendered here -->
+                            </div>
+                        </div>
+
+                        <!-- Multi-Reminder Timings -->
+                        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 6px;">
+                                <span class="app-icon icon-bell" aria-hidden="true"></span>
+                                Push Notification Reminders
+                            </label>
+                            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 12px;">
+                                Choose when you want Deadline Buddy to deliver background push alerts to your device:
+                            </p>
+                            <div class="grid grid-3" style="gap: 10px;">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="1_day_before" checked>
+                                    <span>1 day before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="3_hours_before">
+                                    <span>3 hours before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="1_hour_before" checked>
+                                    <span>1 hour before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="30_min_before">
+                                    <span>30 mins before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="10_min_before">
+                                    <span>10 mins before</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="reminderOffset" value="at_deadline">
+                                    <span>At deadline</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
+                            <a href="tasks.html" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary" style="padding: 10px 24px;">Save Requirement</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bottom Mobile Nav (5 core items) -->
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
+        <a href="dashboard.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-home" aria-hidden="true"></span>
+            <span>Home</span>
+        </a>
+        <a href="tasks.html" class="mobile-nav-item active">
+            <span class="icon app-icon icon-tasks" aria-hidden="true"></span>
+            <span>Tasks</span>
+        </a>
+        <a href="calendar.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-calendar" aria-hidden="true"></span>
+            <span>Calendar</span>
+        </a>
+        <a href="reminders.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-alerts" aria-hidden="true"></span>
+            <span>Alerts</span>
+        </a>
+        <a href="profile.html" class="mobile-nav-item">
+            <span class="icon app-icon icon-profile" aria-hidden="true"></span>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="js/storage.js"></script>
+    <script src="js/deadline.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/local-notifications.js"></script>
+    <script src="js/push.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/pwa.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const subjectSelect = document.getElementById('subjectId');
+            const subtasksList = document.getElementById('subtasksList');
+            const addSubtaskBtn = document.getElementById('addSubtaskBtn');
+            const taskForm = document.getElementById('taskForm');
+            const dueDateInput = document.getElementById('dueDate');
+            const deadlineDisplay = document.getElementById('deadlineDisplay');
+            const deadlineDisplaySub = document.getElementById('deadlineDisplaySub');
+            const deadlinePickerTrigger = document.getElementById('deadlinePickerTrigger');
+            const deadlinePickerPanel = document.getElementById('deadlinePickerPanel');
+            const pickerMonthLabel = document.getElementById('pickerMonthLabel');
+            const deadlineDateGrid = document.getElementById('deadlineDateGrid');
+            const pickerPrevMonth = document.getElementById('pickerPrevMonth');
+            const pickerNextMonth = document.getElementById('pickerNextMonth');
+            const pickerHour = document.getElementById('pickerHour');
+            const pickerMinute = document.getElementById('pickerMinute');
+            const pickerPeriod = document.getElementById('pickerPeriod');
+            const pickerHourDisplay = document.getElementById('pickerHourDisplay');
+            const pickerMinuteDisplay = document.getElementById('pickerMinuteDisplay');
+            const pickerPeriodDisplay = document.getElementById('pickerPeriodDisplay');
+            const saveDeadlinePicker = document.getElementById('saveDeadlinePicker');
+            const cancelDeadlinePicker = document.getElementById('cancelDeadlinePicker');
+            const clockHourHand = document.getElementById('clockHourHand');
+            const clockMinuteHand = document.getElementById('clockMinuteHand');
+            const prioritySelect = document.getElementById('priority');
+            const priorityPreview = document.getElementById('priorityPreview');
+            let pickerSelectedDate = new Date();
+            let pickerViewDate = new Date();
+
+            // Populate subjects
+            const subjects = Storage.getSubjects();
+            if (subjects.length === 0) {
+                alert('Please add at least one subject first!');
+                window.location.href = 'subjects.html';
+                return;
+            }
+
+            subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>' +
+                subjects.map(s => `<option value="${s.id}">${s.name || s.subjectName}</option>`).join('');
+
+            // Subtask DOM generator
+            function createSubtaskRow(title = '', completed = false) {
+                const div = document.createElement('div');
+                div.className = 'subtask-row';
+                div.style.display = 'flex';
+                div.style.gap = '8px';
+                div.style.alignItems = 'center';
+
+                div.innerHTML = `
+                    <input type="checkbox" ${completed ? 'checked' : ''} class="subtask-complete-check" style="width: 18px; height: 18px; cursor: pointer;">
+                    <input type="text" value="${title.replace(/"/g, '&quot;')}" class="form-control subtask-title-input" placeholder="e.g., Gather survey responses" style="flex: 1;">
+                    <button type="button" class="btn btn-danger remove-subtask-btn" style="padding: 6px 12px;">Remove</button>
+                `;
+
+                div.querySelector('.remove-subtask-btn').addEventListener('click', () => div.remove());
+                subtasksList.appendChild(div);
+            }
+
+            addSubtaskBtn.addEventListener('click', () => createSubtaskRow());
+
+            // Check if editing existing task
+            const urlParams = new URLSearchParams(window.location.search);
+            const taskId = urlParams.get('id');
+
+            if (taskId) {
+                const task = Storage.getTasks().find(t => String(t.id) === String(taskId));
+                if (task) {
+                    document.getElementById('formHeading').innerHTML = '<span class="title-with-icon"><span class="app-icon icon-tasks" aria-hidden="true"></span>Edit Academic Requirement</span>';
+                    document.getElementById('taskId').value = task.id;
+                    document.getElementById('taskTitle').value = task.title;
+                    document.getElementById('subjectId').value = task.subjectId;
+                    document.getElementById('taskType').value = task.type || task.taskType || 'Assignment';
+                    document.getElementById('priority').value = task.priority || 'Medium';
+                    document.getElementById('status').value = task.status || 'Pending';
+                    document.getElementById('description').value = task.description || '';
+
+                    // due date formatting for datetime-local
+                    const d = new Date(task.dueDate);
+                    const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                    dueDateInput.value = iso;
+                    syncPickerFromValue();
+
+                    // subtasks
+                    if (task.subtasks && task.subtasks.length > 0) {
+                        task.subtasks.forEach(s => createSubtaskRow(s.title, s.completed || s.isCompleted));
+                    }
+
+                    // Populate reminder offset checkboxes
+                    const activeOffsets = Array.isArray(task.reminderOffsets) ? task.reminderOffsets : ['1_day_before', '1_hour_before'];
+                    document.querySelectorAll('input[name="reminderOffset"]').forEach(cb => {
+                        cb.checked = activeOffsets.includes(cb.value);
+                    });
+                }
+            } else {
+                // Default date: tomorrow 5:00 PM
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(17, 0, 0, 0);
+                const iso = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                dueDateInput.value = iso;
+                syncPickerFromValue();
+            }
+
+            function formatPreviewDate(date) {
+                return date.toLocaleString([], {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+            }
+
+            function toDatetimeLocalValue(date) {
+                return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            }
+
+            function parseDatetimeLocal(value) {
+                if (!value) return new Date();
+                const parsed = new Date(value);
+                return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+            }
+
+            function syncPickerFromValue() {
+                const date = parseDatetimeLocal(dueDateInput.value);
+                pickerSelectedDate = new Date(date);
+                pickerViewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+
+                let hour = date.getHours();
+                const minute = date.getMinutes();
+                const period = hour >= 12 ? 'PM' : 'AM';
+                hour = hour % 12 || 12;
+
+                pickerHour.value = String(hour).padStart(2, '0');
+                pickerMinute.value = String(minute).padStart(2, '0');
+                pickerPeriod.value = period;
+
+                updateTimeStepperDisplay();
+                renderDeadlinePicker();
+                updateClockPreview();
+            }
+
+            function populateTimeSelects() {
+                pickerHour.innerHTML = Array.from({ length: 12 }, (_, i) => {
+                    const val = String(i + 1).padStart(2, '0');
+                    return `<option value="${val}">${val}</option>`;
+                }).join('');
+
+                pickerMinute.innerHTML = Array.from({ length: 60 }, (_, i) => {
+                    const val = String(i).padStart(2, '0');
+                    return `<option value="${val}">${val}</option>`;
+                }).join('');
+            }
+
+            function renderDeadlinePicker() {
+                const year = pickerViewDate.getFullYear();
+                const month = pickerViewDate.getMonth();
+                const monthName = pickerViewDate.toLocaleDateString([], { month: 'long', year: 'numeric' });
+                const firstDayIndex = new Date(year, month, 1).getDay();
+                const lastDate = new Date(year, month + 1, 0).getDate();
+                const prevLastDate = new Date(year, month, 0).getDate();
+                const today = new Date();
+
+                pickerMonthLabel.textContent = monthName;
+                deadlineDateGrid.innerHTML = '';
+
+                for (let i = firstDayIndex; i > 0; i--) {
+                    deadlineDateGrid.appendChild(createPickerDay(prevLastDate - i + 1, true, new Date(year, month - 1, prevLastDate - i + 1)));
+                }
+
+                for (let day = 1; day <= lastDate; day++) {
+                    const date = new Date(year, month, day);
+                    const isToday = date.toDateString() === today.toDateString();
+                    const isSelected = date.toDateString() === pickerSelectedDate.toDateString();
+                    deadlineDateGrid.appendChild(createPickerDay(day, false, date, isToday, isSelected));
+                }
+
+                const totalCells = firstDayIndex + lastDate;
+                const nextDays = (7 - (totalCells % 7)) % 7;
+                for (let day = 1; day <= nextDays; day++) {
+                    deadlineDateGrid.appendChild(createPickerDay(day, true, new Date(year, month + 1, day)));
+                }
+            }
+
+            function createPickerDay(day, isOtherMonth, date, isToday = false, isSelected = false) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `deadline-day ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`;
+                btn.textContent = day;
+                btn.addEventListener('click', () => {
+                    pickerSelectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    pickerViewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+                    renderDeadlinePicker();
+                });
+                return btn;
+            }
+
+            function updateClockPreview() {
+                const hour = parseInt(pickerHour.value || '12', 10);
+                const minute = parseInt(pickerMinute.value || '0', 10);
+                const hourDegrees = ((hour % 12) * 30) + (minute * 0.5);
+                const minuteDegrees = minute * 6;
+                clockHourHand.style.transform = `rotate(${hourDegrees}deg)`;
+                clockMinuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
+            }
+
+            function updateTimeStepperDisplay() {
+                pickerHourDisplay.textContent = pickerHour.value || '12';
+                pickerMinuteDisplay.textContent = pickerMinute.value || '00';
+                pickerPeriodDisplay.textContent = pickerPeriod.value || 'PM';
+            }
+
+            function changeTimeValue(part, direction) {
+                if (part === 'hour') {
+                    const current = parseInt(pickerHour.value || '12', 10);
+                    let next = direction === 'up' ? current + 1 : current - 1;
+                    if (next > 12) next = 1;
+                    if (next < 1) next = 12;
+                    pickerHour.value = String(next).padStart(2, '0');
+                }
+
+                if (part === 'minute') {
+                    const current = parseInt(pickerMinute.value || '0', 10);
+                    let next = direction === 'up' ? current + 5 : current - 5;
+                    if (next > 59) next = 0;
+                    if (next < 0) next = 55;
+                    pickerMinute.value = String(next).padStart(2, '0');
+                }
+
+                if (part === 'period') {
+                    pickerPeriod.value = pickerPeriod.value === 'AM' ? 'PM' : 'AM';
+                }
+
+                updateTimeStepperDisplay();
+                updateClockPreview();
+            }
+
+            function savePickerValue() {
+                let hour = parseInt(pickerHour.value || '12', 10);
+                const minute = parseInt(pickerMinute.value || '0', 10);
+                if (pickerPeriod.value === 'PM' && hour !== 12) hour += 12;
+                if (pickerPeriod.value === 'AM' && hour === 12) hour = 0;
+
+                const finalDate = new Date(
+                    pickerSelectedDate.getFullYear(),
+                    pickerSelectedDate.getMonth(),
+                    pickerSelectedDate.getDate(),
+                    hour,
+                    minute,
+                    0,
+                    0
+                );
+
+                dueDateInput.value = toDatetimeLocalValue(finalDate);
+                closeDeadlinePicker();
+                updateDeadlinePreview();
+            }
+
+            function openDeadlinePicker() {
+                syncPickerFromValue();
+                deadlinePickerPanel.classList.remove('hidden');
+                deadlinePickerTrigger.setAttribute('aria-expanded', 'true');
+            }
+
+            function closeDeadlinePicker() {
+                deadlinePickerPanel.classList.add('hidden');
+                deadlinePickerTrigger.setAttribute('aria-expanded', 'false');
+            }
+
+            populateTimeSelects();
+            syncPickerFromValue();
+
+            deadlinePickerTrigger.addEventListener('click', () => {
+                if (deadlinePickerPanel.classList.contains('hidden')) {
+                    openDeadlinePicker();
+                } else {
+                    closeDeadlinePicker();
+                }
+            });
+
+            pickerPrevMonth.addEventListener('click', () => {
+                pickerViewDate.setMonth(pickerViewDate.getMonth() - 1);
+                renderDeadlinePicker();
+            });
+
+            pickerNextMonth.addEventListener('click', () => {
+                pickerViewDate.setMonth(pickerViewDate.getMonth() + 1);
+                renderDeadlinePicker();
+            });
+
+            [pickerHour, pickerMinute, pickerPeriod].forEach(el => {
+                el.addEventListener('change', () => {
+                    updateTimeStepperDisplay();
+                    updateClockPreview();
+                });
+            });
+
+            document.querySelectorAll('[data-time-part][data-time-step]').forEach(button => {
+                button.addEventListener('click', () => {
+                    changeTimeValue(button.dataset.timePart, button.dataset.timeStep);
+                });
+            });
+
+            saveDeadlinePicker.addEventListener('click', savePickerValue);
+            cancelDeadlinePicker.addEventListener('click', closeDeadlinePicker);
+
+            function updateDeadlinePreview() {
+                if (!dueDateInput.value) {
+                    deadlineDisplay.textContent = 'Choose due date and time';
+                    deadlineDisplaySub.textContent = 'Reminders will be prepared automatically';
+                    return;
+                }
+
+                const due = new Date(dueDateInput.value);
+                deadlineDisplay.textContent = formatPreviewDate(due);
+                deadlineDisplaySub.textContent = 'Alerts: 1 day, 1 hour, and 20 minutes before';
+            }
+
+            dueDateInput.addEventListener('input', updateDeadlinePreview);
+            dueDateInput.addEventListener('change', updateDeadlinePreview);
+            updateDeadlinePreview();
+
+            function updatePriorityPreview() {
+                const priority = prioritySelect.value || 'Medium';
+                const priorityClass = `priority-${priority.toLowerCase()}`;
+                const messages = {
+                    Low: 'Easy task. You can finish this with a simple plan.',
+                    Medium: 'Medium task. Work on it little by little so it does not pile up.',
+                    High: 'Hard task. Start early and break it into smaller steps.'
+                };
+
+                prioritySelect.classList.remove('priority-low', 'priority-medium', 'priority-high');
+                priorityPreview.classList.remove('priority-low', 'priority-medium', 'priority-high');
+                prioritySelect.classList.add(priorityClass);
+                priorityPreview.classList.add(priorityClass);
+                priorityPreview.textContent = messages[priority] || messages.Medium;
+            }
+
+            prioritySelect.addEventListener('change', updatePriorityPreview);
+            prioritySelect.addEventListener('input', updatePriorityPreview);
+            updatePriorityPreview();
+
+            // Form submission
+            taskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const id = document.getElementById('taskId').value;
+                const title = document.getElementById('taskTitle').value.trim();
+                const subjectId = document.getElementById('subjectId').value;
+                const type = document.getElementById('taskType').value;
+                const dueDate = dueDateInput.value;
+                const priority = document.getElementById('priority').value;
+                const status = document.getElementById('status').value;
+                const description = document.getElementById('description').value.trim();
+
+                if (!dueDate) {
+                    openDeadlinePicker();
+                    if (typeof showFeedbackToast === 'function') {
+                        showFeedbackToast('Please choose a due date and time before saving.', 'warning');
+                    } else {
+                        alert('Please choose a due date and time before saving.');
+                    }
+                    return;
+                }
+
+                // Collect subtasks
+                const subtaskRows = subtasksList.querySelectorAll('.subtask-row');
+                const subtasks = Array.from(subtaskRows).map(row => {
+                    return {
+                        id: Storage.generateId(),
+                        title: row.querySelector('.subtask-title-input').value.trim(),
+                        completed: row.querySelector('.subtask-complete-check').checked
+                    };
+                }).filter(s => s.title.length > 0);
+
+                const reminderOffsets = Array.from(document.querySelectorAll('input[name="reminderOffset"]:checked')).map(cb => cb.value);
+
+                const taskData = {
+                    title,
+                    subjectId,
+                    type,
+                    dueDate: new Date(dueDate).toISOString(),
+                    priority,
+                    status,
+                    description,
+                    subtasks,
+                    reminderOffsets
+                };
+
+                if (id) {
+                    Storage.updateTask(id, taskData);
+                    if (typeof queueFeedbackToast === 'function') queueFeedbackToast('Requirement updated successfully.', 'success');
+                } else {
+                    Storage.saveTask(taskData);
+                    if (typeof queueFeedbackToast === 'function') queueFeedbackToast('Requirement added successfully.', 'success');
+                }
+
+                window.location.href = 'tasks.html';
+            });
+        });
+    </script>
+</body>
+</html>
