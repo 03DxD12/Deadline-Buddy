@@ -12,3 +12,5 @@ backend/*.sqlite-wal
 dist/
 release/
 out/
+data/vapid.json
+*.env*

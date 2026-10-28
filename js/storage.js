@@ -226,6 +226,22 @@ async function supabaseFindUser(username) {
 
 async function supabaseRegisterUser(accountData) {
     const clean = (accountData.username || '').trim().toLowerCase();
+    // 1. Try secure RPC first
+    const rpcRes = await supabaseFetch('rpc/register_student', 'POST', {
+        p_username: clean,
+        p_password: accountData.password || '',
+        p_name: (accountData.name || '').trim(),
+        p_grade: accountData.gradeLevel || 'Grade 12',
+        p_section: accountData.strand || 'ASSH'
+    });
+    if (rpcRes && rpcRes.success && rpcRes.data) {
+        if (rpcRes.data.error) {
+            return { success: false, error: rpcRes.data.error };
+        }
+        return { success: true, user: rpcRes.data };
+    }
+
+    // 2. Direct table fallback
     const payload = {
         username: clean,
         password: accountData.password || '',
@@ -237,7 +253,6 @@ async function supabaseRegisterUser(accountData) {
         'Prefer': 'return=representation'
     });
     if (res && res.success) {
-        // Also initialize student_data row
         await supabaseFetch('student_data', 'POST', {
             username: clean,
             subjects: getSubjects() || [],
@@ -294,6 +309,38 @@ async function supabaseLogin(username, password) {
     const clean = (username || '').trim().toLowerCase();
     // 1. Check Supabase first if online
     if (typeof navigator !== 'undefined' && navigator.onLine) {
+        // Try secure RPC first
+        const rpcRes = await supabaseFetch('rpc/login_student', 'POST', {
+            p_username: clean,
+            p_password: password
+        });
+        if (rpcRes && rpcRes.success) {
+            if (rpcRes.data) {
+                const user = rpcRes.data;
+                const account = {
+                    id: Date.now(),
+                    name: user.name || username,
+                    username: user.username,
+                    password: password,
+                    gradeLevel: user.grade || 'Grade 12',
+                    strand: user.section || 'ASSH',
+                    school: 'Olinsterg College Inc.',
+                    createdAt: user.created_at || new Date().toISOString()
+                };
+                const accounts = getAccounts();
+                const existingIdx = accounts.findIndex(a => (a.username || '').toLowerCase() === clean);
+                if (existingIdx >= 0) accounts[existingIdx] = account;
+                else accounts.push(account);
+                saveAccounts(accounts);
+
+                await supabasePullData(clean);
+                return { success: true, account };
+            } else if (rpcRes.data === null) {
+                return { success: false, error: 'Invalid username or password.' };
+            }
+        }
+
+        // Direct table fallback
         const remoteUser = await supabaseFindUser(clean);
         if (remoteUser) {
             if (remoteUser.password !== password) {
@@ -353,6 +400,21 @@ async function supabaseResetPassword(username, name, newPassword) {
 
     // Check remote user first if online
     if (typeof navigator !== 'undefined' && navigator.onLine) {
+        // Try secure RPC first
+        const rpcRes = await supabaseFetch('rpc/reset_student_password', 'POST', {
+            p_username: clean,
+            p_name: cleanName,
+            p_new_password: newPassword
+        });
+        if (rpcRes && rpcRes.success && rpcRes.data) {
+            if (rpcRes.data.error) {
+                return { success: false, error: rpcRes.data.error };
+            }
+            updateAccount(clean, { password: newPassword });
+            return { success: true };
+        }
+
+        // Direct table fallback
         const remoteUser = await supabaseFindUser(clean);
         if (remoteUser) {
             const regName = (remoteUser.name || '').trim().toLowerCase();
@@ -362,7 +424,6 @@ async function supabaseResetPassword(username, name, newPassword) {
             await supabaseFetch(`users?username=eq.${encodeURIComponent(clean)}`, 'PATCH', {
                 password: newPassword
             });
-            // Update local copy too
             updateAccount(clean, { password: newPassword });
             return { success: true };
         }
