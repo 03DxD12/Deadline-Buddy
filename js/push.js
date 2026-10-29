@@ -11,7 +11,9 @@
 const PushManagerService = (function() {
     const API_BASE = (function() {
         if (window.location.protocol === 'file:') return 'http://127.0.0.1:3000';
-        if (window.location.port === '5500') return 'http://127.0.0.1:3000';
+        if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port && window.location.port !== '3000') {
+            return `http://${window.location.hostname}:3000`;
+        }
         return '';
     })();
 

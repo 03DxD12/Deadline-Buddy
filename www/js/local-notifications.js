@@ -81,8 +81,18 @@ const LocalNotificationService = (function() {
      * - taskId * 10 + 4: Overdue Alert
      */
     function getNotificationIds(taskId) {
+        let numeric = parseInt(taskId, 10);
+        if (isNaN(numeric)) {
+            let hash = 0;
+            const str = String(taskId || 'task');
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            numeric = Math.abs(hash);
+        }
         // Ensure numeric ID within 32-bit integer limits for Android PendingIntent
-        const base = Math.abs(parseInt(taskId, 10)) % 200000;
+        const base = Math.abs(numeric) % 200000;
         return {
             oneDay: base * 10 + 1,
             oneHour: base * 10 + 2,
@@ -96,8 +106,13 @@ const LocalNotificationService = (function() {
      */
     function calculateReminderTimes(dueDateStr, dueTimeStr) {
         if (!dueDateStr) return null;
-        const timeStr = dueTimeStr || '23:59';
-        const deadlineDate = new Date(`${dueDateStr}T${timeStr}:00`);
+        let deadlineDate;
+        if (typeof dueDateStr === 'string' && dueDateStr.includes('T')) {
+            deadlineDate = new Date(dueDateStr);
+        } else {
+            const timeStr = dueTimeStr || '23:59';
+            deadlineDate = new Date(`${dueDateStr}T${timeStr}:00`);
+        }
         if (isNaN(deadlineDate.getTime())) return null;
 
         const deadlineMs = deadlineDate.getTime();

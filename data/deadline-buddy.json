@@ -1,20 +1,5 @@
 {
-  "tasks": [
-    {
-      "dueTime": "20:00",
-      "id": 99901,
-      "reminderOffsets": [
-        "1_day_before",
-        "1_hour_before",
-        "15_min_before"
-      ],
-      "dueDate": "2026-10-30",
-      "userId": "default",
-      "title": "IT Security Final Report",
-      "priority": "High",
-      "status": "Pending"
-    }
-  ],
+  "tasks": [],
   "reminders": [
     {
       "id": "rem-999-1_day_before-mvpgpcqq",
@@ -62,10 +47,16 @@
       "title": "Study Session (Starting Soon)",
       "body": "Computer Networks: Subnetting Practice starts at 19:00.",
       "scheduledAt": "2026-10-28T10:45:00.000Z",
-      "status": "scheduled",
+      "status": "sent",
       "url": "reminders.html?tab=study&id=study-mvpgpcr3",
       "priority": "Normal",
-      "createdAt": "2026-10-26T16:19:33.711Z"
+      "createdAt": "2026-10-26T16:19:33.711Z",
+      "sentAt": "2026-10-29T09:09:42.917Z",
+      "deliveryStats": {
+        "total": 0,
+        "successCount": 0,
+        "failCount": 0
+      }
     },
     {
       "id": "rem-99901-1_day_before-mvq9kcao",
@@ -132,6 +123,17 @@
   ],
   "pushSubscriptions": [],
   "notifications": [
+    {
+      "id": "notif-1793264982917-hscldf",
+      "userId": "default",
+      "type": "study",
+      "title": "Study Session (Starting Soon)",
+      "body": "Computer Networks: Subnetting Practice starts at 19:00.",
+      "url": "reminders.html?tab=study&id=study-mvpgpcr3",
+      "read": false,
+      "reminderId": "rem-study-study-mvpgpcr3",
+      "createdAt": "2026-10-29T09:09:42.917Z"
+    },
     {
       "id": "notif-1793080024873-likl4d",
       "userId": "default",
