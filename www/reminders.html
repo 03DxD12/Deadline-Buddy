@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#ff8ba7">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Deadline Buddy">
-    <link rel="apple-touch-icon" href="images/deadline-buddy-logo.svg">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
     <title>Reminders & Push Alerts - Deadline Buddy</title>
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('deadlinebuddy_theme') === 'blue' ? 'blue' : 'pink');
@@ -883,8 +888,25 @@
             const toggleBtn = document.getElementById('togglePushSubscriptionBtn');
 
             if (!PushManagerService.isPushSupported()) {
+                const isApple = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                if (isApple && !window.matchMedia('(display-mode: standalone)').matches && !navigator.standalone) {
+                    badge.className = 'badge badge-warning';
+                    badge.style.background = '#fef3c7';
+                    badge.style.color = '#92400e';
+                    badge.textContent = 'Add to Home Screen Required';
+                    details.innerHTML = 'Apple iOS/iPadOS requires Deadline Buddy to be installed to your <strong>Home Screen</strong> to enable Web Push. Tap the Share button &rarr; <strong>"Add to Home Screen"</strong>, then open Deadline Buddy from your Home Screen.';
+                    toggleBtn.textContent = 'How to Install on iOS';
+                    toggleBtn.className = 'btn btn-primary';
+                    toggleBtn.disabled = false;
+                    toggleBtn.onclick = () => {
+                        if (typeof window.installDeadlineBuddyPwa === 'function') {
+                            window.installDeadlineBuddyPwa();
+                        }
+                    };
+                    return;
+                }
                 badge.className = 'badge badge-overdue';
-                badge.textContent = 'Unsupported on this device';
+                badge.textContent = 'Unsupported in this browser';
                 details.textContent = 'Web Push API is not supported in this browser version. Use Chrome, Edge, or install to Home Screen.';
                 toggleBtn.disabled = true;
                 return;

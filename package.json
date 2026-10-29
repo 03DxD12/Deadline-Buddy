@@ -3,7 +3,7 @@
   "version": "4.0.0",
   "description": "Deadline Buddy - Installable PWA and Android App with Native Scheduled Alarms",
   "scripts": {
-    "build:www": "powershell -Command \"Copy-Item -Path *.html, manifest.json, service-worker.js -Destination www/ -Force; Copy-Item -Path css, js, images, webfonts -Destination www/ -Recurse -Force\"",
+    "build:www": "powershell -Command \"Copy-Item -Path *.html, *.png, manifest.json, service-worker.js -Destination www/ -Force; Copy-Item -Path css, js, images, webfonts -Destination www/ -Recurse -Force\"",
     "cap:sync": "npm run build:www && cap sync android",
     "cap:open:android": "cap open android"
   },

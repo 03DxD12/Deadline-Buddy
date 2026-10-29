@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deadline-buddy-shell-v20';
+const CACHE_NAME = 'deadline-buddy-shell-v21';
 const APP_SHELL = [
     './',
     './index.html',
@@ -19,6 +19,7 @@ const APP_SHELL = [
     './js/push.js',
     './js/pwa.js',
     './js/storage.js',
+    './apple-touch-icon.png',
     './images/deadline-buddy-logo.svg',
     './images/icon-192.png',
     './images/icon-512.png',
@@ -30,11 +31,23 @@ const APP_SHELL = [
     './manifest.json'
 ];
 
-// Pre-cache core application shell
+// Pre-cache core application shell with resilient fallback
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(APP_SHELL))
+            .then(async cache => {
+                const cachePromises = APP_SHELL.map(async url => {
+                    try {
+                        const response = await fetch(url);
+                        if (response.ok) {
+                            await cache.put(url, response);
+                        }
+                    } catch (err) {
+                        console.warn('[SW] Pre-cache item warning:', url, err);
+                    }
+                });
+                await Promise.all(cachePromises);
+            })
             .then(() => self.skipWaiting())
     );
 });
@@ -56,8 +69,8 @@ self.addEventListener('fetch', event => {
 
     const url = new URL(event.request.url);
 
-    // Dynamic REST APIs must never be cached by service worker
-    if (url.pathname.startsWith('/api/')) {
+    // Dynamic REST APIs and remote DB endpoints must never be cached by service worker
+    if (url.pathname.startsWith('/api/') || url.hostname.includes('supabase.co')) {
         return;
     }
 

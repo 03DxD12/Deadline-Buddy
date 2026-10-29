@@ -33,7 +33,8 @@ const PushManagerService = (function() {
     function getDeviceType() {
         const ua = navigator.userAgent;
         if (/android/i.test(ua)) return 'Android Device';
-        if (/iphone|ipad|ipod/i.test(ua)) return 'iOS Device';
+        if (/ipad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && window.innerWidth >= 768)) return 'iPadOS Device';
+        if (/iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'iOS Device';
         if (/windows/i.test(ua)) return 'Windows PC';
         if (/mac/i.test(ua)) return 'Mac';
         if (/linux/i.test(ua)) return 'Linux';
@@ -73,6 +74,11 @@ const PushManagerService = (function() {
 
     async function subscribeDevice(customUserId = 'default') {
         if (!isPushSupported()) {
+            const ua = navigator.userAgent;
+            const isApple = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isApple) {
+                throw new Error('On iPhone and iPad, Apple requires Deadline Buddy to be added to your Home Screen to enable notifications. Tap Share -> "Add to Home Screen", then open from your Home Screen.');
+            }
             throw new Error('Push notifications are not supported on this browser or device.');
         }
 
