@@ -71,6 +71,13 @@ When a student creates or edits a requirement (e.g., *Research Chapter 2* due *N
 
 ```text
 Deadline-Buddy/
+├── docs/                      # Project Documentation, Client Guides, and Defense Reports
+│   ├── CLIENT-DEMO-GUIDE.md
+│   ├── DEADLINE-BUDDY-CLIENT-EXPLANATION-AND-SYSTEM-GUIDE.md
+│   ├── DEADLINE-BUDDY-DESIGN-INNOVATION-PROJECT-REPORT.md
+│   ├── READ ME FIRST.txt
+│   ├── StudySpace-Design-Innovation-Project-Report.md
+│   └── SYSTEM-EXPLANATION-AND-DEMO-GUIDE.md
 ├── android/                   # Native Android Project (Capacitor)
 │   ├── app/src/main/
 │   │   ├── AndroidManifest.xml # Notification & Exact Alarm Permissions
@@ -88,6 +95,12 @@ Deadline-Buddy/
 │   ├── local-notifications.js # Native Android alarms & exact scheduling
 │   ├── push.js                # Web Push diagnostics & manager
 │   └── pwa.js                 # Service worker registration & install prompts
+├── server/                    # Node.js Express REST API & Web Push Server
+│   ├── index.js               # API Server entry point
+│   ├── db.js                  # Persistent JSON storage handler
+│   ├── scheduler.js           # 15s background interval push worker
+│   └── package.json           # Server dependencies
+├── data/                      # Server data storage & VAPID keys
 ├── www/                       # Capacitor build output distribution folder
 ├── index.html                 # Login, Sign Up, & Install Landing
 ├── dashboard.html             # Today's Classes, Today's Deadlines, & Overview
@@ -98,9 +111,10 @@ Deadline-Buddy/
 ├── calendar.html              # Monthly deadline calendar
 ├── reminders.html             # Notification Center & Android Alarm status
 ├── profile.html               # Profile, Settings, Exact Alarms, & Reset
+├── apple-touch-icon.png       # Square 192x192 PNG for iOS/iPadOS Home Screen
 ├── manifest.json              # PWA Web App Manifest
 ├── service-worker.js          # PWA Service Worker caching
-├── capacitor.config.ts        # Capacitor configuration
+├── capacitor.config.json      # Capacitor configuration
 ├── package.json               # Dependencies (@capacitor/core, local-notifications)
 └── README.md
 ```
