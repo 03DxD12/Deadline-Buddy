@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -93,13 +93,23 @@
 
             <!-- Container -->
             <div class="container" style="max-width: 800px;">
-                <div class="card">
-                    <form id="taskForm">
-                        <input type="hidden" id="taskId">
-                        
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    
+                    <!-- Chunk 1: Requirement Essentials (Miller's Law) -->
+                    <div class="form-chunk-card">
+                        <div class="form-chunk-header">
+                            <div class="form-chunk-icon">📝</div>
+                            <div class="form-chunk-title-wrap">
+                                <h3>Requirement Essentials</h3>
+                                <p>Name your academic requirement and assign it to the proper subject</p>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label for="taskTitle">Requirement Title *</label>
                             <input type="text" id="taskTitle" class="form-control" placeholder="e.g., Practical Research 2 Chapter 1-3 Draft" required>
+                            <span class="form-helper-text">Enter the full assignment, project, or exam title given by your teacher.</span>
                         </div>
 
                         <div class="grid grid-2">
@@ -123,6 +133,17 @@
                                     <option value="Written Work">✍️ Written Work</option>
                                     <option value="Other">✨ Other</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chunk 2: Schedule & Urgency (Miller's Law & Proximity) -->
+                    <div class="form-chunk-card">
+                        <div class="form-chunk-header">
+                            <div class="form-chunk-icon">⏰</div>
+                            <div class="form-chunk-title-wrap">
+                                <h3>Schedule & Priority</h3>
+                                <p>Set when this requirement is due and how urgent it is</p>
                             </div>
                         </div>
 
@@ -230,93 +251,122 @@
 
                         <div class="form-group">
                             <label for="description">Requirement Notes & Instructions</label>
-                            <textarea id="description" class="form-control" rows="4" placeholder="Add specific guidelines, rubrics, link references, or teacher notes..."></textarea>
+                            <textarea id="description" class="form-control" rows="3" placeholder="Add specific guidelines, rubrics, link references, or teacher notes..."></textarea>
+                            <span class="form-helper-text">Include key requirements, submission portal links, formatting guides, or scoring criteria.</span>
+                        </div>
+                    </div>
+
+                    <!-- Chunk 3: Subtasks & Action Steps (Miller's Law) -->
+                    <div class="form-chunk-card">
+                        <div class="form-chunk-header" style="justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="form-chunk-icon">📋</div>
+                                <div class="form-chunk-title-wrap">
+                                    <h3>Subtasks & Action Steps</h3>
+                                    <p>Break large projects into easy manageable milestones</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" style="font-size: 0.82rem; padding: 6px 12px;" id="addSubtaskBtn">
+                                <span class="app-icon icon-plus" aria-hidden="true"></span> Add Step
+                            </button>
+                        </div>
+                        <div id="subtasksList" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Subtask items rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Chunk 4: Multi-Tier Push Reminders (Hick's Law & Miller's Law) -->
+                    <div class="form-chunk-card">
+                        <div class="form-chunk-header">
+                            <div class="form-chunk-icon">🔔</div>
+                            <div class="form-chunk-title-wrap">
+                                <h3>Automated Push Reminders</h3>
+                                <p>Select timely background alerts so deadlines never catch you by surprise</p>
+                            </div>
                         </div>
 
-                        <!-- Subtasks Builder -->
-                        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <label style="margin: 0;">Subtasks / Breakdown Steps</label>
-                                <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px;" id="addSubtaskBtn">
-                                    <span class="app-icon icon-plus" aria-hidden="true"></span> Add Step
-                                </button>
-                            </div>
-                            <div id="subtasksList" style="display: flex; flex-direction: column; gap: 8px;">
-                                <!-- Subtask items rendered here -->
-                            </div>
-                        </div>
-
-                        <!-- Multi-Reminder Timings -->
-                        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 20px;">
-                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 6px;">
-                                <span class="app-icon icon-bell" aria-hidden="true"></span>
-                                Push Notification Reminders
-                            </label>
-                            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 12px;">
-                                Choose when you want Deadline Buddy to deliver background push alerts to your device:
-                            </p>
-                            <div class="grid grid-3" style="gap: 10px;">
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                        <!-- Tier 1: Early Planning (Days in Advance) -->
+                        <div class="reminder-tier-box">
+                            <div class="reminder-tier-title">📅 Early Planning (Days in Advance)</div>
+                            <div class="reminder-tier-grid">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="1_week_before">
                                     <span>1 week before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="3_days_before">
                                     <span>3 days before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="2_days_before">
                                     <span>2 days before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="1_day_before" checked>
                                     <span>1 day before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                            </div>
+                        </div>
+
+                        <!-- Tier 2: Day-Of Progress (Hours Before) -->
+                        <div class="reminder-tier-box">
+                            <div class="reminder-tier-title">⏱️ Day-Of Progress (Hours Before)</div>
+                            <div class="reminder-tier-grid">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="12_hours_before">
                                     <span>12 hours before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="6_hours_before">
                                     <span>6 hours before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="3_hours_before">
                                     <span>3 hours before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="1_hour_before" checked>
                                     <span>1 hour before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                            </div>
+                        </div>
+
+                        <!-- Tier 3: Final Submission Window (Minutes Before) -->
+                        <div class="reminder-tier-box">
+                            <div class="reminder-tier-title">🚨 Final Submission Window (Minutes Before)</div>
+                            <div class="reminder-tier-grid">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="30_min_before">
                                     <span>30 mins before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="15_min_before">
                                     <span>15 mins before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="10_min_before">
                                     <span>10 mins before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="5_min_before">
                                     <span>5 mins before</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem; padding: 8px 12px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                                <label class="reminder-tier-pill">
                                     <input type="checkbox" name="reminderOffset" value="at_deadline">
                                     <span>At deadline</span>
                                 </label>
                             </div>
                         </div>
+                    </div>
 
-                        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px;">
-                            <a href="tasks.html" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary" style="padding: 10px 24px;">Save Requirement</button>
-                        </div>
-                    </form>
-                </div>
+                    <!-- Bottom Action Row (Von Restorff Effect & Jakob's Law) -->
+                    <div class="card" style="display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-top: 24px; padding: 16px 20px;">
+                        <a href="tasks.html" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary" style="padding: 11px 28px; font-size: 0.95rem; font-weight: 800;">
+                            <span class="app-icon icon-save" aria-hidden="true"></span> Save Requirement
+                        </button>
+                    </div>
+                </form>
             </div>
         </main>
     </div>

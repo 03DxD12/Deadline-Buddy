@@ -168,7 +168,7 @@
                             </p>
 
                             <div style="display: flex; flex-direction: column; gap: 12px;">
-                                <button class="btn btn-primary" id="exportBtn" style="justify-content: center; gap: 8px;">
+                                <button class="btn btn-secondary" id="exportBtn" style="justify-content: center; gap: 8px;">
                                     <span class="app-icon icon-download" aria-hidden="true"></span>
                                     Download My Saved Records
                                 </button>
@@ -204,40 +204,57 @@
                                 </div>
                             </div>
 
-                            <h4 style="font-size: 0.95rem; margin: 12px 0 8px 0; color: var(--text-heading);">Deadline Schedule Reminders</h4>
-                            <div style="display: flex; flex-direction: column; gap: 10px;">
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>Deadline Notifications</span>
-                                    <input type="checkbox" id="prefMasterNotifications" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>Precise Deadline Reminders</span>
-                                    <input type="checkbox" id="prefPreciseReminders" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>1-Day Reminder</span>
-                                    <input type="checkbox" id="pref1Day" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>1-Hour Reminder</span>
-                                    <input type="checkbox" id="pref1Hour" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>20-Minute Reminder</span>
-                                    <input type="checkbox" id="pref20Min" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>Overdue Alert</span>
-                                    <input type="checkbox" id="prefOverdue" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>Sound</span>
-                                    <input type="checkbox" id="prefSound" checked style="width: 18px; height: 18px;">
-                                </label>
-                                <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
-                                    <span>Vibration</span>
-                                    <input type="checkbox" id="prefVibration" checked style="width: 18px; height: 18px;">
-                                </label>
+                            <!-- Chunk A: Master Delivery Switches (Miller's Law) -->
+                            <div class="reminder-tier-box" style="margin-bottom: 12px;">
+                                <div class="reminder-tier-title">🔔 Master Controls</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>Deadline Notifications</span>
+                                        <input type="checkbox" id="prefMasterNotifications" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>Precise Deadline Reminders</span>
+                                        <input type="checkbox" id="prefPreciseReminders" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Chunk B: Standard Timing Alerts (Hick's Law) -->
+                            <div class="reminder-tier-box" style="margin-bottom: 12px;">
+                                <div class="reminder-tier-title">⏰ Default Reminder Intervals</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>1-Day Reminder</span>
+                                        <input type="checkbox" id="pref1Day" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>1-Hour Reminder</span>
+                                        <input type="checkbox" id="pref1Hour" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>20-Minute Reminder</span>
+                                        <input type="checkbox" id="pref20Min" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>Overdue Alert</span>
+                                        <input type="checkbox" id="prefOverdue" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Chunk C: Audio & Haptics -->
+                            <div class="reminder-tier-box" style="margin-bottom: 14px;">
+                                <div class="reminder-tier-title">📳 Audio & Haptics</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>Sound</span>
+                                        <input type="checkbox" id="prefSound" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                    <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; cursor: pointer;">
+                                        <span>Vibration</span>
+                                        <input type="checkbox" id="prefVibration" checked style="width: 18px; height: 18px;">
+                                    </label>
+                                </div>
                             </div>
 
                             <button type="button" class="btn btn-secondary" id="profileSendTestNotifBtn" style="width: 100%; margin-top: 14px; justify-content: center; gap: 8px;">

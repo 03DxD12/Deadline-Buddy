@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -264,15 +264,23 @@
                     ` : ''}
                 </div>
 
-                <!-- Actions Card -->
-                <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                    <button onclick="toggleMainStatus()" class="btn ${currentTask.status === 'Completed' ? 'btn-secondary' : 'btn-success'}" style="padding: 10px 20px;">
-                        ${currentTask.status === 'Completed' ? 'Mark as Pending' : 'Mark Entire Requirement Completed'}
-                    </button>
+                <!-- Actions Card (Jakob's Law, Proximity, Von Restorff Effect) -->
+                <div class="card" style="padding: 18px 20px;">
+                    <div class="action-row-split">
+                        <div class="destructive-actions">
+                            <button onclick="deleteCurrentTask()" class="btn btn-danger" style="padding: 9px 18px;">
+                                <span class="app-icon icon-delete" aria-hidden="true"></span> Delete Requirement
+                            </button>
+                        </div>
 
-                    <div style="display: flex; gap: 8px;">
-                        <a href="task-form.html?id=${currentTask.id}" class="btn btn-secondary">Edit Requirement</a>
-                        <button onclick="deleteCurrentTask()" class="btn btn-danger">Delete</button>
+                        <div class="primary-actions">
+                            <a href="task-form.html?id=${currentTask.id}" class="btn btn-secondary" style="padding: 9px 18px;">
+                                <span class="app-icon icon-edit" aria-hidden="true"></span> Edit Requirement
+                            </a>
+                            <button onclick="toggleMainStatus()" class="btn ${currentTask.status === 'Completed' ? 'btn-secondary' : 'btn-success'}" style="padding: 10px 22px; font-weight: 800;">
+                                ${currentTask.status === 'Completed' ? 'Reopen Requirement' : 'Mark Entire Requirement Completed'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;

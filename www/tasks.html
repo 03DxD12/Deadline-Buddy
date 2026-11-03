@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -105,13 +105,29 @@
 
             <!-- Container -->
             <div class="container">
-                <!-- Status Filter Tabs -->
-                <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary active-tab" id="tabAll" onclick="filterByTab('All')">All Tasks (<span id="countAll">0</span>)</button>
-                    <button class="btn btn-secondary" id="tabPending" onclick="filterByTab('Pending')">Pending (<span id="countPending">0</span>)</button>
-                    <button class="btn btn-secondary" id="tabInProgress" onclick="filterByTab('In Progress')">In Progress (<span id="countInProgress">0</span>)</button>
-                    <button class="btn btn-secondary" id="tabCompleted" onclick="filterByTab('Completed')">Completed (<span id="countCompleted">0</span>)</button>
-                    <button class="btn btn-secondary" id="tabUrgent" onclick="filterByTab('Urgent')"><span class="app-icon icon-alerts" aria-hidden="true"></span> Urgent / Overdue (<span id="countUrgent">0</span>)</button>
+                <!-- Status Filter Tabs (Jakob's Law & Hick's Law: Familiar Segmented Control) -->
+                <div class="filter-tab-bar" role="tablist" aria-label="Task Status Filters">
+                    <button type="button" class="filter-tab-pill active-tab" id="tabAll" onclick="filterByTab('All')">
+                        <span>All Requirements</span>
+                        <span class="filter-tab-count" id="countAll">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-pill" id="tabPending" onclick="filterByTab('Pending')">
+                        <span>Pending</span>
+                        <span class="filter-tab-count" id="countPending">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-pill" id="tabInProgress" onclick="filterByTab('In Progress')">
+                        <span>In Progress</span>
+                        <span class="filter-tab-count" id="countInProgress">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-pill" id="tabCompleted" onclick="filterByTab('Completed')">
+                        <span>Completed</span>
+                        <span class="filter-tab-count" id="countCompleted">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-pill" id="tabUrgent" onclick="filterByTab('Urgent')">
+                        <span class="app-icon icon-alerts" aria-hidden="true"></span>
+                        <span>Urgent / Overdue</span>
+                        <span class="filter-tab-count" id="countUrgent">0</span>
+                    </button>
                 </div>
 
                 <!-- Filters & Search Toolbar -->
