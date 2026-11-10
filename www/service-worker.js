@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deadline-buddy-shell-v21';
+const CACHE_NAME = 'deadline-buddy-shell-v22';
 const APP_SHELL = [
     './',
     './index.html',
@@ -252,5 +252,119 @@ function getStoredTasksFromIndexedDB() {
         };
         req.onerror = () => resolve([]);
     });
+}
+
+// Background Sync — fires when connectivity is restored (even after app was closed)
+self.addEventListener('sync', event => {
+    if (event.tag === 'deadline-buddy-offline-sync') {
+        event.waitUntil(
+            // Notify all open app windows to process their offline queue
+            clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+                clientList.forEach(client => {
+                    client.postMessage({ type: 'PROCESS_OFFLINE_QUEUE' });
+                });
+            })
+        );
+    }
+});
+
+// Periodic Background Sync — check deadlines every 30 minutes (Chrome/Android only)
+// Falls back to the in-app 30s loop on other browsers
+self.addEventListener('periodicsync', event => {
+    if (event.tag === 'deadline-buddy-check-reminders') {
+        event.waitUntil(checkAndFireDeadlineNotifications());
+    }
+});
+
+// Message handler — receives messages from app pages
+self.addEventListener('message', event => {
+    if (!event.data) return;
+    if (event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+    if (event.data.type === 'CHECK_DEADLINES') {
+        checkAndFireDeadlineNotifications();
+    }
+});
+
+/**
+ * SW-side deadline check: reads tasks from IndexedDB, fires a system notification
+ * for any task that is due in the next 24 h and hasn't been notified yet.
+ * This is the background engine that works even when the app is closed on Android.
+ */
+async function checkAndFireDeadlineNotifications() {
+    const tasks = await getStoredTasksFromIndexedDB();
+    if (!tasks || !tasks.length) return;
+
+    const now = Date.now();
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    const ONE_HOUR = 60 * 60 * 1000;
+    const TWENTY_MIN = 20 * 60 * 1000;
+
+    // Track which notifications we have already fired (persist in Cache Storage)
+    const firedCache = await caches.open('deadline-buddy-sw-fired');
+    const firedRes = await firedCache.match('fired-keys');
+    let firedKeys = {};
+    if (firedRes) {
+        try { firedKeys = await firedRes.json(); } catch (_) {}
+    }
+    let updated = false;
+
+    for (const task of tasks) {
+        if (task.status === 'Completed') continue;
+        const dueDateStr = task.dueDate;
+        const dueTimeStr = task.dueTime || '23:59';
+        if (!dueDateStr) continue;
+
+        let deadline;
+        try {
+            deadline = dueDateStr.includes('T')
+                ? new Date(dueDateStr)
+                : new Date(`${dueDateStr}T${dueTimeStr}:00`);
+        } catch (_) { continue; }
+        if (isNaN(deadline.getTime())) continue;
+
+        const diff = deadline.getTime() - now;
+        const title = task.title || 'Deadline';
+
+        const checks = [
+            { key: `${task.id}_1day`,   threshold: ONE_DAY,    label: '📅 Due Tomorrow', body: `${title} is due tomorrow at ${dueTimeStr}.` },
+            { key: `${task.id}_1hour`,  threshold: ONE_HOUR,   label: '⏰ Due in 1 Hour', body: `${title} is due in about 1 hour!` },
+            { key: `${task.id}_20min`,  threshold: TWENTY_MIN, label: '🚨 Due in 20 Min', body: `${title} is due in 20 minutes! Submit now.` },
+            { key: `${task.id}_overdue`,threshold: 0,          label: '❌ Deadline Missed', body: `${title} deadline has passed.`, overdue: true }
+        ];
+
+        for (const check of checks) {
+            if (firedKeys[check.key]) continue;
+            const inWindow = check.overdue
+                ? (diff < 0 && diff > -ONE_HOUR)   // only fire overdue within 1h after deadline
+                : (diff > 0 && diff <= check.threshold);
+            if (!inWindow) continue;
+
+            try {
+                await self.registration.showNotification(check.label, {
+                    body: check.body,
+                    icon: './images/icon-192.png',
+                    badge: './images/icon-192.png',
+                    tag: `deadline-${check.key}`,
+                    vibrate: [200, 100, 200],
+                    data: { url: 'reminders.html', taskId: task.id }
+                });
+                firedKeys[check.key] = now;
+                updated = true;
+            } catch (_) {}
+        }
+    }
+
+    if (updated) {
+        // Prune keys older than 2 days to prevent unbounded growth
+        const twoDays = 2 * 24 * 60 * 60 * 1000;
+        for (const k of Object.keys(firedKeys)) {
+            if (now - firedKeys[k] > twoDays) delete firedKeys[k];
+        }
+        await firedCache.put('fired-keys', new Response(JSON.stringify(firedKeys), {
+            headers: { 'Content-Type': 'application/json' }
+        }));
+    }
 }
 
