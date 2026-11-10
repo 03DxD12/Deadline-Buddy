@@ -182,6 +182,71 @@ function findAccount(username) {
     return getAccounts().find(acc => (acc.username || '').toLowerCase() === cleanUsername) || null;
 }
 
+// --- Offline Queue: actions saved locally when offline, synced when back online ---
+const OFFLINE_QUEUE_KEY = 'deadlinebuddy_offline_queue';
+
+function getOfflineQueue() {
+    try { return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY)) || []; }
+    catch (_) { return []; }
+}
+
+function saveOfflineQueue(q) {
+    try { localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(q)); }
+    catch (_) {}
+}
+
+function enqueueOfflineAction(action) {
+    const q = getOfflineQueue();
+    // Deduplicate by type+username — replace existing same-user action
+    const idx = q.findIndex(a => a.type === action.type && a.username === action.username);
+    if (idx >= 0) q[idx] = action;
+    else q.push(action);
+    saveOfflineQueue(q);
+}
+
+/**
+ * Attempt to flush all queued offline actions to Supabase.
+ * Called on window 'online' event and on each app load when navigator.onLine is true.
+ */
+async function processOfflineQueue() {
+    const q = getOfflineQueue();
+    if (!q.length) return;
+    const remaining = [];
+    for (const action of q) {
+        try {
+            if (action.type === 'register') {
+                await supabaseRegisterUser(action.data).catch(() => {});
+            } else if (action.type === 'update_password') {
+                await supabaseFetch(`users?username=eq.${encodeURIComponent(action.username)}`, 'PATCH', {
+                    password: action.newPassword
+                }).catch(() => {});
+            } else if (action.type === 'push_data') {
+                const payload = {
+                    username: action.username,
+                    subjects: JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS) || '[]'),
+                    tasks: JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS) || '[]'),
+                    updated_at: new Date().toISOString()
+                };
+                const res = await supabaseFetch('student_data?on_conflict=username', 'POST', payload, {
+                    'Prefer': 'resolution=merge-duplicates'
+                });
+                if (!res || res.error) remaining.push(action);
+                continue;
+            }
+        } catch (_) {
+            remaining.push(action);
+        }
+    }
+    saveOfflineQueue(remaining);
+}
+
+// Auto-flush queue whenever connectivity is restored
+if (typeof window !== 'undefined') {
+    window.addEventListener('online', () => {
+        setTimeout(processOfflineQueue, 1500);
+    });
+}
+
 // --- Supabase Cloud Sync & Authentication Layer ---
 const SUPABASE_CONFIG = {
     url: 'https://baswqlchousnnnlguejk.supabase.co',
@@ -301,42 +366,32 @@ function supabasePushCurrentData() {
         const user = getUser();
         const username = (user?.username || '').trim().toLowerCase();
         if (!username || username === 'default') return;
+        const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+        if (!isOnline) {
+            // Queue the push for when connectivity returns
+            enqueueOfflineAction({ type: 'push_data', username });
+            return;
+        }
         const payload = {
             username,
             subjects: getSubjects(),
             tasks: getTasks(),
             updated_at: new Date().toISOString()
         };
-        await supabaseFetch('student_data?on_conflict=username', 'POST', payload, {
+        const res = await supabaseFetch('student_data?on_conflict=username', 'POST', payload, {
             'Prefer': 'resolution=merge-duplicates'
         });
+        if (!res || res.error) {
+            // Failed — queue for retry
+            enqueueOfflineAction({ type: 'push_data', username });
+        }
     }, 1000);
 }
 
 async function supabaseLogin(username, password) {
     const clean = (username || '').trim().toLowerCase();
 
-    // Helper: attempt network login, return null on timeout/network failure
-    async function tryNetworkLogin() {
-        // Try secure RPC first
-        const rpcRes = await supabaseFetch('rpc/login_student', 'POST', {
-            p_username: clean,
-            p_password: password
-        });
-        if (rpcRes && rpcRes.success) {
-            if (rpcRes.data) return { rpcUser: rpcRes.data };
-            if (rpcRes.data === null) return { badCredentials: true };
-        }
-        // If RPC timed out / failed, try direct table
-        const remoteUser = await supabaseFindUser(clean);
-        if (remoteUser) {
-            if (remoteUser.password !== password) return { wrongPassword: true };
-            return { remoteUser };
-        }
-        return null; // network responded but user not found
-    }
-
-    // Helper: build & cache account object
+    // Helper: build & cache account object from any user data shape
     function buildAndCacheAccount(userData, pwd) {
         const account = {
             id: Date.now(),
@@ -356,64 +411,95 @@ async function supabaseLogin(username, password) {
         return account;
     }
 
-    // 1. Try network if browser reports online
-    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-    if (isOnline) {
-        let networkResult = null;
-        try {
-            networkResult = await tryNetworkLogin();
-        } catch (e) {
-            networkResult = null; // treat network errors as timeout, fall through to local
-        }
-
-        if (networkResult) {
-            if (networkResult.badCredentials) {
-                return { success: false, error: 'Invalid username or password.' };
-            }
-            if (networkResult.wrongPassword) {
-                return { success: false, error: 'Wrong password. Please check your password and try again.' };
-            }
-            if (networkResult.rpcUser) {
-                const account = buildAndCacheAccount(networkResult.rpcUser, password);
-                await supabasePullData(clean).catch(() => {});
-                return { success: true, account };
-            }
-            if (networkResult.remoteUser) {
-                const account = buildAndCacheAccount(networkResult.remoteUser, password);
-                await supabasePullData(clean).catch(() => {});
-                return { success: true, account };
-            }
-        }
-        // networkResult === null means timeout/network failure — fall through to local cache
-    }
-
-    // 2. Offline / weak-network fallback: use locally cached account
+    // ── STEP 1: Local cache check (instant, works 100% offline) ──────────────
     const localAcc = findAccount(clean);
     if (localAcc) {
         if (localAcc.password !== password) {
             return { success: false, error: 'Wrong password. Please check your password and try again.' };
         }
-        return { success: true, account: localAcc };
+        // Logged in from local cache — kick off background cloud sync if online
+        const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : false;
+        if (isOnline) {
+            // Pull latest data from cloud in background (non-blocking)
+            supabasePullData(clean).catch(() => {});
+        }
+        return { success: true, account: localAcc, source: 'local' };
     }
 
-    // 3. If truly offline and no local cache, give a helpful message
+    // ── STEP 2: No local account — try network (first-time login on this device) ──
+    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
     if (!isOnline) {
-        return { success: false, error: 'You are offline. Connect to the internet to log in for the first time, or use an account you have logged in to before.' };
+        return {
+            success: false,
+            error: 'You are offline and have no account saved on this device. Connect to the internet to log in for the first time.'
+        };
     }
 
-    return { success: false, error: 'No account found with that username. Please sign up first.' };
+    // Try secure RPC first
+    try {
+        const rpcRes = await supabaseFetch('rpc/login_student', 'POST', {
+            p_username: clean,
+            p_password: password
+        });
+        if (rpcRes && rpcRes.success) {
+            if (rpcRes.data) {
+                const account = buildAndCacheAccount(rpcRes.data, password);
+                supabasePullData(clean).catch(() => {});
+                return { success: true, account };
+            }
+            if (rpcRes.data === null) {
+                return { success: false, error: 'Invalid username or password.' };
+            }
+        }
+    } catch (_) {}
+
+    // Direct table fallback
+    try {
+        const remoteUser = await supabaseFindUser(clean);
+        if (remoteUser) {
+            if (remoteUser.password !== password) {
+                return { success: false, error: 'Wrong password. Please check your password and try again.' };
+            }
+            const account = buildAndCacheAccount(remoteUser, password);
+            supabasePullData(clean).catch(() => {});
+            return { success: true, account };
+        }
+    } catch (_) {}
+
+    // Network responded but user not found
+    return { success: false, error: 'No account found with that username. Please sign up first or check your username.' };
 }
 
 async function supabaseRegister(accountData) {
+    const clean = (accountData.username || '').trim().toLowerCase();
+
+    // Always create locally first so the user can use the app immediately
     let localAccount;
     try {
         localAccount = createAccount(accountData);
     } catch (e) {
-        localAccount = findAccount(accountData.username);
+        // Username conflict — might already exist locally
+        const existing = findAccount(clean);
+        if (existing) {
+            throw new Error('That username is already taken. Please choose a different username.');
+        }
+        throw e;
     }
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
-        await supabaseRegisterUser(accountData);
+
+    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+    if (isOnline) {
+        // Try to sync to cloud immediately
+        try {
+            await supabaseRegisterUser(accountData);
+        } catch (_) {
+            // Cloud sync failed — queue it for later
+            enqueueOfflineAction({ type: 'register', username: clean, data: accountData });
+        }
+    } else {
+        // Queue the registration to sync when back online
+        enqueueOfflineAction({ type: 'register', username: clean, data: accountData });
     }
+
     return localAccount;
 }
 
@@ -1044,5 +1130,16 @@ const Storage = {
     supabaseRegister(d)         { return supabaseRegister(d); },
     supabaseResetPassword(u, n, p) { return supabaseResetPassword(u, n, p); },
     syncFromCloud(u)            { return supabasePullData(u); },
-    syncToCloud()               { return supabasePushCurrentData(); }
+    syncToCloud()               { return supabasePushCurrentData(); },
+    processOfflineQueue()       { return processOfflineQueue(); },
+    getOfflineQueue()           { return getOfflineQueue(); }
 };
+
+// On first load while online, flush any queued offline actions
+if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', () => {
+        if (navigator.onLine) {
+            setTimeout(processOfflineQueue, 2000);
+        }
+    });
+}

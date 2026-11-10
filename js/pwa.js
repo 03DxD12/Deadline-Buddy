@@ -415,6 +415,49 @@
         }
     });
 
+    // Register Background Sync to flush offline queue when connectivity returns
+    async function registerOfflineSync(reg) {
+        if (!reg || !('sync' in reg)) return;
+        try {
+            await reg.sync.register('deadline-buddy-offline-sync');
+        } catch (_) {}
+    }
+
+    // Register Periodic Background Sync for deadline checks (Android Chrome)
+    async function registerPeriodicSync(reg) {
+        if (!reg || !('periodicSync' in reg)) return;
+        try {
+            const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
+            if (status.state === 'granted') {
+                await reg.periodicSync.register('deadline-buddy-check-reminders', {
+                    minInterval: 30 * 60 * 1000 // 30 minutes
+                });
+            }
+        } catch (_) {}
+    }
+
+    // Show connectivity status toast
+    function notifyConnectivityChange(isOnline) {
+        if (typeof showFeedbackToast !== 'function') return;
+        if (isOnline) {
+            showFeedbackToast('Back online! Syncing your data to the cloud...', 'success', 'Connected');
+        } else {
+            showFeedbackToast('You are offline. All changes are saved locally and will sync when reconnected.', 'info', 'Offline Mode');
+        }
+    }
+
+    window.addEventListener('online', () => {
+        notifyConnectivityChange(true);
+        // Also register a background sync for when SW takes over
+        if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then(reg => registerOfflineSync(reg)).catch(() => {});
+        }
+    });
+
+    window.addEventListener('offline', () => {
+        notifyConnectivityChange(false);
+    });
+
     window.addEventListener('load', () => {
         if (window.location.protocol === 'file:') {
             console.info('Deadline Buddy PWA cache is active when opened from localhost, HTTPS, or Live Server.');
@@ -427,6 +470,11 @@
                 setInterval(() => {
                     reg.update().catch(() => {});
                 }, 60 * 60 * 1000);
+
+                // Register background sync after SW is ready
+                registerOfflineSync(reg);
+                // Register periodic sync for background deadline checks
+                registerPeriodicSync(reg);
 
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
@@ -443,5 +491,15 @@
             .catch(error => {
                 console.warn('Deadline Buddy Service Worker registration note:', error);
             });
+
+        // Listen for messages from Service Worker (e.g. background sync trigger)
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (!event.data) return;
+            if (event.data.type === 'PROCESS_OFFLINE_QUEUE') {
+                if (typeof Storage !== 'undefined' && typeof Storage.processOfflineQueue === 'function') {
+                    Storage.processOfflineQueue();
+                }
+            }
+        });
     });
 })();

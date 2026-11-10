@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -975,12 +975,18 @@
                     Storage.clearSavedLogin();
                 }
 
-                openDashboardForAccount(res.account);
+                // If logged in from local cache while offline, show notice
+                if (res.source === 'local' && !navigator.onLine) {
+                    showMessage('You are offline. Logged in from saved data on this device.', 'success');
+                    setTimeout(() => openDashboardForAccount(res.account), 900);
+                } else {
+                    openDashboardForAccount(res.account);
+                }
             } catch (err) {
                 clearTimeout(safetyTimer);
                 const isNetworkError = !navigator.onLine || err.name === 'TypeError';
                 showMessage(isNetworkError
-                    ? 'Network problem detected. If you have logged in before on this device, trying again may work offline.'
+                    ? 'Network problem. If you have logged in before on this device, check your username and password and try again.'
                     : (err.message || 'Unable to log in. Please try again.'));
                 if (submitBtn) {
                     submitBtn.disabled = false;
@@ -999,6 +1005,8 @@
             const submitBtn = signupForm.querySelector('button[type="submit"]');
             const origText = submitBtn ? submitBtn.textContent : '';
 
+            if (!name) { showMessage('Please enter your full name.'); return; }
+            if (!username) { showMessage('Please enter a username.'); return; }
             if (password.length < 4) {
                 showMessage('Please use at least 4 characters for the password.');
                 return;
@@ -1006,7 +1014,7 @@
 
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Creating student account...';
+                submitBtn.textContent = navigator.onLine ? 'Creating student account...' : 'Saving account offline...';
             }
 
             try {
@@ -1020,7 +1028,14 @@
                 });
 
                 Storage.saveSavedLogin({ username, password });
-                openDashboardForAccount(account);
+
+                // Show brief offline notice before redirecting
+                if (!navigator.onLine) {
+                    showMessage('Account saved on this device! It will sync to the cloud automatically when you are back online.', 'success');
+                    setTimeout(() => openDashboardForAccount(account), 1500);
+                } else {
+                    openDashboardForAccount(account);
+                }
             } catch (err) {
                 showMessage(err.message || 'Could not create the account. Please try again.');
                 if (submitBtn) {
