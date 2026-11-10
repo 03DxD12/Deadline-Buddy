@@ -925,13 +925,41 @@
             const submitBtn = loginForm.querySelector('button[type="submit"]');
             const origText = submitBtn ? submitBtn.textContent : '';
 
+            if (!username || !password) {
+                showMessage('Please enter your username and password.');
+                return;
+            }
+
+            if (!navigator.onLine) {
+                // Try local cache immediately without hitting the network
+                const res = await Storage.supabaseLogin(username, password);
+                if (res.success) {
+                    if (rememberLogin.checked) Storage.saveSavedLogin({ username, password });
+                    else Storage.clearSavedLogin();
+                    openDashboardForAccount(res.account);
+                } else {
+                    showMessage('You are offline. Connect to the internet and try again, or log in with an account you have used before on this device.');
+                }
+                return;
+            }
+
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Verifying credentials...';
             }
 
+            // Safety re-enable timer — if anything hangs beyond 20 s, unblock the button
+            const safetyTimer = setTimeout(() => {
+                if (submitBtn && submitBtn.disabled) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = origText;
+                    showMessage('The server is taking too long. Please check your connection and try again.');
+                }
+            }, 20000);
+
             try {
                 const res = await Storage.supabaseLogin(username, password);
+                clearTimeout(safetyTimer);
                 if (!res.success) {
                     showMessage(res.error || 'Login failed. Please check your username and password.');
                     if (submitBtn) {
@@ -949,7 +977,11 @@
 
                 openDashboardForAccount(res.account);
             } catch (err) {
-                showMessage(err.message || 'Unable to log in. Please try again.');
+                clearTimeout(safetyTimer);
+                const isNetworkError = !navigator.onLine || err.name === 'TypeError';
+                showMessage(isNetworkError
+                    ? 'Network problem detected. If you have logged in before on this device, trying again may work offline.'
+                    : (err.message || 'Unable to log in. Please try again.'));
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.textContent = origText;

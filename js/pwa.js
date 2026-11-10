@@ -62,7 +62,7 @@
     }
     unlockAudioOnFirstGesture();
 
-    // Show install buttons if installable or on iOS browser
+    // Show install buttons if installable or on iOS browser or on Android browser (manual fallback)
     function updateInstallButtonVisibility() {
         const platform = getPlatformInfo();
         const installBtns = document.querySelectorAll('#installAppBtn, #profileInstallAppBtn, .pwa-install-trigger');
@@ -76,8 +76,8 @@
             return;
         }
 
-        // On Android/desktop with prompt OR on iOS/iPadOS browser, make buttons visible and active
-        if (deferredPrompt || platform.isIOS) {
+        // Show install buttons on: Android/Desktop with native prompt, iOS/iPadOS browser, OR Android browser (manual guide fallback)
+        if (deferredPrompt || platform.isIOS || platform.isAndroid) {
             installBtns.forEach(btn => {
                 btn.style.display = 'inline-flex';
             });
@@ -376,6 +376,7 @@
             return 'already-installed';
         }
 
+        // Android / Desktop — native prompt is available
         if (deferredPrompt) {
             try {
                 deferredPrompt.prompt();
@@ -391,12 +392,12 @@
                 return outcome;
             } catch (err) {
                 console.warn('[PWA] Prompt trigger error:', err);
-                window.showInstallInstructionsModal();
-                return 'manual-instructions';
+                // Fall through to manual instructions
             }
         }
 
-        // On iOS or browsers without automated beforeinstallprompt
+        // No native prompt available — show platform-appropriate manual instructions
+        // (Android gets Chrome menu steps; iOS gets Safari Share steps; Desktop gets address-bar steps)
         window.showInstallInstructionsModal();
         return 'manual-instructions';
     };

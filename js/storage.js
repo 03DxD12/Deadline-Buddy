@@ -188,8 +188,10 @@ const SUPABASE_CONFIG = {
     anonKey: 'sb_publishable_F6PlSbHGTt4SrXoT1Yi0ZQ_ndnT85me'
 };
 
-async function supabaseFetch(endpoint, method = 'GET', body = null, extraHeaders = {}) {
+async function supabaseFetch(endpoint, method = 'GET', body = null, extraHeaders = {}, timeoutMs = 12000) {
     if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
         const url = `${SUPABASE_CONFIG.url}/rest/v1/${endpoint}`;
         const headers = {
@@ -198,9 +200,10 @@ async function supabaseFetch(endpoint, method = 'GET', body = null, extraHeaders
             'Content-Type': 'application/json',
             ...extraHeaders
         };
-        const options = { method, headers };
+        const options = { method, headers, signal: controller.signal };
         if (body) options.body = JSON.stringify(body);
         const res = await fetch(url, options);
+        clearTimeout(timer);
         if (!res.ok) {
             const errText = await res.text().catch(() => '');
             console.warn('[Supabase] Request failed:', res.status, errText);
@@ -209,6 +212,11 @@ async function supabaseFetch(endpoint, method = 'GET', body = null, extraHeaders
         const text = await res.text();
         return { success: true, data: text ? JSON.parse(text) : null };
     } catch (e) {
+        clearTimeout(timer);
+        if (e.name === 'AbortError') {
+            console.warn('[Supabase] Request timed out:', endpoint);
+            return { error: true, status: 0, message: 'timeout' };
+        }
         console.warn('[Supabase] Network/fetch error:', e);
         return null;
     }
@@ -307,75 +315,90 @@ function supabasePushCurrentData() {
 
 async function supabaseLogin(username, password) {
     const clean = (username || '').trim().toLowerCase();
-    // 1. Check Supabase first if online
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
+
+    // Helper: attempt network login, return null on timeout/network failure
+    async function tryNetworkLogin() {
         // Try secure RPC first
         const rpcRes = await supabaseFetch('rpc/login_student', 'POST', {
             p_username: clean,
             p_password: password
         });
         if (rpcRes && rpcRes.success) {
-            if (rpcRes.data) {
-                const user = rpcRes.data;
-                const account = {
-                    id: Date.now(),
-                    name: user.name || username,
-                    username: user.username,
-                    password: password,
-                    gradeLevel: user.grade || 'Grade 12',
-                    strand: user.section || 'ASSH',
-                    school: 'Olinsterg College Inc.',
-                    createdAt: user.created_at || new Date().toISOString()
-                };
-                const accounts = getAccounts();
-                const existingIdx = accounts.findIndex(a => (a.username || '').toLowerCase() === clean);
-                if (existingIdx >= 0) accounts[existingIdx] = account;
-                else accounts.push(account);
-                saveAccounts(accounts);
-
-                await supabasePullData(clean);
-                return { success: true, account };
-            } else if (rpcRes.data === null) {
-                return { success: false, error: 'Invalid username or password.' };
-            }
+            if (rpcRes.data) return { rpcUser: rpcRes.data };
+            if (rpcRes.data === null) return { badCredentials: true };
         }
-
-        // Direct table fallback
+        // If RPC timed out / failed, try direct table
         const remoteUser = await supabaseFindUser(clean);
         if (remoteUser) {
-            if (remoteUser.password !== password) {
-                return { success: false, error: 'Wrong password. Please check your password and try again.' };
-            }
-            // Save into local accounts cache
-            const account = {
-                id: Date.now(),
-                name: remoteUser.name || username,
-                username: remoteUser.username,
-                password: remoteUser.password,
-                gradeLevel: remoteUser.grade || 'Grade 12',
-                strand: remoteUser.section || 'ASSH',
-                school: 'Olinsterg College Inc.',
-                createdAt: remoteUser.created_at || new Date().toISOString()
-            };
-            const accounts = getAccounts();
-            const existingIdx = accounts.findIndex(a => (a.username || '').toLowerCase() === clean);
-            if (existingIdx >= 0) accounts[existingIdx] = account;
-            else accounts.push(account);
-            saveAccounts(accounts);
-
-            // Pull latest subjects/tasks for this student
-            await supabasePullData(clean);
-            return { success: true, account };
+            if (remoteUser.password !== password) return { wrongPassword: true };
+            return { remoteUser };
         }
+        return null; // network responded but user not found
     }
 
-    // 2. Offline fallback or local account check
+    // Helper: build & cache account object
+    function buildAndCacheAccount(userData, pwd) {
+        const account = {
+            id: Date.now(),
+            name: userData.name || username,
+            username: userData.username || clean,
+            password: pwd,
+            gradeLevel: userData.grade || userData.gradeLevel || 'Grade 12',
+            strand: userData.section || userData.strand || 'ASSH',
+            school: 'Olinsterg College Inc.',
+            createdAt: userData.created_at || userData.createdAt || new Date().toISOString()
+        };
+        const accounts = getAccounts();
+        const idx = accounts.findIndex(a => (a.username || '').toLowerCase() === clean);
+        if (idx >= 0) accounts[idx] = account;
+        else accounts.push(account);
+        saveAccounts(accounts);
+        return account;
+    }
+
+    // 1. Try network if browser reports online
+    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+    if (isOnline) {
+        let networkResult = null;
+        try {
+            networkResult = await tryNetworkLogin();
+        } catch (e) {
+            networkResult = null; // treat network errors as timeout, fall through to local
+        }
+
+        if (networkResult) {
+            if (networkResult.badCredentials) {
+                return { success: false, error: 'Invalid username or password.' };
+            }
+            if (networkResult.wrongPassword) {
+                return { success: false, error: 'Wrong password. Please check your password and try again.' };
+            }
+            if (networkResult.rpcUser) {
+                const account = buildAndCacheAccount(networkResult.rpcUser, password);
+                await supabasePullData(clean).catch(() => {});
+                return { success: true, account };
+            }
+            if (networkResult.remoteUser) {
+                const account = buildAndCacheAccount(networkResult.remoteUser, password);
+                await supabasePullData(clean).catch(() => {});
+                return { success: true, account };
+            }
+        }
+        // networkResult === null means timeout/network failure — fall through to local cache
+    }
+
+    // 2. Offline / weak-network fallback: use locally cached account
     const localAcc = findAccount(clean);
     if (localAcc) {
         if (localAcc.password !== password) {
             return { success: false, error: 'Wrong password. Please check your password and try again.' };
         }
         return { success: true, account: localAcc };
+    }
+
+    // 3. If truly offline and no local cache, give a helpful message
+    if (!isOnline) {
+        return { success: false, error: 'You are offline. Connect to the internet to log in for the first time, or use an account you have logged in to before.' };
     }
 
     return { success: false, error: 'No account found with that username. Please sign up first.' };
